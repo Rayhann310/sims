@@ -61,6 +61,18 @@ class GuruModel {
         return $stats;
     }
 
+    public function getWaliKelasList()
+    {
+        $this->db->query("SELECT g.*, u.nama_lengkap, r.nama_rombel as kelas
+                          FROM rombel r
+                          JOIN tahun_akademik ta ON r.tahun_akademik_id = ta.id
+                          JOIN guru g ON r.wali_kelas_id = g.id
+                          JOIN users u ON g.user_id = u.id
+                          WHERE ta.status = 'Aktif' AND r.wali_kelas_id IS NOT NULL
+                          ORDER BY r.nama_rombel ASC");
+        return $this->db->resultSet();
+    }
+
     public function getGuruChartStats()
     {
         // Distribusi guru berdasarkan jenis kelamin

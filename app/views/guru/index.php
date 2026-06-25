@@ -1,8 +1,18 @@
-<div class="space-y-6" 
-     x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, detailModalOpen: false, deleteUrl: '', currentGuru: {} }"
+<div x-data="{ 
+    showModal: false, 
+    importModalOpen: false, 
+    editModalOpen: false, 
+    deleteModalOpen: false, 
+    detailModalOpen: false, 
+    waliKelasModalOpen: false,
+    deleteUrl: '', 
+    currentGuru: {} 
+}" 
      @open-edit-modal.window="editModalOpen = true"
      @open-detail-modal.window="detailModalOpen = true; currentGuru = $event.detail;"
-     @open-delete-modal.window="deleteModalOpen = true; deleteUrl = $event.detail.url">
+     @open-delete-modal.window="deleteModalOpen = true; deleteUrl = $event.detail.url"
+     @open-walikelas-modal.window="waliKelasModalOpen = true"
+     class="space-y-6">
     
     <!-- Stats Grid 4 Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -47,9 +57,9 @@
         </div>
 
         <!-- Stat Card 4 -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
+        <div @click="openWaliKelasModal()" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group cursor-pointer">
             <div class="flex items-center gap-4 mb-2">
-                <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <div class="w-12 h-12 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <i class="fas fa-user-tie text-xl"></i>
                 </div>
                 <div>
@@ -466,7 +476,33 @@
                     </div>
                 </div>
                 <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button type="button" @click="detailModalOpen = false" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto">Tutup</button>
+                    <button type="button" @click="detailModalOpen = false" class="inline-flex w-full justify-center rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:w-auto">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Wali Kelas -->
+    <div x-show="waliKelasModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div x-show="waliKelasModalOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="waliKelasModalOpen = false"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="waliKelasModalOpen" x-transition class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-slate-200">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold leading-6 text-slate-900 flex items-center gap-2">
+                        <i class="fas fa-chalkboard-teacher text-orange-500"></i>
+                        Daftar Wali Kelas Aktif
+                    </h3>
+                    <button type="button" @click="waliKelasModalOpen = false" class="text-slate-400 hover:text-slate-500 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="bg-slate-50 px-6 py-6 max-h-[60vh] overflow-y-auto">
+                    <div id="waliKelasContainer" class="space-y-3">
+                        <div class="flex justify-center py-4"><i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i></div>
+                    </div>
+                </div>
+                <div class="bg-white px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6 border-t border-slate-200 gap-3">
+                    <button type="button" @click="waliKelasModalOpen = false" class="inline-flex w-full justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:w-auto transition-colors">Tutup</button>
                 </div>
             </div>
         </div>
@@ -519,6 +555,42 @@ function openEditModalGuru(id) {
         // Buka modal Alpine dari luar
         window.dispatchEvent(new CustomEvent('open-edit-modal'));
     });
+}
+
+function openWaliKelasModal() {
+    window.dispatchEvent(new CustomEvent('open-walikelas-modal'));
+    document.getElementById('waliKelasContainer').innerHTML = '<div class="flex justify-center py-4"><i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i></div>';
+    
+    fetch('<?= BASEURL; ?>/guru/getwalikelas')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('waliKelasContainer');
+            if(data.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-500 py-4">Belum ada data wali kelas</div>';
+                return;
+            }
+            
+            let html = '';
+            data.forEach(g => {
+                let fotoHtml = g.foto ? `<img src="${g.foto}" class="w-10 h-10 rounded-full object-cover">` : `<div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">${g.nama_lengkap.substring(0,1).toUpperCase()}</div>`;
+                html += `
+                <div class="bg-white p-4 rounded-xl border border-slate-200 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3">
+                        ${fotoHtml}
+                        <div>
+                            <p class="font-bold text-slate-800">${g.nama_lengkap}</p>
+                            <p class="text-xs text-slate-500">NIP: ${g.nip}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">
+                            Kelas ${g.kelas}
+                        </span>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        });
 }
 
 // Self-healing: Image Compression
