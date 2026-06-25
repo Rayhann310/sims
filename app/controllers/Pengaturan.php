@@ -33,11 +33,15 @@ class Pengaturan extends Controller {
     public function repair()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Jalankan self-healing manual
-            $userModel = $this->model('UserModel');
-            $userModel->selfHealing();
-            
-            $_SESSION['flash'] = ['pesan' => 'Database berhasil', 'aksi' => 'diperbaiki & self-healing dijalankan', 'tipe' => 'success'];
+            try {
+                // Jalankan self-healing manual
+                $userModel = $this->model('UserModel');
+                $userModel->selfHealing();
+                
+                $_SESSION['flash'] = ['pesan' => 'Database berhasil', 'aksi' => 'diperbaiki & self-healing dijalankan', 'tipe' => 'success'];
+            } catch (Exception $e) {
+                $_SESSION['flash'] = ['pesan' => 'Gagal repair: ' . $e->getMessage(), 'aksi' => 'ditolak', 'tipe' => 'danger'];
+            }
             header('Location: ' . BASEURL . '/pengaturan');
             exit;
         }
