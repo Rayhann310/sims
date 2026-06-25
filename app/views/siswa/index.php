@@ -188,6 +188,31 @@
     </div>
     </div> <!-- End Table Container -->
 
+    <!-- Charts Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <!-- Doughnut Chart -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-pie text-emerald-500"></i>
+                Distribusi Siswa per Kelas
+            </h3>
+            <div class="relative flex-grow flex items-center justify-center min-h-[300px]">
+                <canvas id="siswaDoughnutChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Bar Chart -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-bar text-blue-500"></i>
+                Jumlah Siswa per Kelas
+            </h3>
+            <div class="relative flex-grow flex items-center justify-center min-h-[300px]">
+                <canvas id="siswaBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Tambah Data -->
     <div x-show="showModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
         <div x-show="showModal" 
@@ -498,5 +523,97 @@ function openEditModalSiswa(id) {
         window.dispatchEvent(new CustomEvent('open-edit-modal'));
     });
 }
+
+// Chart.js Initialization
+document.addEventListener('DOMContentLoaded', function() {
+    const chartLabels = <?= $data['chart_labels']; ?>;
+    const chartData = <?= $data['chart_data']; ?>;
+    
+    // Warna untuk chart
+    const bgColors = [
+        'rgba(16, 185, 129, 0.8)', // emerald
+        'rgba(59, 130, 246, 0.8)', // blue
+        'rgba(245, 158, 11, 0.8)', // amber
+        'rgba(236, 72, 153, 0.8)', // pink
+        'rgba(139, 92, 246, 0.8)', // purple
+        'rgba(14, 165, 233, 0.8)', // sky
+        'rgba(244, 63, 94, 0.8)'   // rose
+    ];
+    
+    const borderColors = bgColors.map(color => color.replace('0.8', '1'));
+
+    if(chartLabels.length > 0) {
+        // Doughnut Chart
+        const ctxDoughnut = document.getElementById('siswaDoughnutChart').getContext('2d');
+        new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    data: chartData,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { family: "'Inter', sans-serif" },
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+
+        // Bar Chart
+        const ctxBar = document.getElementById('siswaBarChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Jumlah Siswa',
+                    data: chartData,
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            font: { family: "'Inter', sans-serif" }
+                        },
+                        grid: { borderDash: [2, 4], color: '#f1f5f9' }
+                    },
+                    x: {
+                        ticks: { font: { family: "'Inter', sans-serif" } },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    } else {
+        // Fallback jika tidak ada data kelas
+        document.getElementById('siswaDoughnutChart').parentElement.innerHTML = '<p class="text-slate-400 text-sm">Tidak ada data kelas aktif</p>';
+        document.getElementById('siswaBarChart').parentElement.innerHTML = '<p class="text-slate-400 text-sm">Tidak ada data kelas aktif</p>';
+    }
+});
 </script>
 

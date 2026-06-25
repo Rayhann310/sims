@@ -73,6 +73,17 @@ class SiswaModel {
         return $stats;
     }
 
+    public function getSiswaPerKelasStats()
+    {
+        $this->db->query("SELECT r.nama_rombel as label, COUNT(ar.siswa_id) as jumlah 
+                          FROM rombel r 
+                          LEFT JOIN anggota_rombel ar ON r.id = ar.rombel_id 
+                          JOIN tahun_akademik ta ON r.tahun_akademik_id = ta.id 
+                          WHERE ta.status = 'Aktif' 
+                          GROUP BY r.id 
+                          ORDER BY r.nama_rombel");
+        return $this->db->resultSet();
+    }
 
     public function tambahDataSiswa($data)
     {

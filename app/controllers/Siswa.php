@@ -17,6 +17,11 @@ class Siswa extends Controller {
         $stats = $this->model('SiswaModel')->getSiswaStats();
         $data['stats'] = $stats;
 
+        // Data for charts
+        $chartData = $this->model('SiswaModel')->getSiswaPerKelasStats();
+        $data['chart_labels'] = json_encode(array_column($chartData, 'label'));
+        $data['chart_data'] = json_encode(array_column($chartData, 'jumlah'));
+
         $this->view('templates/admin_header', $data);
         $this->view('siswa/index', $data);
         $this->view('templates/admin_footer');
