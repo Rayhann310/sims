@@ -28,10 +28,6 @@ class SiswaModel {
             $query .= " AND k.nama_kelas = :kelas";
             $binds['kelas'] = $filters['kelas'];
         }
-        if (!empty($filters['jurusan'])) {
-            $query .= " AND k.jurusan = :jurusan";
-            $binds['jurusan'] = $filters['jurusan'];
-        }
         if (!empty($filters['jk'])) {
             $query .= " AND siswa.jenis_kelamin = :jk";
             $binds['jk'] = $filters['jk'];
@@ -56,9 +52,6 @@ class SiswaModel {
         $options = [];
         $this->db->query("SELECT DISTINCT nama_kelas FROM kelas ORDER BY tingkat ASC, nama_kelas ASC");
         $options['kelas'] = array_column($this->db->resultSet(), 'nama_kelas');
-        
-        $this->db->query("SELECT DISTINCT jurusan FROM kelas ORDER BY jurusan ASC");
-        $options['jurusan'] = array_column($this->db->resultSet(), 'jurusan');
         
         return $options;
     }

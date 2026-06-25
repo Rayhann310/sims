@@ -124,16 +124,6 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            
-            <div class="w-full sm:w-auto flex-1 min-w-[150px]">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Jurusan</label>
-                <select name="jurusan" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Semua Jurusan</option>
-                    <?php foreach($data['filter_options']['jurusan'] as $jur): ?>
-                        <option value="<?= $jur; ?>" <?= ($data['filters']['jurusan'] == $jur) ? 'selected' : ''; ?>><?= $jur; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
 
             <div class="w-full sm:w-auto flex-1 min-w-[150px]">
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Gender</label>

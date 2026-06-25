@@ -15,7 +15,6 @@ class Siswa extends Controller {
         
         $filters = [
             'kelas' => $_GET['kelas'] ?? '',
-            'jurusan' => $_GET['jurusan'] ?? '',
             'jk' => $_GET['jk'] ?? '',
             'status' => $_GET['status'] ?? ''
         ];
