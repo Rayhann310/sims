@@ -50,7 +50,18 @@ class Guru extends Controller {
 
     public function detail($id)
     {
-        echo json_encode($this->model('GuruModel')->getGuruByIdWithJabatan($id));
+        header('Content-Type: application/json');
+        try {
+            $guru = $this->model('GuruModel')->getGuruByIdWithJabatan($id);
+            if (!$guru) {
+                echo json_encode(['error' => 'Data tidak ditemukan']);
+            } else {
+                echo json_encode($guru);
+            }
+        } catch (Exception $e) {
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
     }
 
     public function getubah()

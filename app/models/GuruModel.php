@@ -112,13 +112,38 @@ class GuruModel {
     {
         $guru = $this->getGuruById($id);
         if ($guru) {
-            $guru['jabatan_list'] = $this->getJabatanByGuru($id);
-            // Build jabatan_ids array for form pre-selection
-            $guru['jabatan_ids'] = array_column($guru['jabatan_list'], 'jabatan_id');
-            // Build display string
-            $guru['nama_jabatan'] = implode(', ', array_column($guru['jabatan_list'], 'nama_jabatan'));
+            try {
+                $guru['jabatan_list'] = $this->getJabatanByGuru($id);
+            } catch (Exception $e) {
+                $guru['jabatan_list'] = [];
+            }
+            $guru['jabatan_ids']  = array_column($guru['jabatan_list'] ?? [], 'jabatan_id');
+            $guru['nama_jabatan'] = implode(', ', array_column($guru['jabatan_list'] ?? [], 'nama_jabatan'));
+
+            // Mapel yang diajarkan
+            try {
+                $guru['mapel_list'] = $this->getMapelByGuru($id);
+            } catch (Exception $e) {
+                $guru['mapel_list'] = [];
+            }
         }
         return $guru;
+    }
+
+    public function getMapelByGuru($guru_id)
+    {
+        $this->db->query("
+            SELECT DISTINCT m.id, m.nama_mapel, m.kode_mapel, r.nama_rombel, k.nama_kelas, t.nama_tahun, t.semester
+            FROM jadwal_pelajaran jp
+            JOIN mata_pelajaran m ON jp.mapel_id = m.id
+            JOIN rombel r ON jp.rombel_id = r.id
+            JOIN kelas k ON r.kelas_id = k.id
+            JOIN tahun_akademik t ON r.tahun_akademik_id = t.id
+            WHERE jp.guru_id = :guru_id
+            ORDER BY t.nama_tahun DESC, m.nama_mapel ASC
+        ");
+        $this->db->bind('guru_id', $guru_id);
+        return $this->db->resultSet();
     }
 
     public function getJabatanByGuru($guru_id)
@@ -134,22 +159,26 @@ class GuruModel {
 
     public function syncJabatanGuru($guru_id, $jabatan_ids = [])
     {
-        // Hapus semua jabatan lama
-        $this->db->query("DELETE FROM guru_jabatan WHERE guru_id = :guru_id");
-        $this->db->bind('guru_id', $guru_id);
-        $this->db->execute();
+        try {
+            // Hapus semua jabatan lama
+            $this->db->query("DELETE FROM guru_jabatan WHERE guru_id = :guru_id");
+            $this->db->bind('guru_id', $guru_id);
+            $this->db->execute();
 
-        // Insert jabatan baru
-        if (!empty($jabatan_ids)) {
-            foreach ($jabatan_ids as $jabatan_id) {
-                $jabatan_id = (int)$jabatan_id;
-                if ($jabatan_id > 0) {
-                    $this->db->query("INSERT IGNORE INTO guru_jabatan (guru_id, jabatan_id) VALUES (:guru_id, :jabatan_id)");
-                    $this->db->bind('guru_id', $guru_id);
-                    $this->db->bind('jabatan_id', $jabatan_id);
-                    $this->db->execute();
+            // Insert jabatan baru
+            if (!empty($jabatan_ids)) {
+                foreach ($jabatan_ids as $jabatan_id) {
+                    $jabatan_id = (int)$jabatan_id;
+                    if ($jabatan_id > 0) {
+                        $this->db->query("INSERT IGNORE INTO guru_jabatan (guru_id, jabatan_id) VALUES (:guru_id, :jabatan_id)");
+                        $this->db->bind('guru_id', $guru_id);
+                        $this->db->bind('jabatan_id', $jabatan_id);
+                        $this->db->execute();
+                    }
                 }
             }
+        } catch (Exception $e) {
+            // Tabel belum ada, abaikan - self-healing akan membuat tabel ini
         }
     }
 

@@ -501,10 +501,10 @@
                         <i class="fas fa-times text-xl"></i>
                     </button>
                 </div>
-                <div class="bg-slate-50 px-6 py-6">
+                 <div class="bg-slate-50 px-6 py-6 max-h-[75vh] overflow-y-auto space-y-6">
                     <!-- Profile Header with Photo -->
-                    <div class="flex flex-col sm:flex-row items-center gap-6 mb-6 pb-6 border-b border-slate-200">
-                        <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-lg overflow-hidden shrink-0 bg-white flex items-center justify-center text-4xl font-bold text-emerald-200">
+                    <div class="flex flex-col sm:flex-row items-center gap-6 pb-5 border-b border-slate-200">
+                        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white shadow-lg overflow-hidden shrink-0 bg-emerald-100 flex items-center justify-center text-4xl font-bold text-emerald-400">
                             <template x-if="currentGuru.foto">
                                 <img :src="currentGuru.foto" class="w-full h-full object-cover" alt="Foto Guru">
                             </template>
@@ -513,46 +513,86 @@
                             </template>
                         </div>
                         <div class="text-center sm:text-left flex-1">
-                            <h4 class="text-2xl font-bold text-slate-800 mb-1" x-text="currentGuru.nama_lengkap"></h4>
-                            <p class="text-sm font-medium text-emerald-600 mb-3 bg-emerald-50 inline-block px-3 py-1 rounded-full border border-emerald-100" x-text="'NIP/NUPTK: ' + currentGuru.nip"></p>
-                            
-                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-sm text-slate-600">
-                                <span class="flex items-center gap-1"><i class="fas fa-venus-mars w-4 text-center text-slate-400"></i> <span x-text="currentGuru.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan'"></span></span>
-                                <span class="text-slate-300">•</span>
-                                <span class="flex items-center gap-1"><i class="fas fa-calendar-alt w-4 text-center text-slate-400"></i> <span x-text="currentGuru.tanggal_lahir ? new Date(currentGuru.tanggal_lahir).toLocaleDateString('id-ID') : '-'"></span></span>
+                            <h4 class="text-xl font-bold text-slate-800 mb-1" x-text="currentGuru.nama_lengkap"></h4>
+                            <p class="text-xs font-medium text-emerald-600 bg-emerald-50 inline-block px-3 py-1 rounded-full border border-emerald-100 mb-2" x-text="'NIP: ' + (currentGuru.nip || '-')"></p>
+                            <!-- Jabatan Badges -->
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <template x-if="currentGuru.jabatan_list && currentGuru.jabatan_list.length > 0">
+                                    <template x-for="jab in currentGuru.jabatan_list" :key="jab.jabatan_id">
+                                        <span x-text="jab.nama_jabatan" class="inline-flex items-center gap-1 text-xs font-semibold bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full">
+                                        </span>
+                                    </template>
+                                </template>
+                                <template x-if="!currentGuru.jabatan_list || currentGuru.jabatan_list.length === 0">
+                                    <span class="text-xs text-slate-400 italic">Belum ada jabatan</span>
+                                </template>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Additional Details Info Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-                        <div>
-                            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Informasi Kepegawaian</h5>
-                            <ul class="space-y-3">
-                                <li class="flex flex-col">
-                                    <span class="text-xs text-slate-500">Akun Login (Username)</span>
-                                    <span class="font-medium text-slate-800 mt-0.5" x-text="'@' + currentGuru.username"></span>
-                                </li>
-                            </ul>
+                    <!-- Info Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+                            <p class="text-xs text-slate-400 mb-1">Jenis Kelamin</p>
+                            <p class="font-semibold text-slate-700 text-sm" x-text="currentGuru.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan'"></p>
                         </div>
-                        
-                        <div>
-                            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Informasi Kontak & Domisili</h5>
-                            <ul class="space-y-3">
-                                <li class="flex flex-col">
-                                    <span class="text-xs text-slate-500">Nomor Handphone</span>
-                                    <span class="font-medium text-slate-800 mt-0.5" x-text="currentGuru.no_hp || '-'"></span>
-                                </li>
-                                <li class="flex flex-col">
-                                    <span class="text-xs text-slate-500">Alamat Rumah</span>
-                                    <span class="font-medium text-slate-800 mt-0.5" x-text="currentGuru.alamat || '-'"></span>
-                                </li>
-                            </ul>
+                        <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+                            <p class="text-xs text-slate-400 mb-1">Tanggal Lahir</p>
+                            <p class="font-semibold text-slate-700 text-sm" x-text="currentGuru.tanggal_lahir ? new Date(currentGuru.tanggal_lahir).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}) : '-'"></p>
+                        </div>
+                        <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+                            <p class="text-xs text-slate-400 mb-1">No. HP</p>
+                            <p class="font-semibold text-slate-700 text-sm" x-text="currentGuru.no_hp || '-'"></p>
+                        </div>
+                        <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+                            <p class="text-xs text-slate-400 mb-1">Username</p>
+                            <p class="font-semibold text-slate-700 text-sm font-mono" x-text="'@' + (currentGuru.username || '-')"></p>
+                        </div>
+                        <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm col-span-2">
+                            <p class="text-xs text-slate-400 mb-1">Alamat</p>
+                            <p class="font-semibold text-slate-700 text-sm" x-text="currentGuru.alamat || '-'"></p>
                         </div>
                     </div>
+
+                    <!-- Tabel Mata Pelajaran -->
+                    <div>
+                        <h5 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <i class="fas fa-book text-blue-400"></i> Mata Pelajaran yang Diajarkan
+                        </h5>
+                        <template x-if="currentGuru.mapel_list && currentGuru.mapel_list.length > 0">
+                            <div class="rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+                                <table class="w-full text-xs">
+                                    <thead class="bg-slate-100 text-slate-500 uppercase tracking-wider">
+                                        <tr>
+                                            <th class="text-left px-4 py-2.5">Mata Pelajaran</th>
+                                            <th class="text-left px-4 py-2.5">Kode</th>
+                                            <th class="text-left px-4 py-2.5">Rombel / Kelas</th>
+                                            <th class="text-left px-4 py-2.5">Tahun Akademik</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-slate-100">
+                                        <template x-for="mp in currentGuru.mapel_list" :key="mp.id + '_' + mp.nama_rombel">
+                                            <tr class="hover:bg-slate-50">
+                                                <td class="px-4 py-2.5 font-semibold text-slate-800" x-text="mp.nama_mapel"></td>
+                                                <td class="px-4 py-2.5 text-slate-500 font-mono" x-text="mp.kode_mapel"></td>
+                                                <td class="px-4 py-2.5 text-slate-600" x-text="mp.nama_rombel + ' (' + mp.nama_kelas + ')'"></td>
+                                                <td class="px-4 py-2.5 text-slate-500" x-text="mp.nama_tahun + ' - ' + mp.semester"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </template>
+                        <template x-if="!currentGuru.mapel_list || currentGuru.mapel_list.length === 0">
+                            <div class="text-center py-6 text-slate-400 bg-white rounded-xl border border-slate-200">
+                                <i class="fas fa-book-open text-3xl mb-2 block text-slate-300"></i>
+                                Belum ada mata pelajaran terdaftar
+                            </div>
+                        </template>
+                    </div>
                 </div>
-                <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button type="button" @click="detailModalOpen = false" class="inline-flex w-full justify-center rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 sm:w-auto">Tutup</button>
+                <div class="bg-white px-4 py-3 flex justify-end border-t border-slate-200">
+                    <button type="button" @click="detailModalOpen = false" class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 transition-colors">Tutup</button>
                 </div>
             </div>
         </div>
