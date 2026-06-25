@@ -150,4 +150,3 @@ document.addEventListener('alpine:init', () => {
     }));
 });
 </script>
-</div>
