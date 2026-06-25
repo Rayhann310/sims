@@ -9,7 +9,7 @@ class Dashboard extends Controller {
             exit;
         }
 
-        $data['judul'] = 'Dasbor - SIAKAD';
+        $data['judul'] = 'Dashboard';
         $data['user'] = $_SESSION['user'];
 
         // Ambil data realtime dari database

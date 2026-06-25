@@ -8,7 +8,7 @@ class Login extends Controller {
             exit;
         }
 
-        $data['judul'] = 'Portal Login - SIAKAD';
+        $data['judul'] = 'Portal Login';
         $this->view('auth/login', $data);
     }
 
