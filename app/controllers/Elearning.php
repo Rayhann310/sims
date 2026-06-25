@@ -17,9 +17,13 @@ class Elearning extends Controller {
         $role = $_SESSION['user']['role'];
         
         if($role == 'guru') {
-            // Jika yang login guru, ambil jadwal mengajarnya
-            // Tapi untuk demo, kita ambil semua untuk admin (jika admin login sebagai simulasi)
-            $data['jadwal'] = $this->model('ElearningModel')->getJadwalByGuru($user_id);
+            // Ambil guru_id dari user yang login
+            $guru_id = $this->model('ElearningModel')->getGuruIdByUserId($user_id);
+            if ($guru_id) {
+                $data['jadwal'] = $this->model('ElearningModel')->getJadwalByGuru($guru_id);
+            } else {
+                $data['jadwal'] = [];
+            }
         } else if($role == 'siswa') {
             $data['jadwal'] = $this->model('ElearningModel')->getJadwalBySiswa($user_id);
         } else {

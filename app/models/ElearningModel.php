@@ -8,6 +8,14 @@ class ElearningModel {
         $this->db = new Database();
     }
 
+    public function getGuruIdByUserId($user_id)
+    {
+        $this->db->query("SELECT id FROM guru WHERE user_id = :user_id");
+        $this->db->bind('user_id', $user_id);
+        $result = $this->db->single();
+        return $result ? $result['id'] : null;
+    }
+
     public function getJadwalByGuru($guru_id)
     {
         $this->db->query("
