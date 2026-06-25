@@ -8,13 +8,52 @@ class SiswaModel {
         $this->db = new Database();
     }
 
-    public function getAllSiswa()
+    public function getAllSiswa($filters = [])
     {
-        $this->db->query("SELECT siswa.*, users.username, users.nama_lengkap 
-                          FROM siswa 
-                          JOIN users ON siswa.user_id = users.id 
-                          ORDER BY users.nama_lengkap ASC");
+        $query = "SELECT siswa.*, users.username, users.nama_lengkap, kelas.nama_kelas, kelas.jurusan 
+                  FROM siswa 
+                  JOIN users ON siswa.user_id = users.id 
+                  LEFT JOIN kelas ON siswa.kelas_id = kelas.id 
+                  WHERE 1=1";
+        
+        $binds = [];
+        if (!empty($filters['kelas'])) {
+            $query .= " AND kelas.nama_kelas = :kelas";
+            $binds['kelas'] = $filters['kelas'];
+        }
+        if (!empty($filters['jurusan'])) {
+            $query .= " AND kelas.jurusan = :jurusan";
+            $binds['jurusan'] = $filters['jurusan'];
+        }
+        if (!empty($filters['jk'])) {
+            $query .= " AND siswa.jenis_kelamin = :jk";
+            $binds['jk'] = $filters['jk'];
+        }
+        if (!empty($filters['status'])) {
+            $query .= " AND siswa.status = :status";
+            $binds['status'] = $filters['status'];
+        }
+
+        $query .= " ORDER BY users.nama_lengkap ASC";
+        
+        $this->db->query($query);
+        foreach ($binds as $key => $val) {
+            $this->db->bind($key, $val);
+        }
+
         return $this->db->resultSet();
+    }
+
+    public function getFilterOptions()
+    {
+        $options = [];
+        $this->db->query("SELECT DISTINCT nama_kelas FROM kelas ORDER BY tingkat ASC, nama_kelas ASC");
+        $options['kelas'] = array_column($this->db->resultSet(), 'nama_kelas');
+        
+        $this->db->query("SELECT DISTINCT jurusan FROM kelas ORDER BY jurusan ASC");
+        $options['jurusan'] = array_column($this->db->resultSet(), 'jurusan');
+        
+        return $options;
     }
 
     public function getSiswaById($id)

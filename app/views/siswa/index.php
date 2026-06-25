@@ -112,6 +112,61 @@
         </div>
     </div>
 
+    <!-- Filter Bar -->
+    <div class="px-6 py-4 bg-white border-b border-slate-200">
+        <form action="<?= BASEURL; ?>/siswa" method="GET" class="flex flex-wrap items-end gap-4">
+            <div class="w-full sm:w-auto flex-1 min-w-[150px]">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Kelas</label>
+                <select name="kelas" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Semua Kelas</option>
+                    <?php foreach($data['filter_options']['kelas'] as $kls): ?>
+                        <option value="<?= $kls; ?>" <?= ($data['filters']['kelas'] == $kls) ? 'selected' : ''; ?>><?= $kls; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            
+            <div class="w-full sm:w-auto flex-1 min-w-[150px]">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Jurusan</label>
+                <select name="jurusan" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Semua Jurusan</option>
+                    <?php foreach($data['filter_options']['jurusan'] as $jur): ?>
+                        <option value="<?= $jur; ?>" <?= ($data['filters']['jurusan'] == $jur) ? 'selected' : ''; ?>><?= $jur; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="w-full sm:w-auto flex-1 min-w-[150px]">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Gender</label>
+                <select name="jk" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Semua</option>
+                    <option value="L" <?= ($data['filters']['jk'] == 'L') ? 'selected' : ''; ?>>Laki-Laki</option>
+                    <option value="P" <?= ($data['filters']['jk'] == 'P') ? 'selected' : ''; ?>>Perempuan</option>
+                </select>
+            </div>
+
+            <div class="w-full sm:w-auto flex-1 min-w-[150px]">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Status</label>
+                <select name="status" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Semua Status</option>
+                    <option value="Aktif" <?= ($data['filters']['status'] == 'Aktif') ? 'selected' : ''; ?>>Aktif</option>
+                    <option value="Alumni" <?= ($data['filters']['status'] == 'Alumni') ? 'selected' : ''; ?>>Alumni</option>
+                    <option value="Keluar" <?= ($data['filters']['status'] == 'Keluar') ? 'selected' : ''; ?>>Keluar</option>
+                </select>
+            </div>
+
+            <div class="w-full sm:w-auto flex gap-2">
+                <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <?php if(array_filter($data['filters'])): ?>
+                <a href="<?= BASEURL; ?>/siswa" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fas fa-times"></i> Reset
+                </a>
+                <?php endif; ?>
+            </div>
+        </form>
+    </div>
+
     <!-- Flash Message -->
     <?php if(isset($_SESSION['flash'])): ?>
         <div class="px-6 py-4 border-b border-<?= $_SESSION['flash']['tipe'] == 'success' ? 'green' : 'red' ?>-200 bg-<?= $_SESSION['flash']['tipe'] == 'success' ? 'green' : 'red' ?>-50 flex items-center gap-3">

@@ -12,7 +12,17 @@ class Siswa extends Controller {
     public function index()
     {
         $data['judul'] = 'Manajemen Data Siswa';
-        $data['siswa'] = $this->model('SiswaModel')->getAllSiswa();
+        
+        $filters = [
+            'kelas' => $_GET['kelas'] ?? '',
+            'jurusan' => $_GET['jurusan'] ?? '',
+            'jk' => $_GET['jk'] ?? '',
+            'status' => $_GET['status'] ?? ''
+        ];
+        
+        $data['filters'] = $filters;
+        $data['siswa'] = $this->model('SiswaModel')->getAllSiswa($filters);
+        $data['filter_options'] = $this->model('SiswaModel')->getFilterOptions();
         
         $stats = $this->model('SiswaModel')->getSiswaStats();
         $data['stats'] = $stats;
