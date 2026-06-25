@@ -1,9 +1,16 @@
+<?php
+$db = new Database();
+$db->query("SELECT * FROM pengaturan ORDER BY id ASC LIMIT 1");
+$pengaturan = $db->single();
+$app_name = $pengaturan ? htmlspecialchars($pengaturan['nama_aplikasi']) : 'SMA NAHDLATUL WATHAN JAKARTA';
+$app_logo = (!empty($pengaturan['logo_sekolah'])) ? htmlspecialchars($pengaturan['logo_sekolah']) : BASEURL . '/img/logo.png';
+?>
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $data['judul']; ?></title>
+    <title><?= $data['judul']; ?> - <?= $app_name ?></title>
     
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,9 +48,9 @@
             <div class="flex justify-between items-center">
                 <!-- Logo -->
                 <div class="flex items-center gap-4">
-                    <img src="<?= BASEURL; ?>/img/logo.png" alt="Logo" class="w-12 h-12 object-contain bg-white rounded-full p-1" onerror="this.src='https://ui-avatars.com/api/?name=NW&background=fff&color=064e3b'">
+                    <img src="<?= $app_logo ?>" alt="Logo" class="w-12 h-12 object-contain bg-white rounded-full p-1" onerror="this.src='https://ui-avatars.com/api/?name=NW&background=fff&color=064e3b'">
                     <div>
-                        <h1 class="text-white font-bold text-lg tracking-wide leading-tight">SMA NAHDLATUL WATHAN JAKARTA</h1>
+                        <h1 class="text-white font-bold text-lg tracking-wide leading-tight"><?= $app_name ?></h1>
                         <p class="text-accent text-xs font-medium tracking-wide">Religius • Nasionalis • Berkualitas</p>
                     </div>
                 </div>

@@ -16,10 +16,23 @@ class PengaturanModel {
 
     public function updatePengaturan($data)
     {
-        $this->db->query("UPDATE pengaturan SET nama_aplikasi = :nama_aplikasi, logo_teks = :logo_teks, teks_footer = :teks_footer WHERE id = :id");
+        $query = "UPDATE pengaturan SET nama_aplikasi = :nama_aplikasi, logo_teks = :logo_teks, teks_footer = :teks_footer";
+        
+        if(isset($data['logo_sekolah'])) {
+            $query .= ", logo_sekolah = :logo_sekolah";
+        }
+        
+        $query .= " WHERE id = :id";
+        
+        $this->db->query($query);
         $this->db->bind('nama_aplikasi', $data['nama_aplikasi']);
         $this->db->bind('logo_teks', $data['logo_teks']);
         $this->db->bind('teks_footer', $data['teks_footer']);
+        
+        if(isset($data['logo_sekolah'])) {
+            $this->db->bind('logo_sekolah', $data['logo_sekolah']);
+        }
+        
         $this->db->bind('id', 1);
         $this->db->execute();
         return $this->db->rowCount();

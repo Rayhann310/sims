@@ -49,7 +49,11 @@ $GLOBALS['pengaturan'] = $pengaturan;
         <!-- Sidebar Header -->
         <div class="h-16 flex items-center justify-between lg:justify-center px-4 border-b border-emerald-800">
             <div class="flex items-center gap-3 overflow-hidden">
-                <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-bold shrink-0"><?= $app_logo ?></div>
+                <?php if (!empty($pengaturan['logo_sekolah'])): ?>
+                    <img src="<?= htmlspecialchars($pengaturan['logo_sekolah']) ?>" class="w-8 h-8 rounded-lg object-contain shrink-0 bg-white p-0.5">
+                <?php else: ?>
+                    <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-bold shrink-0"><?= $app_logo ?></div>
+                <?php endif; ?>
                 <span x-show="sidebarOpen || mobileOpen" class="font-bold text-white tracking-wide truncate transition-opacity duration-300"><?= $app_name ?></span>
             </div>
             <!-- Close Mobile Button -->
