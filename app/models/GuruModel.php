@@ -8,10 +8,70 @@ class GuruModel {
         $this->db = new Database();
     }
 
-    public function getAllGuru()
+    public function getAllGuru($filters = [])
     {
-        $this->db->query("SELECT guru.*, users.username, users.nama_lengkap FROM guru JOIN users ON guru.user_id = users.id ORDER BY users.nama_lengkap ASC");
+        $query = "SELECT guru.*, users.username, users.nama_lengkap 
+                  FROM guru 
+                  JOIN users ON guru.user_id = users.id 
+                  WHERE 1=1";
+        
+        $binds = [];
+        if (!empty($filters['jk'])) {
+            $query .= " AND guru.jenis_kelamin = :jk";
+            $binds['jk'] = $filters['jk'];
+        }
+
+        $query .= " ORDER BY users.nama_lengkap ASC";
+        
+        $this->db->query($query);
+        foreach ($binds as $key => $val) {
+            $this->db->bind($key, $val);
+        }
+
         return $this->db->resultSet();
+    }
+
+    public function getGuruStats()
+    {
+        $stats = [
+            'total' => 0,
+            'laki' => 0,
+            'perempuan' => 0,
+            'wali_kelas' => 0
+        ];
+
+        $this->db->query("SELECT COUNT(id) as total, 
+                                 SUM(CASE WHEN jenis_kelamin = 'L' THEN 1 ELSE 0 END) as laki,
+                                 SUM(CASE WHEN jenis_kelamin = 'P' THEN 1 ELSE 0 END) as perempuan
+                          FROM guru");
+        $aktif = $this->db->single();
+        if ($aktif) {
+            $stats['total'] = $aktif['total'] ?? 0;
+            $stats['laki'] = $aktif['laki'] ?? 0;
+            $stats['perempuan'] = $aktif['perempuan'] ?? 0;
+        }
+
+        $this->db->query("SELECT COUNT(DISTINCT r.wali_kelas_id) as total 
+                          FROM rombel r 
+                          JOIN tahun_akademik ta ON r.tahun_akademik_id = ta.id 
+                          WHERE ta.status = 'Aktif' AND r.wali_kelas_id IS NOT NULL");
+        $wali = $this->db->single();
+        $stats['wali_kelas'] = $wali['total'] ?? 0;
+
+        return $stats;
+    }
+
+    public function getGuruChartStats()
+    {
+        // Distribusi guru berdasarkan jenis kelamin
+        $this->db->query("SELECT jenis_kelamin as label, COUNT(id) as jumlah FROM guru GROUP BY jenis_kelamin");
+        $result = $this->db->resultSet();
+        
+        // Map labels L/P to Laki-laki/Perempuan
+        foreach($result as &$row) {
+            $row['label'] = ($row['label'] == 'L') ? 'Laki-Laki' : 'Perempuan';
+        }
+        return $result;
     }
 
     public function getGuruById($id)
@@ -162,14 +222,13 @@ class GuruModel {
                 $userId = $this->db->single()['last_id'];
 
                 // 2. Tambah guru
-                $queryGuru = "INSERT INTO guru (user_id, nip, jenis_kelamin, tanggal_lahir, mata_pelajaran, nomor_telepon) VALUES (:user_id, :nip, :jenis_kelamin, :tanggal_lahir, :mata_pelajaran, :nomor_telepon)";
+                $queryGuru = "INSERT INTO guru (user_id, nip, jenis_kelamin, no_hp, alamat) VALUES (:user_id, :nip, :jenis_kelamin, :no_hp, :alamat)";
                 $this->db->query($queryGuru);
                 $this->db->bind('user_id', $userId);
                 $this->db->bind('nip', $username);
                 $this->db->bind('jenis_kelamin', strtoupper($data['jenis_kelamin']) == 'P' ? 'P' : 'L');
-                $this->db->bind('tanggal_lahir', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
-                $this->db->bind('mata_pelajaran', $data['mata_pelajaran'] ?? '');
-                $this->db->bind('nomor_telepon', $data['nomor_telepon'] ?? '');
+                $this->db->bind('no_hp', $data['no_hp'] ?? '');
+                $this->db->bind('alamat', $data['alamat'] ?? '');
                 $this->db->execute();
 
                 $this->db->query("COMMIT");

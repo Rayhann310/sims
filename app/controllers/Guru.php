@@ -13,17 +13,19 @@ class Guru extends Controller {
     public function index()
     {
         $data['judul'] = 'Manajemen Data Guru';
-        $data['guru'] = $this->model('GuruModel')->getAllGuru();
-
-        $db = new Database();
-        $db->query("SELECT COUNT(id) as total FROM guru");
-        $data['total_guru'] = $db->single()['total'] ?? 0;
         
-        $db->query("SELECT COUNT(id) as total FROM guru WHERE jenis_kelamin = 'L'");
-        $data['guru_l'] = $db->single()['total'] ?? 0;
+        $filters = [
+            'jk' => $_GET['jk'] ?? ''
+        ];
         
-        $db->query("SELECT COUNT(id) as total FROM guru WHERE jenis_kelamin = 'P'");
-        $data['guru_p'] = $db->single()['total'] ?? 0;
+        $data['filters'] = $filters;
+        $data['guru'] = $this->model('GuruModel')->getAllGuru($filters);
+        
+        $data['stats'] = $this->model('GuruModel')->getGuruStats();
+        
+        $chartData = $this->model('GuruModel')->getGuruChartStats();
+        $data['chart_labels'] = json_encode(array_column($chartData, 'label'));
+        $data['chart_data'] = json_encode(array_column($chartData, 'jumlah'));
 
         $this->view('templates/admin_header', $data);
         $this->view('guru/index', $data);
@@ -45,6 +47,10 @@ class Guru extends Controller {
         }
     }
 
+    public function detail($id)
+    {
+        echo json_encode($this->model('GuruModel')->getGuruById($id));
+    }
 
     public function getubah()
     {

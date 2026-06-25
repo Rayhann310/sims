@@ -1,59 +1,75 @@
 <div class="space-y-6" 
-     x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, deleteUrl: '' }"
+     x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, detailModalOpen: false, deleteUrl: '', currentGuru: {} }"
      @open-edit-modal.window="editModalOpen = true"
+     @open-detail-modal.window="detailModalOpen = true; currentGuru = $event.detail;"
      @open-delete-modal.window="deleteModalOpen = true; deleteUrl = $event.detail.url">
     
-    <!-- Stats Grid Minimalist -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <!-- Stats Grid 4 Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Stat Card 1 -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 hover:shadow-md transition-all group">
-            <div class="w-14 h-14 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-chalkboard-teacher text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400">Total Guru</p>
+                    <p class="text-2xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['total']); ?></p>
+                </div>
             </div>
-            <div>
-                <p class="text-sm font-medium text-slate-400 mb-1">Total Guru</p>
-                <p class="text-3xl font-bold text-slate-800 tracking-tight"><?= number_format($data['total_guru']); ?></p>
-            </div>
+            <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold border-t border-slate-100 pt-2">Status: Aktif</p>
         </div>
 
         <!-- Stat Card 2 -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 hover:shadow-md transition-all group">
-            <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-            </div>
-            <div>
-                <p class="text-sm font-medium text-slate-400 mb-1">Laki-Laki</p>
-                <p class="text-3xl font-bold text-slate-800 tracking-tight"><?= number_format($data['guru_l']); ?></p>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-male text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400">Laki-Laki</p>
+                    <p class="text-2xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['laki']); ?></p>
+                </div>
             </div>
         </div>
 
         <!-- Stat Card 3 -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 hover:shadow-md transition-all group">
-            <div class="w-14 h-14 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="w-12 h-12 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-female text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400">Perempuan</p>
+                    <p class="text-2xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['perempuan']); ?></p>
+                </div>
             </div>
-            <div>
-                <p class="text-sm font-medium text-slate-400 mb-1">Perempuan</p>
-                <p class="text-3xl font-bold text-slate-800 tracking-tight"><?= number_format($data['guru_p']); ?></p>
+        </div>
+
+        <!-- Stat Card 4 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-user-tie text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400">Wali Kelas</p>
+                    <p class="text-2xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['wali_kelas']); ?></p>
+                </div>
             </div>
+            <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold border-t border-slate-100 pt-2">Thn Akd: Aktif</p>
         </div>
     </div>
 
     <!-- Table Container -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
     <!-- Header Tabel -->
-    <div class="px-6 py-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 bg-slate-50">
+    <div class="px-6 py-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50">
         <div>
             <h2 class="text-xl font-bold text-slate-800">Manajemen Data Guru</h2>
-            <p class="text-sm text-slate-500">Kelola informasi staf pengajar sekolah.</p>
+            <p class="text-sm text-slate-500">Kelola informasi pendidik/guru sekolah.</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-            <!-- Tombol Export Excel -->
-            <a href="<?= BASEURL; ?>/guru/export" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                Export
-            </a>
-            
             <!-- Dropdown Import -->
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open" @click.away="open = false" class="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
@@ -67,24 +83,49 @@
                 </div>
             </div>
 
-            <button @click="showModal = true" class="bg-primary hover:bg-blue-800 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+            <button @click="showModal = true" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm shrink-0">
+                <i class="fas fa-plus"></i>
                 Tambah Guru
             </button>
         </div>
     </div>
 
-    <!-- Flash Message (Jika ada) -->
+    <!-- Filter Bar -->
+    <div class="px-6 py-4 bg-white border-b border-slate-200">
+        <form action="<?= BASEURL; ?>/guru" method="GET" class="flex flex-wrap items-end gap-4">
+            <div class="w-full sm:w-auto flex-1 min-w-[150px]">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Gender</label>
+                <select name="jk" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Semua Gender</option>
+                    <option value="L" <?= ($data['filters']['jk'] == 'L') ? 'selected' : ''; ?>>Laki-Laki</option>
+                    <option value="P" <?= ($data['filters']['jk'] == 'P') ? 'selected' : ''; ?>>Perempuan</option>
+                </select>
+            </div>
+
+            <div class="w-full sm:w-auto flex gap-2">
+                <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <?php if(array_filter($data['filters'])): ?>
+                <a href="<?= BASEURL; ?>/guru" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-2">
+                    <i class="fas fa-times"></i> Reset
+                </a>
+                <?php endif; ?>
+            </div>
+        </form>
+    </div>
+
+    <!-- Flash Message -->
     <?php if(isset($_SESSION['flash'])): ?>
-        <div class="px-6 py-4 border-b border-<?= $_SESSION['flash']['tipe'] == 'success' ? 'green' : 'red' ?>-200 bg-<?= $_SESSION['flash']['tipe'] == 'success' ? 'green' : 'red' ?>-50 flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-<?= $_SESSION['flash']['tipe'] == 'success' ? 'green' : 'red' ?>-100 flex items-center justify-center text-<?= $_SESSION['flash']['tipe'] == 'success' ? 'green' : 'red' ?>-600 shrink-0">
+        <div class="px-6 py-4 border-b border-<?= $_SESSION['flash']['tipe'] == 'success' ? 'emerald' : 'red' ?>-200 bg-<?= $_SESSION['flash']['tipe'] == 'success' ? 'emerald' : 'red' ?>-50 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-<?= $_SESSION['flash']['tipe'] == 'success' ? 'emerald' : 'red' ?>-100 flex items-center justify-center text-<?= $_SESSION['flash']['tipe'] == 'success' ? 'emerald' : 'red' ?>-600 shrink-0">
                 <?php if($_SESSION['flash']['tipe'] == 'success'): ?>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 <?php else: ?>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 <?php endif; ?>
             </div>
-            <p class="text-<?= $_SESSION['flash']['tipe'] == 'success' ? 'green' : 'red' ?>-800">
+            <p class="text-<?= $_SESSION['flash']['tipe'] == 'success' ? 'emerald' : 'red' ?>-800 text-sm">
                 Data Guru <strong><?= $_SESSION['flash']['pesan'] ?></strong> <?= $_SESSION['flash']['aksi'] ?>.
             </p>
         </div>
@@ -96,11 +137,10 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200">
-                    <th class="px-6 py-4 font-semibold">NIP / NUPTK</th>
+                    <th class="px-6 py-4 font-semibold">NIP</th>
                     <th class="px-6 py-4 font-semibold">Nama Lengkap</th>
                     <th class="px-6 py-4 font-semibold">L/P</th>
-                    <th class="px-6 py-4 font-semibold">Akun Login</th>
-                    <th class="px-6 py-4 font-semibold">Kontak</th>
+                    <th class="px-6 py-4 font-semibold">No. HP</th>
                     <th class="px-6 py-4 font-semibold text-center w-32">Aksi</th>
                 </tr>
             </thead>
@@ -110,26 +150,23 @@
                     <td class="px-6 py-4 font-medium text-slate-800"><?= htmlspecialchars($g['nip']); ?></td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm shrink-0">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm shrink-0">
                                 <?= substr($g['nama_lengkap'], 0, 1); ?>
                             </div>
                             <span class="font-medium text-slate-700"><?= htmlspecialchars($g['nama_lengkap']); ?></span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-slate-600"><?= $g['jenis_kelamin'] == 'L' ? 'Laki-laki' : 'Perempuan'; ?></td>
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
-                            @<?= htmlspecialchars($g['username']); ?>
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 text-slate-600 text-sm"><?= htmlspecialchars($g['no_hp']); ?></td>
+                    <td class="px-6 py-4 text-slate-600"><?= $g['jenis_kelamin'] == 'L' ? 'L' : 'P'; ?></td>
+                    <td class="px-6 py-4 text-slate-600 font-medium"><?= htmlspecialchars($g['no_hp'] ?? '-'); ?></td>
                     <td class="px-6 py-4 flex justify-center gap-2">
-
-                        <button type="button" @click="openEditModalGuru(<?= $g['id']; ?>)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        <button type="button" @click="openDetailModalGuru(<?= $g['id']; ?>)" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Lihat Detail">
+                            <i class="fas fa-eye"></i>
                         </button>
-                        <button type="button" @click="$dispatch('open-delete-modal', { url: '<?= BASEURL; ?>/guru/hapus/<?= $g['id']; ?>' })" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <button type="button" @click="openEditModalGuru(<?= $g['id']; ?>)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" @click="$dispatch('open-delete-modal', { url: '<?= BASEURL; ?>/guru/hapus/<?= $g['id']; ?>' })" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 </tr>
@@ -137,7 +174,7 @@
                 
                 <?php if(empty($data['guru'])): ?>
                 <tr>
-                    <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                    <td colspan="5" class="px-6 py-12 text-center text-slate-500">
                         <svg class="w-12 h-12 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         Belum ada data guru. Klik tombol "Tambah Guru" untuk memulai.
                     </td>
@@ -148,15 +185,27 @@
     </div>
     </div> <!-- End Table Container -->
 
-    <!-- Modal Tambah Data (Alpine.js) -->
+    <!-- Charts Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <!-- Doughnut Chart -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:col-span-2 lg:col-span-1 mx-auto w-full max-w-lg">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2 justify-center">
+                <i class="fas fa-chart-pie text-emerald-500"></i>
+                Distribusi Guru per Gender
+            </h3>
+            <div class="relative flex-grow flex items-center justify-center min-h-[300px]">
+                <canvas id="guruDoughnutChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Data -->
     <div x-show="showModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
-        <!-- Backdrop -->
         <div x-show="showModal" 
              x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
              x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="showModal = false"></div>
+             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="showModal = false"></div>
 
-        <!-- Modal Panel -->
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <div x-show="showModal" 
                  x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
@@ -165,72 +214,71 @@
                 
                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 border-b border-slate-100">
                     <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         </div>
                         <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                             <h3 class="text-xl font-bold leading-6 text-slate-900">Tambah Guru Baru</h3>
-                            <p class="text-sm text-slate-500 mt-1">Sistem akan otomatis membuatkan akun login (username & password) untuk guru bersangkutan.</p>
+                            <p class="text-sm text-slate-500 mt-1">Lengkapi data diri guru. Akun login akan dibuatkan secara otomatis.</p>
                         </div>
                     </div>
                 </div>
 
                 <form action="<?= BASEURL; ?>/guru/tambah" method="POST">
                     <div class="bg-slate-50 px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Kolom Profil Guru -->
+                        <!-- Kolom Profil -->
                         <div class="space-y-4">
-                            <h4 class="font-semibold text-slate-700 border-b pb-2">Profil Pengajar</h4>
+                            <h4 class="font-semibold text-slate-700 border-b pb-2">Biodata Guru</h4>
                             
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">NIP / NUPTK</label>
-                                <input type="text" name="nip" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">NIP/NUPTK</label>
+                                <input type="text" name="nip" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap (Gelar)</label>
-                                <input type="text" name="nama_lengkap" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
+                                <input type="text" name="nama_lengkap" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Gender</label>
+                                <select name="jenis_kelamin" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                    <option value="L">Laki-laki</option>
+                                    <option value="P">Perempuan</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Kolom Detail & Akun -->
+                        <div class="space-y-4">
+                            <h4 class="font-semibold text-slate-700 border-b pb-2">Data Tambahan & Akun</h4>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">No. HP</label>
+                                <input type="text" name="no_hp" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
+                                <textarea name="alamat" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"></textarea>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Gender</label>
-                                    <select name="jenis_kelamin" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary">
-                                        <option value="L">Laki-laki</option>
-                                        <option value="P">Perempuan</option>
-                                    </select>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Username Login</label>
+                                    <input type="text" name="username" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">No. HP / WA</label>
-                                    <input type="text" name="no_hp" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary">
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                                    <input type="password" name="password" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
                                 </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
-                                <textarea name="alamat" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Kolom Akun Login -->
-                        <div class="space-y-4">
-                            <h4 class="font-semibold text-slate-700 border-b pb-2">Informasi Akun Login</h4>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Username Login</label>
-                                <input type="text" name="username" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary bg-white">
-                                <p class="text-xs text-slate-500 mt-1">Disarankan menggunakan NIP atau nama depan.</p>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Password Sementara</label>
-                                <input type="password" name="password" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary bg-white">
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-white px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6 border-t border-slate-200 gap-3">
-                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-800 sm:w-auto transition-colors">Simpan Data</button>
-                        <button type="button" @click="showModal = false" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto transition-colors">Batal</button>
+                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 sm:w-auto transition-colors">Simpan Data</button>
+                        <button type="button" @click="showModal = false" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto transition-colors">Batal</button>
                     </div>
                 </form>
             </div>
@@ -271,7 +319,7 @@
                 </form>
             </div>
         </div>
-</div>
+    </div>
 
     <!-- Modal Edit Data -->
     <div x-show="editModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
@@ -291,43 +339,43 @@
                     
                     <div class="bg-slate-50 px-6 py-6 space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">NIP / NUPTK</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">NIP/NUPTK</label>
                             <input type="text" name="nip" id="edit_nip" readonly class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-200 text-slate-500 cursor-not-allowed">
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap (Gelar)</label>
-                            <input type="text" name="nama_lengkap" id="edit_nama_lengkap" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
+                            <input type="text" name="nama_lengkap" id="edit_nama_lengkap" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Gender</label>
-                                <select name="jenis_kelamin" id="edit_jenis_kelamin" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary">
-                                    <option value="L">Laki-laki</option>
-                                    <option value="P">Perempuan</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">No. HP / WA</label>
-                                <input type="text" name="no_hp" id="edit_no_hp" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary">
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Gender</label>
+                            <select name="jenis_kelamin" id="edit_jenis_kelamin" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="L">Laki-laki</option>
+                                <option value="P">Perempuan</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">No. HP</label>
+                            <input type="text" name="no_hp" id="edit_no_hp" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
-                            <textarea name="alamat" id="edit_alamat" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary"></textarea>
+                            <textarea name="alamat" id="edit_alamat" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
                         </div>
                     </div>
 
                     <div class="bg-white px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6 border-t border-slate-200 gap-3">
-                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-800 sm:w-auto transition-colors">Simpan Perubahan</button>
+                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-800 sm:w-auto transition-colors">Simpan Perubahan</button>
                         <button type="button" @click="editModalOpen = false" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto transition-colors">Batal</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
     <!-- Modal Konfirmasi Hapus -->
     <div x-show="deleteModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
         <div x-show="deleteModalOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="deleteModalOpen = false"></div>
@@ -355,9 +403,68 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Detail Data -->
+    <div x-show="detailModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div x-show="detailModalOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="detailModalOpen = false"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="detailModalOpen" x-transition class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-slate-200">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="text-xl font-bold leading-6 text-slate-900"><i class="fas fa-id-badge mr-2 text-emerald-600"></i> Detail Informasi Guru</h3>
+                    <button @click="detailModalOpen = false" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="px-6 py-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <h4 class="font-semibold text-slate-700 border-b border-slate-200 pb-2"><i class="fas fa-user-circle mr-2"></i> Biodata Utama</h4>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">NIP/NUPTK</p>
+                                <p class="text-sm font-semibold text-slate-800" x-text="currentGuru.nip || '-'"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Nama Lengkap</p>
+                                <p class="text-sm font-semibold text-slate-800" x-text="currentGuru.nama_lengkap || '-'"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Jenis Kelamin</p>
+                                <p class="text-sm font-semibold text-slate-800" x-text="currentGuru.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan'"></p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <h4 class="font-semibold text-slate-700 border-b border-slate-200 pb-2"><i class="fas fa-info-circle mr-2"></i> Informasi Tambahan</h4>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">No. Handphone</p>
+                                <p class="text-sm font-semibold text-slate-800" x-text="currentGuru.no_hp || 'Belum Diatur'"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Alamat</p>
+                                <p class="text-sm font-semibold text-slate-800" x-text="currentGuru.alamat || 'Belum Diatur'"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Akun Login</p>
+                                <p class="text-sm font-semibold text-slate-800">@<span x-text="currentGuru.username"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="button" @click="detailModalOpen = false" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
+function openDetailModalGuru(id) {
+    fetch('<?= BASEURL; ?>/guru/detail/' + id)
+    .then(response => response.json())
+    .then(data => {
+        window.dispatchEvent(new CustomEvent('open-detail-modal', { detail: data }));
+    })
+    .catch(err => console.error(err));
+}
+
 function openEditModalGuru(id) {
     const formData = new FormData();
     formData.append('id', id);
@@ -380,4 +487,51 @@ function openEditModalGuru(id) {
         window.dispatchEvent(new CustomEvent('open-edit-modal'));
     });
 }
+
+// Chart.js Initialization
+document.addEventListener('DOMContentLoaded', function() {
+    const chartLabels = <?= $data['chart_labels']; ?>;
+    const chartData = <?= $data['chart_data']; ?>;
+    
+    // Warna untuk chart
+    const bgColors = [
+        'rgba(59, 130, 246, 0.8)', // blue (Laki-laki)
+        'rgba(236, 72, 153, 0.8)'  // pink (Perempuan)
+    ];
+    
+    const borderColors = bgColors.map(color => color.replace('0.8', '1'));
+
+    if(chartLabels.length > 0) {
+        // Doughnut Chart
+        const ctxDoughnut = document.getElementById('guruDoughnutChart').getContext('2d');
+        new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    data: chartData,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { family: "'Inter', sans-serif" },
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        document.getElementById('guruDoughnutChart').parentElement.innerHTML = '<p class="text-slate-400 text-sm">Tidak ada data guru</p>';
+    }
+});
 </script>
