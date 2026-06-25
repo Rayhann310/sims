@@ -1,0 +1,6 @@
+{
+    "name": "smanw/siakad",
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.8"
+    }
+}
