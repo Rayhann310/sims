@@ -24,6 +24,55 @@ class SiswaModel {
         return $this->db->single();
     }
 
+    public function getSiswaStats()
+    {
+        $stats = [
+            'total' => 0,
+            'laki' => 0,
+            'perempuan' => 0,
+            'alumni' => 0,
+            'ultah' => 0,
+            'tahun_akademik' => 'Tidak Ada'
+        ];
+
+        // Dapatkan Tahun Akademik Aktif
+        $this->db->query("SELECT id, nama_tahun, semester FROM tahun_akademik WHERE status = 'Aktif' LIMIT 1");
+        $ta = $this->db->single();
+        
+        if ($ta) {
+            $stats['tahun_akademik'] = $ta['nama_tahun'] . ' (' . $ta['semester'] . ')';
+            $ta_id = $ta['id'];
+
+            // Total Siswa Aktif di Rombel Tahun Ini
+            $this->db->query("SELECT COUNT(DISTINCT ar.siswa_id) as total, 
+                                     SUM(CASE WHEN s.jenis_kelamin = 'L' THEN 1 ELSE 0 END) as laki,
+                                     SUM(CASE WHEN s.jenis_kelamin = 'P' THEN 1 ELSE 0 END) as perempuan
+                              FROM anggota_rombel ar 
+                              JOIN rombel r ON ar.rombel_id = r.id 
+                              JOIN siswa s ON ar.siswa_id = s.id
+                              WHERE r.tahun_akademik_id = :ta_id");
+            $this->db->bind('ta_id', $ta_id);
+            $aktif = $this->db->single();
+            if ($aktif) {
+                $stats['total'] = $aktif['total'] ?? 0;
+                $stats['laki'] = $aktif['laki'] ?? 0;
+                $stats['perempuan'] = $aktif['perempuan'] ?? 0;
+            }
+        }
+
+        // Alumni (Semua siswa yang status = 'Alumni')
+        $this->db->query("SELECT COUNT(id) as total FROM siswa WHERE status = 'Alumni'");
+        $alumni = $this->db->single();
+        $stats['alumni'] = $alumni['total'] ?? 0;
+
+        // Ulang Tahun Hari Ini
+        $this->db->query("SELECT COUNT(id) as total FROM siswa WHERE MONTH(tanggal_lahir) = MONTH(CURDATE()) AND DAY(tanggal_lahir) = DAY(CURDATE())");
+        $ultah = $this->db->single();
+        $stats['ultah'] = $ultah['total'] ?? 0;
+
+        return $stats;
+    }
+
 
     public function tambahDataSiswa($data)
     {

@@ -13,16 +13,9 @@ class Siswa extends Controller {
     {
         $data['judul'] = 'Manajemen Data Siswa';
         $data['siswa'] = $this->model('SiswaModel')->getAllSiswa();
-
-        $db = new Database();
-        $db->query("SELECT COUNT(id) as total FROM siswa");
-        $data['total_siswa'] = $db->single()['total'] ?? 0;
         
-        $db->query("SELECT COUNT(id) as total FROM siswa WHERE jenis_kelamin = 'L'");
-        $data['siswa_l'] = $db->single()['total'] ?? 0;
-        
-        $db->query("SELECT COUNT(id) as total FROM siswa WHERE jenis_kelamin = 'P'");
-        $data['siswa_p'] = $db->single()['total'] ?? 0;
+        $stats = $this->model('SiswaModel')->getSiswaStats();
+        $data['stats'] = $stats;
 
         $this->view('templates/admin_header', $data);
         $this->view('siswa/index', $data);
@@ -44,7 +37,10 @@ class Siswa extends Controller {
         }
     }
 
-
+    public function detail($id)
+    {
+        echo json_encode($this->model('SiswaModel')->getSiswaById($id));
+    }
 
     public function getubah()
     {

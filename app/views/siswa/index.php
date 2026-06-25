@@ -1,41 +1,79 @@
 <div class="space-y-6" 
-     x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, deleteUrl: '' }"
+     x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, detailModalOpen: false, deleteUrl: '', currentSiswa: {} }"
      @open-edit-modal.window="editModalOpen = true"
+     @open-detail-modal.window="detailModalOpen = true; currentSiswa = $event.detail;"
      @open-delete-modal.window="deleteModalOpen = true; deleteUrl = $event.detail.url">
     
-    <!-- Stats Grid Minimalist -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <!-- Stats Grid 5 Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Stat Card 1 -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 hover:shadow-md transition-all group">
-            <div class="w-14 h-14 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-users text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400">Total Siswa</p>
+                    <p class="text-2xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['total']); ?></p>
+                </div>
             </div>
-            <div>
-                <p class="text-sm font-medium text-slate-400 mb-1">Total Siswa</p>
-                <p class="text-3xl font-bold text-slate-800 tracking-tight"><?= number_format($data['total_siswa']); ?></p>
-            </div>
+            <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold border-t border-slate-100 pt-2">Thn Akd: <?= $data['stats']['tahun_akademik']; ?></p>
         </div>
 
         <!-- Stat Card 2 -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 hover:shadow-md transition-all group">
-            <div class="w-14 h-14 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-male text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400">Laki-Laki</p>
+                    <p class="text-2xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['laki']); ?></p>
+                </div>
             </div>
-            <div>
-                <p class="text-sm font-medium text-slate-400 mb-1">Laki-Laki</p>
-                <p class="text-3xl font-bold text-slate-800 tracking-tight"><?= number_format($data['siswa_l']); ?></p>
-            </div>
+            <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold border-t border-slate-100 pt-2">Thn Akd: <?= $data['stats']['tahun_akademik']; ?></p>
         </div>
 
         <!-- Stat Card 3 -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-5 hover:shadow-md transition-all group">
-            <div class="w-14 h-14 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="w-12 h-12 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-female text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400">Perempuan</p>
+                    <p class="text-2xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['perempuan']); ?></p>
+                </div>
             </div>
-            <div>
-                <p class="text-sm font-medium text-slate-400 mb-1">Perempuan</p>
-                <p class="text-3xl font-bold text-slate-800 tracking-tight"><?= number_format($data['siswa_p']); ?></p>
+            <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold border-t border-slate-100 pt-2">Thn Akd: <?= $data['stats']['tahun_akademik']; ?></p>
+        </div>
+
+        <!-- Stat Card 4 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400">Siswa Lulus</p>
+                    <p class="text-2xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['alumni']); ?></p>
+                </div>
             </div>
+            <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold border-t border-slate-100 pt-2">Status: Alumni</p>
+        </div>
+
+        <!-- Stat Card 5 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-birthday-cake text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-400">Ulang Tahun</p>
+                    <p class="text-2xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['ultah']); ?></p>
+                </div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold border-t border-slate-100 pt-2">Tgl: <?= date('d M Y'); ?> (WIB)</p>
         </div>
     </div>
 
@@ -68,7 +106,7 @@
             </div>
 
             <button @click="showModal = true" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                <i class="fas fa-plus"></i>
                 Tambah Siswa
             </button>
         </div>
@@ -124,11 +162,14 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 flex justify-center gap-2">
-                        <button type="button" @click="openEditModalSiswa(<?= $s['id']; ?>)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        <button type="button" @click="openDetailModalSiswa(<?= $s['id']; ?>)" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Lihat Detail">
+                            <i class="fas fa-eye"></i>
                         </button>
-                        <button type="button" @click="$dispatch('open-delete-modal', { url: '<?= BASEURL; ?>/siswa/hapus/<?= $s['id']; ?>' })" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <button type="button" @click="openEditModalSiswa(<?= $s['id']; ?>)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" @click="$dispatch('open-delete-modal', { url: '<?= BASEURL; ?>/siswa/hapus/<?= $s['id']; ?>' })" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 </tr>
@@ -361,9 +402,79 @@
             </div>
         </div>
     </div>
+    <!-- Modal Detail Data -->
+    <div x-show="detailModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div x-show="detailModalOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="detailModalOpen = false"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="detailModalOpen" x-transition class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-slate-200">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="text-xl font-bold leading-6 text-slate-900"><i class="fas fa-id-card mr-2 text-emerald-600"></i> Detail Informasi Siswa</h3>
+                    <button @click="detailModalOpen = false" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="px-6 py-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <h4 class="font-semibold text-slate-700 border-b border-slate-200 pb-2"><i class="fas fa-user mr-2"></i> Biodata Utama</h4>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">NISN</p>
+                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.nisn || '-'"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Nama Lengkap</p>
+                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.nama_lengkap || '-'"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Jenis Kelamin</p>
+                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan'"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Tanggal Lahir</p>
+                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.tanggal_lahir || 'Belum Diatur'"></p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <h4 class="font-semibold text-slate-700 border-b border-slate-200 pb-2"><i class="fas fa-info-circle mr-2"></i> Informasi Tambahan</h4>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Nama Wali</p>
+                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.nama_wali || 'Belum Diatur'"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Alamat</p>
+                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.alamat || 'Belum Diatur'"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Status Akademik</p>
+                                <p class="text-sm font-semibold">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
+                                          :class="{'bg-emerald-100 text-emerald-800': currentSiswa.status === 'Aktif', 'bg-blue-100 text-blue-800': currentSiswa.status === 'Alumni', 'bg-red-100 text-red-800': currentSiswa.status === 'Keluar'}"
+                                          x-text="currentSiswa.status || 'Aktif'"></span>
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Akun Login</p>
+                                <p class="text-sm font-semibold text-slate-800">@<span x-text="currentSiswa.username"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="button" @click="detailModalOpen = false" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
+function openDetailModalSiswa(id) {
+    fetch('<?= BASEURL; ?>/siswa/detail/' + id)
+    .then(response => response.json())
+    .then(data => {
+        window.dispatchEvent(new CustomEvent('open-detail-modal', { detail: data }));
+    })
+    .catch(err => console.error(err));
+}
+
 function openEditModalSiswa(id) {
     const formData = new FormData();
     formData.append('id', id);

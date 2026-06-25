@@ -29,6 +29,7 @@ class Database {
         $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->db_name;
         try {
             $this->dbh = new PDO($dsn, $this->user, $this->pass, $option);
+            $this->dbh->exec("SET time_zone = '+07:00'");
         } catch(PDOException $e) {
             die("DB Connection failed: " . $e->getMessage());
         }

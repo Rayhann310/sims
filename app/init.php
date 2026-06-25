@@ -3,6 +3,9 @@ if (file_exists('../vendor/autoload.php')) {
     require_once '../vendor/autoload.php';
 }
 
+// Set Timezone to WIB (Asia/Jakarta)
+date_default_timezone_set('Asia/Jakarta');
+
 // Load Environment Variables
 $dotenvPath = dirname(__DIR__);
 if (class_exists('Dotenv\Dotenv') && file_exists($dotenvPath . '/.env')) {
