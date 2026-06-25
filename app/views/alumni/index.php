@@ -61,9 +61,13 @@
                         <td class="px-6 py-4 font-medium text-slate-800"><?= htmlspecialchars($s['nisn']); ?></td>
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm shrink-0">
-                                    <?= substr($s['nama_lengkap'], 0, 1); ?>
-                                </div>
+                                <?php if(!empty($s['foto'])): ?>
+                                    <img src="<?= $s['foto']; ?>" class="w-8 h-8 rounded-full object-cover shrink-0" title="Foto Profil">
+                                <?php else: ?>
+                                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm shrink-0">
+                                        <?= substr($s['nama_lengkap'], 0, 1); ?>
+                                    </div>
+                                <?php endif; ?>
                                 <span class="font-medium text-slate-700"><?= htmlspecialchars($s['nama_lengkap']); ?></span>
                             </div>
                         </td>
