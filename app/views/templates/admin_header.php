@@ -31,6 +31,7 @@ $GLOBALS['pengaturan'] = $pengaturan;
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3/dist/style.min.css" rel="stylesheet">
 </head>
 <body class="bg-[#f8fafc] text-slate-800 antialiased flex h-[100dvh] overflow-hidden" x-data="{ sidebarOpen: true, mobileOpen: false }">
 
