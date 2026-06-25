@@ -150,9 +150,13 @@
                     <td class="px-6 py-4 font-medium text-slate-800"><?= htmlspecialchars($g['nip']); ?></td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm shrink-0">
-                                <?= substr($g['nama_lengkap'], 0, 1); ?>
-                            </div>
+                            <?php if(!empty($g['foto'])): ?>
+                                <img src="<?= $g['foto']; ?>" class="w-8 h-8 rounded-full object-cover shrink-0 cursor-pointer" onclick="openEditModalGuru(<?= $g['id']; ?>)" title="Klik untuk edit foto">
+                            <?php else: ?>
+                                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm shrink-0 cursor-pointer" onclick="openEditModalGuru(<?= $g['id']; ?>)" title="Klik untuk edit foto">
+                                    <?= substr($g['nama_lengkap'], 0, 1); ?>
+                                </div>
+                            <?php endif; ?>
                             <span class="font-medium text-slate-700"><?= htmlspecialchars($g['nama_lengkap']); ?></span>
                         </div>
                     </td>
@@ -336,8 +340,22 @@
                 <form action="<?= BASEURL; ?>/guru/ubah" method="POST">
                     <input type="hidden" name="id" id="edit_id">
                     <input type="hidden" name="user_id" id="edit_user_id">
+                    <input type="hidden" name="foto" id="edit_foto_base64">
                     
                     <div class="bg-slate-50 px-6 py-6 space-y-4">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="relative w-16 h-16 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                                <img id="edit_foto_preview" src="" class="w-full h-full object-cover hidden">
+                                <div id="edit_foto_initials" class="w-full h-full flex items-center justify-center text-xl font-bold text-blue-600 bg-blue-100">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Foto Profil (Opsional)</label>
+                                <input type="file" id="edit_foto_input" accept="image/*" class="text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                <p class="text-xs text-slate-400 mt-1">Otomatis dikompres</p>
+                            </div>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">NIP/NUPTK</label>
                             <input type="text" name="nip" id="edit_nip" readonly class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-slate-200 text-slate-500 cursor-not-allowed">
@@ -483,10 +501,70 @@ function openEditModalGuru(id) {
         document.getElementById('edit_no_hp').value = data.no_hp;
         document.getElementById('edit_alamat').value = data.alamat;
 
+        const fotoPreview = document.getElementById('edit_foto_preview');
+        const fotoInitials = document.getElementById('edit_foto_initials');
+        document.getElementById('edit_foto_base64').value = '';
+        document.getElementById('edit_foto_input').value = '';
+
+        if(data.foto) {
+            fotoPreview.src = data.foto;
+            fotoPreview.classList.remove('hidden');
+            fotoInitials.classList.add('hidden');
+        } else {
+            fotoInitials.innerHTML = data.nama_lengkap ? data.nama_lengkap.substring(0, 1).toUpperCase() : '';
+            fotoPreview.classList.add('hidden');
+            fotoInitials.classList.remove('hidden');
+        }
+
         // Buka modal Alpine dari luar
         window.dispatchEvent(new CustomEvent('open-edit-modal'));
     });
 }
+
+// Self-healing: Image Compression
+document.getElementById('edit_foto_input').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 250;
+            const MAX_HEIGHT = 250;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height;
+                    height = MAX_HEIGHT;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            
+            // Set ke preview dan hidden input
+            document.getElementById('edit_foto_preview').src = dataUrl;
+            document.getElementById('edit_foto_preview').classList.remove('hidden');
+            document.getElementById('edit_foto_initials').classList.add('hidden');
+            document.getElementById('edit_foto_base64').value = dataUrl;
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+});
 
 // Chart.js Initialization
 document.addEventListener('DOMContentLoaded', function() {

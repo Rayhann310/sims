@@ -89,9 +89,8 @@ class Guru extends Controller {
         $sheet->setCellValue('A1', 'NIP');
         $sheet->setCellValue('B1', 'Nama Lengkap');
         $sheet->setCellValue('C1', 'Jenis Kelamin (L/P)');
-        $sheet->setCellValue('D1', 'Tanggal Lahir (YYYY-MM-DD)');
-        $sheet->setCellValue('E1', 'Mata Pelajaran');
-        $sheet->setCellValue('F1', 'No. Telepon');
+        $sheet->setCellValue('D1', 'No. HP');
+        $sheet->setCellValue('E1', 'Alamat');
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="Template_Guru.xlsx"');
@@ -188,9 +187,8 @@ class Guru extends Controller {
                             'nip' => $row[0],
                             'nama_lengkap' => $row[1],
                             'jenis_kelamin' => $row[2],
-                            'tanggal_lahir' => $row[3],
-                            'mata_pelajaran' => $row[4],
-                            'nomor_telepon' => $row[5]
+                            'no_hp' => $row[3] ?? '',
+                            'alamat' => $row[4] ?? ''
                         ];
                     }
                 }

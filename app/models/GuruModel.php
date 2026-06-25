@@ -161,7 +161,12 @@ class GuruModel {
             $this->db->execute();
 
             // 2. Ubah data guru
-            $this->db->query("UPDATE guru SET jenis_kelamin = :jenis_kelamin, no_hp = :no_hp, alamat = :alamat WHERE id = :id");
+            if(!empty($data['foto'])) {
+                $this->db->query("UPDATE guru SET jenis_kelamin = :jenis_kelamin, no_hp = :no_hp, alamat = :alamat, foto = :foto WHERE id = :id");
+                $this->db->bind('foto', $data['foto']);
+            } else {
+                $this->db->query("UPDATE guru SET jenis_kelamin = :jenis_kelamin, no_hp = :no_hp, alamat = :alamat WHERE id = :id");
+            }
             $this->db->bind('jenis_kelamin', htmlspecialchars($data['jenis_kelamin']));
             $this->db->bind('no_hp', htmlspecialchars($data['no_hp']));
             $this->db->bind('alamat', htmlspecialchars($data['alamat']));

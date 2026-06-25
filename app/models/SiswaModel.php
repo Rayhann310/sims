@@ -184,7 +184,12 @@ class SiswaModel {
             $this->db->execute();
 
             // 2. Ubah data siswa
-            $this->db->query("UPDATE siswa SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, alamat = :alamat, nama_wali = :nama_wali WHERE id = :id");
+            if(!empty($data['foto'])) {
+                $this->db->query("UPDATE siswa SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, alamat = :alamat, nama_wali = :nama_wali, foto = :foto WHERE id = :id");
+                $this->db->bind('foto', $data['foto']);
+            } else {
+                $this->db->query("UPDATE siswa SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, alamat = :alamat, nama_wali = :nama_wali WHERE id = :id");
+            }
             $this->db->bind('jenis_kelamin', htmlspecialchars($data['jenis_kelamin']));
             $this->db->bind('tanggal_lahir', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
             $this->db->bind('alamat', htmlspecialchars($data['alamat']));
