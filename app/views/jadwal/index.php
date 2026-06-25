@@ -240,7 +240,7 @@ document.addEventListener('alpine:init', () => {
             if(!this.ta_id) return;
             
             try {
-                const res = await fetch(`<?= BASEURL; ?>/akademik/apiGetRombel/${this.ta_id}`);
+                const res = await fetch(`<?= BASEURL; ?>/jadwal/getRombelAjax/${this.ta_id}`);
                 this.rombels = await res.json();
             } catch (err) {
                 console.error(err);

@@ -26,6 +26,14 @@ class Jadwal extends Controller {
         $this->view('templates/admin_footer');
     }
 
+    // AJAX: dapatkan rombel by tahun akademik (terbuka untuk guru)
+    public function getRombelAjax($ta_id)
+    {
+        header('Content-Type: application/json');
+        echo json_encode($this->model('RombelModel')->getRombelByTahunAkademik($ta_id));
+        exit;
+    }
+
     // AJAX: dapatkan jadwal by rombel
     public function getJadwalAjax($rombel_id)
     {
