@@ -4,6 +4,7 @@
             <h1 class="text-2xl font-bold text-slate-900"><?= $data['judul']; ?></h1>
             <p class="text-sm text-slate-500 mt-1">Kelola Jadwal Pelajaran untuk tiap Rombongan Belajar.</p>
         </div>
+        <?php if ($_SESSION['user']['role'] == 'admin') : ?>
         <div class="flex space-x-2">
             <button @click="openModal()" :disabled="!rombel_id" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
@@ -14,6 +15,7 @@
                 Tambah Jadwal
             </button>
         </div>
+        <?php endif; ?>
     </div>
 
     <!-- Flash Message -->
@@ -59,7 +61,9 @@
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Jam</th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Mata Pelajaran</th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Guru Pengampu</th>
+                        <?php if ($_SESSION['user']['role'] == 'admin') : ?>
                         <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200 bg-white">
@@ -71,10 +75,14 @@
                                 <div class="text-sm font-medium text-slate-900" x-text="j.nama_mapel"></div>
                                 <div class="text-xs text-slate-500" x-text="'Kode: ' + j.kode_mapel"></div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700" x-text="j.nama_guru"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+                                <span x-text="j.nama_guru" :class="j.nama_guru === '<?= addslashes($_SESSION['user']['nama_lengkap']) ?>' ? 'font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md border border-blue-200' : ''"></span>
+                            </td>
+                            <?php if ($_SESSION['user']['role'] == 'admin') : ?>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <a :href="'<?= BASEURL; ?>/jadwal/hapus/' + j.id" onclick="return confirm('Yakin ingin menghapus jadwal ini?');" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></a>
                             </td>
+                            <?php endif; ?>
                         </tr>
                     </template>
                     <tr x-show="jadwal.length === 0 && rombel_id">
