@@ -159,6 +159,55 @@ return array (
       'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
+  'elearning_diskusi' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `elearning_diskusi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `jadwal_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `pesan` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `jadwal_id` (`jadwal_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `elearning_diskusi_ibfk_1` FOREIGN KEY (`jadwal_id`) REFERENCES `jadwal_pelajaran` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `elearning_diskusi_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'jadwal_id' => 'int(11) NOT NULL',
+      'user_id' => 'int(11) NOT NULL',
+      'pesan' => 'text NOT NULL',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
+    ),
+  ),
+  'elearning_absensi' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `elearning_absensi` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `jadwal_id` int(11) NOT NULL,
+  `siswa_id` int(11) NOT NULL,
+  `tanggal` date NOT NULL,
+  `status_kehadiran` enum(\'Hadir\',\'Izin\',\'Sakit\',\'Alpa\') NOT NULL DEFAULT \'Alpa\',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `jadwal_id` (`jadwal_id`),
+  KEY `siswa_id` (`siswa_id`),
+  UNIQUE KEY `jadwal_siswa_tanggal` (`jadwal_id`, `siswa_id`, `tanggal`),
+  CONSTRAINT `elearning_absensi_ibfk_1` FOREIGN KEY (`jadwal_id`) REFERENCES `jadwal_pelajaran` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `elearning_absensi_ibfk_2` FOREIGN KEY (`siswa_id`) REFERENCES `siswa` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'jadwal_id' => 'int(11) NOT NULL',
+      'siswa_id' => 'int(11) NOT NULL',
+      'tanggal' => 'date NOT NULL',
+      'status_kehadiran' => 'enum(\'Hadir\',\'Izin\',\'Sakit\',\'Alpa\') NOT NULL DEFAULT \'Alpa\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
+    ),
+  ),
   'guru' => 
   array (
     'create_sql' => 'CREATE TABLE IF NOT EXISTS `guru` (

@@ -86,4 +86,59 @@ class ElearningModel {
         $this->db->execute();
         return $this->db->rowCount();
     }
+
+    public function getDiskusiByJadwal($jadwal_id)
+    {
+        $this->db->query("
+            SELECT d.*, u.nama_lengkap, u.role, u.foto 
+            FROM elearning_diskusi d 
+            JOIN users u ON d.user_id = u.id 
+            WHERE d.jadwal_id = :jadwal_id 
+            ORDER BY d.created_at ASC
+        ");
+        $this->db->bind('jadwal_id', $jadwal_id);
+        return $this->db->resultSet();
+    }
+
+    public function tambahDiskusi($data)
+    {
+        $this->db->query("INSERT INTO elearning_diskusi (jadwal_id, user_id, pesan) VALUES (:jadwal_id, :user_id, :pesan)");
+        $this->db->bind('jadwal_id', $data['jadwal_id']);
+        $this->db->bind('user_id', $data['user_id']);
+        $this->db->bind('pesan', $data['pesan']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function getAbsensiByJadwalTanggal($jadwal_id, $tanggal)
+    {
+        // Get all students in the rombel associated with this jadwal
+        $this->db->query("
+            SELECT s.id as siswa_id, s.nis, s.nama_lengkap, a.status_kehadiran
+            FROM jadwal_pelajaran jp
+            JOIN anggota_rombel ar ON jp.rombel_id = ar.rombel_id
+            JOIN siswa s ON ar.siswa_id = s.id
+            LEFT JOIN elearning_absensi a ON jp.id = a.jadwal_id AND s.id = a.siswa_id AND a.tanggal = :tanggal
+            WHERE jp.id = :jadwal_id
+            ORDER BY s.nama_lengkap ASC
+        ");
+        $this->db->bind('jadwal_id', $jadwal_id);
+        $this->db->bind('tanggal', $tanggal);
+        return $this->db->resultSet();
+    }
+
+    public function simpanAbsensi($jadwal_id, $tanggal, $siswa_id, $status_kehadiran)
+    {
+        $this->db->query("
+            INSERT INTO elearning_absensi (jadwal_id, siswa_id, tanggal, status_kehadiran) 
+            VALUES (:jadwal_id, :siswa_id, :tanggal, :status_kehadiran)
+            ON DUPLICATE KEY UPDATE status_kehadiran = VALUES(status_kehadiran)
+        ");
+        $this->db->bind('jadwal_id', $jadwal_id);
+        $this->db->bind('siswa_id', $siswa_id);
+        $this->db->bind('tanggal', $tanggal);
+        $this->db->bind('status_kehadiran', $status_kehadiran);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
 }

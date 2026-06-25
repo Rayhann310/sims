@@ -38,7 +38,22 @@ class Jadwal extends Controller {
     public function getJadwalAjax($rombel_id)
     {
         header('Content-Type: application/json');
-        echo json_encode($this->model('JadwalModel')->getJadwalByRombel($rombel_id));
+        $jadwal = $this->model('JadwalModel')->getJadwalByRombel($rombel_id);
+        
+        if (isset($_SESSION['user']) && $_SESSION['user']['role'] == 'guru') {
+            $guru_id = $this->model('JadwalModel')->getGuruIdByUserId($_SESSION['user']['id']);
+            if ($guru_id) {
+                $filtered = [];
+                foreach ($jadwal as $j) {
+                    if ($j['guru_id'] == $guru_id) {
+                        $filtered[] = $j;
+                    }
+                }
+                $jadwal = array_values($filtered); // reset keys for JSON array format
+            }
+        }
+        
+        echo json_encode($jadwal);
         exit;
     }
 

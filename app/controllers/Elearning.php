@@ -44,6 +44,7 @@ class Elearning extends Controller {
         
         $data['materi'] = $this->model('ElearningModel')->getMateriByJadwal($jadwal_id);
         $data['tugas'] = $this->model('ElearningModel')->getTugasByJadwal($jadwal_id);
+        $data['diskusi'] = $this->model('ElearningModel')->getDiskusiByJadwal($jadwal_id);
         
         $this->view('templates/admin_header', $data);
         $this->view('elearning/detail', $data);
@@ -86,6 +87,77 @@ class Elearning extends Controller {
             }
             
             header('Location: ' . BASEURL . '/elearning/detail/' . $jadwal_id);
+            exit;
+        }
+    }
+
+    public function tambahTugas()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && $_SESSION['user']['role'] == 'guru') {
+            $jadwal_id = $_POST['jadwal_id'];
+            $judul = $_POST['judul'];
+            $deskripsi = $_POST['deskripsi'];
+            $tenggat_waktu = $_POST['tenggat_waktu'];
+            
+            $data = [
+                'jadwal_id' => $jadwal_id,
+                'judul' => $judul,
+                'deskripsi' => $deskripsi,
+                'tenggat_waktu' => $tenggat_waktu
+            ];
+
+            if($this->model('ElearningModel')->tambahTugas($data) > 0) {
+                $_SESSION['flash'] = ['pesan' => 'Tugas berhasil', 'aksi' => 'ditambahkan', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'Tugas gagal', 'aksi' => 'ditambahkan', 'tipe' => 'danger'];
+            }
+            
+            header('Location: ' . BASEURL . '/elearning/detail/' . $jadwal_id . '?tab=tugas');
+            exit;
+        }
+    }
+
+    public function tambahDiskusi()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $jadwal_id = $_POST['jadwal_id'];
+            $data = [
+                'jadwal_id' => $jadwal_id,
+                'user_id' => $_SESSION['user']['id'],
+                'pesan' => $_POST['pesan']
+            ];
+            $this->model('ElearningModel')->tambahDiskusi($data);
+            header('Location: ' . BASEURL . '/elearning/detail/' . $jadwal_id . '?tab=diskusi');
+            exit;
+        }
+    }
+
+    public function getAbsensiAjax($jadwal_id, $tanggal)
+    {
+        header('Content-Type: application/json');
+        try {
+            $data = $this->model('ElearningModel')->getAbsensiByJadwalTanggal($jadwal_id, $tanggal);
+            echo json_encode($data);
+        } catch (Exception $e) {
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    public function simpanAbsensi()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && $_SESSION['user']['role'] == 'guru') {
+            header('Content-Type: application/json');
+            $jadwal_id = $_POST['jadwal_id'];
+            $tanggal = $_POST['tanggal'];
+            $absensi = $_POST['absensi'] ?? []; // Array of siswa_id => status
+
+            $sukses = 0;
+            foreach ($absensi as $siswa_id => $status) {
+                $sukses += $this->model('ElearningModel')->simpanAbsensi($jadwal_id, $tanggal, $siswa_id, $status);
+            }
+
+            echo json_encode(['status' => 'success', 'message' => 'Absensi berhasil disimpan']);
             exit;
         }
     }
