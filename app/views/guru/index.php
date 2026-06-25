@@ -280,13 +280,19 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Jabatan</label>
-                                <select name="jabatan_id" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
-                                    <option value="">-- Tidak Ada Jabatan --</option>
-                                    <?php foreach($data['jabatan_list'] ?? [] as $jab): ?>
-                                    <option value="<?= $jab['id'] ?>"><?= htmlspecialchars($jab['nama_jabatan']) ?></option>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Jabatan <span class="text-xs text-slate-400 font-normal">(bisa pilih lebih dari satu)</span></label>
+                                <div class="grid grid-cols-1 gap-1.5 max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-white">
+                                    <?php if(empty($data['jabatan_list'])): ?>
+                                    <p class="text-xs text-slate-400 italic">Belum ada jabatan. <a href="<?= BASEURL ?>/jabatan" class="text-blue-500 underline">Tambah di sini</a>.</p>
+                                    <?php else: ?>
+                                    <?php foreach($data['jabatan_list'] as $jab): ?>
+                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-2 py-1 rounded">
+                                        <input type="checkbox" name="jabatan_id[]" value="<?= $jab['id'] ?>" class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                                        <span class="text-sm text-slate-700"><?= htmlspecialchars($jab['nama_jabatan']) ?></span>
+                                    </label>
                                     <?php endforeach; ?>
-                                </select>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
 
@@ -428,13 +434,19 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Jabatan</label>
-                            <select name="jabatan_id" id="edit_jabatan_id" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">-- Tidak Ada Jabatan --</option>
-                                <?php foreach($data['jabatan_list'] ?? [] as $jab): ?>
-                                <option value="<?= $jab['id'] ?>"><?= htmlspecialchars($jab['nama_jabatan']) ?></option>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Jabatan <span class="text-xs text-slate-400 font-normal">(bisa pilih lebih dari satu)</span></label>
+                            <div id="edit_jabatan_checkboxes" class="grid grid-cols-1 gap-1.5 max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-white">
+                                <?php if(empty($data['jabatan_list'])): ?>
+                                <p class="text-xs text-slate-400 italic">Belum ada jabatan.</p>
+                                <?php else: ?>
+                                <?php foreach($data['jabatan_list'] as $jab): ?>
+                                <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-2 py-1 rounded">
+                                    <input type="checkbox" name="jabatan_id[]" value="<?= $jab['id'] ?>" class="edit-jabatan-cb rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                    <span class="text-sm text-slate-700"><?= htmlspecialchars($jab['nama_jabatan']) ?></span>
+                                </label>
                                 <?php endforeach; ?>
-                            </select>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
 
@@ -628,10 +640,14 @@ function openEditModalGuru(id) {
         document.getElementById('edit_no_hp').value = data.no_hp;
         document.getElementById('edit_alamat').value = data.alamat;
         
-        // Set jabatan dropdown
-        const jabatanSelect = document.getElementById('edit_jabatan_id');
-        if(jabatanSelect) {
-            jabatanSelect.value = data.jabatan_id || '';
+        // Set jabatan checkboxes (rangkap jabatan)
+        const jabatanCbs = document.querySelectorAll('.edit-jabatan-cb');
+        jabatanCbs.forEach(cb => { cb.checked = false; });
+        if(data.jabatan_ids && Array.isArray(data.jabatan_ids)) {
+            data.jabatan_ids.forEach(jid => {
+                const cb = document.querySelector(`.edit-jabatan-cb[value="${jid}"]`);
+                if(cb) cb.checked = true;
+            });
         }
 
         const fotoPreview = document.getElementById('edit_foto_preview');

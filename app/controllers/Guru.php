@@ -50,7 +50,7 @@ class Guru extends Controller {
 
     public function detail($id)
     {
-        echo json_encode($this->model('GuruModel')->getGuruById($id));
+        echo json_encode($this->model('GuruModel')->getGuruByIdWithJabatan($id));
     }
 
     public function getubah()

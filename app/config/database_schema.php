@@ -18,6 +18,24 @@ return array (
       'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
+  'guru_jabatan' =>
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `guru_jabatan` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `guru_id` int(11) NOT NULL,
+  `jabatan_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `guru_jabatan_unique` (`guru_id`, `jabatan_id`),
+  KEY `guru_id` (`guru_id`),
+  KEY `jabatan_id` (`jabatan_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' =>
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'guru_id' => 'int(11) NOT NULL',
+      'jabatan_id' => 'int(11) NOT NULL',
+    ),
+  ),
   'anggota_rombel' => 
   array (
     'create_sql' => 'CREATE TABLE IF NOT EXISTS `anggota_rombel` (

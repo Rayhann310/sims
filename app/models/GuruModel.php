@@ -108,6 +108,51 @@ class GuruModel {
         return $this->db->single();
     }
 
+    public function getGuruByIdWithJabatan($id)
+    {
+        $guru = $this->getGuruById($id);
+        if ($guru) {
+            $guru['jabatan_list'] = $this->getJabatanByGuru($id);
+            // Build jabatan_ids array for form pre-selection
+            $guru['jabatan_ids'] = array_column($guru['jabatan_list'], 'jabatan_id');
+            // Build display string
+            $guru['nama_jabatan'] = implode(', ', array_column($guru['jabatan_list'], 'nama_jabatan'));
+        }
+        return $guru;
+    }
+
+    public function getJabatanByGuru($guru_id)
+    {
+        $this->db->query("SELECT gj.jabatan_id, j.nama_jabatan
+                          FROM guru_jabatan gj
+                          JOIN jabatan j ON gj.jabatan_id = j.id
+                          WHERE gj.guru_id = :guru_id
+                          ORDER BY j.nama_jabatan ASC");
+        $this->db->bind('guru_id', $guru_id);
+        return $this->db->resultSet();
+    }
+
+    public function syncJabatanGuru($guru_id, $jabatan_ids = [])
+    {
+        // Hapus semua jabatan lama
+        $this->db->query("DELETE FROM guru_jabatan WHERE guru_id = :guru_id");
+        $this->db->bind('guru_id', $guru_id);
+        $this->db->execute();
+
+        // Insert jabatan baru
+        if (!empty($jabatan_ids)) {
+            foreach ($jabatan_ids as $jabatan_id) {
+                $jabatan_id = (int)$jabatan_id;
+                if ($jabatan_id > 0) {
+                    $this->db->query("INSERT IGNORE INTO guru_jabatan (guru_id, jabatan_id) VALUES (:guru_id, :jabatan_id)");
+                    $this->db->bind('guru_id', $guru_id);
+                    $this->db->bind('jabatan_id', $jabatan_id);
+                    $this->db->execute();
+                }
+            }
+        }
+    }
+
     public function getJabatanList()
     {
         $this->db->query("SELECT * FROM jabatan ORDER BY nama_jabatan ASC");
@@ -135,7 +180,7 @@ class GuruModel {
             $userId = $this->db->single()['last_id'];
 
             // 2. Tambah guru
-            $queryGuru = "INSERT INTO guru (user_id, nip, jenis_kelamin, tanggal_lahir, no_hp, alamat, jabatan_id) VALUES (:user_id, :nip, :jenis_kelamin, :tanggal_lahir, :no_hp, :alamat, :jabatan_id)";
+            $queryGuru = "INSERT INTO guru (user_id, nip, jenis_kelamin, tanggal_lahir, no_hp, alamat) VALUES (:user_id, :nip, :jenis_kelamin, :tanggal_lahir, :no_hp, :alamat)";
             $this->db->query($queryGuru);
             $this->db->bind('user_id', $userId);
             $this->db->bind('nip', htmlspecialchars($data['nip']));
@@ -143,11 +188,19 @@ class GuruModel {
             $this->db->bind('tanggal_lahir', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
             $this->db->bind('no_hp', htmlspecialchars($data['no_hp']));
             $this->db->bind('alamat', htmlspecialchars($data['alamat']));
-            $this->db->bind('jabatan_id', !empty($data['jabatan_id']) ? (int)$data['jabatan_id'] : null);
             $this->db->execute();
+
+            // Dapatkan ID guru yang baru dibuat
+            $this->db->query("SELECT LAST_INSERT_ID() as last_id");
+            $guruId = $this->db->single()['last_id'];
 
             $this->db->query("COMMIT");
             $this->db->execute();
+
+            // 3. Sync jabatan (many-to-many) - luar transaksi
+            $jabatan_ids = isset($data['jabatan_id']) ? (array)$data['jabatan_id'] : [];
+            $this->syncJabatanGuru($guruId, $jabatan_ids);
+
             return ['status' => true];
         } catch (PDOException $e) {
             $this->db->query("ROLLBACK");
@@ -197,21 +250,25 @@ class GuruModel {
 
             // 2. Ubah data guru
             if(!empty($data['foto'])) {
-                $this->db->query("UPDATE guru SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, no_hp = :no_hp, alamat = :alamat, foto = :foto, jabatan_id = :jabatan_id WHERE id = :id");
+                $this->db->query("UPDATE guru SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, no_hp = :no_hp, alamat = :alamat, foto = :foto WHERE id = :id");
                 $this->db->bind('foto', $data['foto']);
             } else {
-                $this->db->query("UPDATE guru SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, no_hp = :no_hp, alamat = :alamat, jabatan_id = :jabatan_id WHERE id = :id");
+                $this->db->query("UPDATE guru SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, no_hp = :no_hp, alamat = :alamat WHERE id = :id");
             }
             $this->db->bind('jenis_kelamin', htmlspecialchars($data['jenis_kelamin']));
             $this->db->bind('tanggal_lahir', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
             $this->db->bind('no_hp', htmlspecialchars($data['no_hp']));
             $this->db->bind('alamat', htmlspecialchars($data['alamat']));
-            $this->db->bind('jabatan_id', !empty($data['jabatan_id']) ? (int)$data['jabatan_id'] : null);
             $this->db->bind('id', $data['id']);
             $this->db->execute();
 
             $this->db->query("COMMIT");
             $this->db->execute();
+
+            // 3. Sync jabatan (many-to-many) - luar transaksi
+            $jabatan_ids = isset($data['jabatan_id']) ? (array)$data['jabatan_id'] : [];
+            $this->syncJabatanGuru($data['id'], $jabatan_ids);
+
             return true;
         } catch (Exception $e) {
             $this->db->query("ROLLBACK");
