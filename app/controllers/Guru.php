@@ -62,6 +62,11 @@ class Guru extends Controller {
         echo json_encode($this->model('GuruModel')->getWaliKelasList());
     }
 
+    public function getulangtahun()
+    {
+        echo json_encode($this->model('GuruModel')->getUlangTahunHariIni());
+    }
+
     public function ubah()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {

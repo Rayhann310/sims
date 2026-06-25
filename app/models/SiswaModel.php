@@ -63,6 +63,16 @@ class SiswaModel {
         return $this->db->single();
     }
 
+    public function getUlangTahunHariIni()
+    {
+        $this->db->query("SELECT siswa.*, users.nama_lengkap 
+                          FROM siswa 
+                          JOIN users ON siswa.user_id = users.id 
+                          WHERE MONTH(tanggal_lahir) = MONTH(CURRENT_DATE()) 
+                          AND DAY(tanggal_lahir) = DAY(CURRENT_DATE())");
+        return $this->db->resultSet();
+    }
+
     public function getSiswaStats()
     {
         $stats = [

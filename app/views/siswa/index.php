@@ -1,7 +1,8 @@
 <div class="space-y-6" 
-     x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, detailModalOpen: false, deleteUrl: '', currentSiswa: {} }"
+     x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, detailModalOpen: false, ultahModalOpen: false, deleteUrl: '', currentSiswa: {} }"
      @open-edit-modal.window="editModalOpen = true"
      @open-detail-modal.window="detailModalOpen = true; currentSiswa = $event.detail;"
+     @open-ultah-modal.window="ultahModalOpen = true"
      @open-delete-modal.window="deleteModalOpen = true; deleteUrl = $event.detail.url">
     
     <!-- Stats Grid 5 Cards -->
@@ -63,17 +64,19 @@
         </div>
 
         <!-- Stat Card 5 -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
+        <div @click="openUltahModal()" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group cursor-pointer">
             <div class="flex items-center gap-4 mb-2">
                 <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <i class="fas fa-birthday-cake text-xl"></i>
                 </div>
                 <div>
-                    <p class="text-xs font-medium text-slate-400">Ulang Tahun</p>
-                    <p class="text-2xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['ultah']); ?></p>
+                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ultah Hari Ini</h3>
                 </div>
             </div>
-            <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold border-t border-slate-100 pt-2">Tgl: <?= date('d M Y'); ?> (WIB)</p>
+            <div>
+                <p class="text-sm font-medium text-slate-400 mb-1">Siswa</p>
+                <p class="text-3xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['ultah']); ?></p>
+            </div>
         </div>
     </div>
 
@@ -491,63 +494,83 @@
             </div>
         </div>
     </div>
-    <!-- Modal Detail Data -->
+    <!-- Modal Detail Data Siswa -->
     <div x-show="detailModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
         <div x-show="detailModalOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="detailModalOpen = false"></div>
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <div x-show="detailModalOpen" x-transition class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-slate-200">
                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="text-xl font-bold leading-6 text-slate-900"><i class="fas fa-id-card mr-2 text-emerald-600"></i> Detail Informasi Siswa</h3>
-                    <button @click="detailModalOpen = false" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+                    <h3 class="text-lg font-semibold leading-6 text-slate-900 flex items-center gap-2">
+                        <i class="fas fa-address-card text-blue-500"></i>
+                        Profil Detail Siswa
+                    </h3>
+                    <button type="button" @click="detailModalOpen = false" class="text-slate-400 hover:text-slate-500 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
                 </div>
-                <div class="px-6 py-6 space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-4">
-                            <h4 class="font-semibold text-slate-700 border-b border-slate-200 pb-2"><i class="fas fa-user mr-2"></i> Biodata Utama</h4>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">NISN</p>
-                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.nisn || '-'"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Nama Lengkap</p>
-                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.nama_lengkap || '-'"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Jenis Kelamin</p>
-                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan'"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Tanggal Lahir</p>
-                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.tanggal_lahir || 'Belum Diatur'"></p>
+                <div class="bg-slate-50 px-6 py-6">
+                    <!-- Profile Header with Photo -->
+                    <div class="flex flex-col sm:flex-row items-center gap-6 mb-6 pb-6 border-b border-slate-200">
+                        <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-lg overflow-hidden shrink-0 bg-white flex items-center justify-center text-4xl font-bold text-blue-200">
+                            <template x-if="currentSiswa.foto">
+                                <img :src="currentSiswa.foto" class="w-full h-full object-cover" alt="Foto Siswa">
+                            </template>
+                            <template x-if="!currentSiswa.foto">
+                                <span x-text="currentSiswa.nama_lengkap ? currentSiswa.nama_lengkap.charAt(0).toUpperCase() : '?'"></span>
+                            </template>
+                        </div>
+                        <div class="text-center sm:text-left flex-1">
+                            <h4 class="text-2xl font-bold text-slate-800 mb-1" x-text="currentSiswa.nama_lengkap"></h4>
+                            <p class="text-sm font-medium text-blue-600 mb-3 bg-blue-50 inline-block px-3 py-1 rounded-full border border-blue-100" x-text="'NISN: ' + currentSiswa.nisn"></p>
+                            
+                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-sm text-slate-600">
+                                <span class="flex items-center gap-1"><i class="fas fa-venus-mars w-4 text-center text-slate-400"></i> <span x-text="currentSiswa.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan'"></span></span>
+                                <span class="text-slate-300">•</span>
+                                <span class="flex items-center gap-1"><i class="fas fa-calendar-alt w-4 text-center text-slate-400"></i> <span x-text="currentSiswa.tanggal_lahir ? new Date(currentSiswa.tanggal_lahir).toLocaleDateString('id-ID') : '-'"></span></span>
                             </div>
                         </div>
-                        <div class="space-y-4">
-                            <h4 class="font-semibold text-slate-700 border-b border-slate-200 pb-2"><i class="fas fa-info-circle mr-2"></i> Informasi Tambahan</h4>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Nama Wali</p>
-                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.nama_wali || 'Belum Diatur'"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Alamat</p>
-                                <p class="text-sm font-semibold text-slate-800" x-text="currentSiswa.alamat || 'Belum Diatur'"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Status Akademik</p>
-                                <p class="text-sm font-semibold">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
-                                          :class="{'bg-emerald-100 text-emerald-800': currentSiswa.status === 'Aktif', 'bg-blue-100 text-blue-800': currentSiswa.status === 'Alumni', 'bg-red-100 text-red-800': currentSiswa.status === 'Keluar'}"
-                                          x-text="currentSiswa.status || 'Aktif'"></span>
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Akun Login</p>
-                                <p class="text-sm font-semibold text-slate-800">@<span x-text="currentSiswa.username"></span></p>
-                            </div>
+                    </div>
+
+                    <!-- Additional Details Info Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Informasi Akademik</h5>
+                            <ul class="space-y-3">
+                                <li class="flex flex-col">
+                                    <span class="text-xs text-slate-500">Status Akademik</span>
+                                    <span class="font-medium text-slate-800 flex items-center gap-2 mt-0.5">
+                                        <span class="w-2 h-2 rounded-full" :class="{'bg-emerald-500': currentSiswa.status === 'Aktif', 'bg-blue-500': currentSiswa.status === 'Alumni', 'bg-red-500': currentSiswa.status === 'Keluar'}"></span>
+                                        <span x-text="currentSiswa.status || 'Aktif'"></span>
+                                    </span>
+                                </li>
+                                <li class="flex flex-col">
+                                    <span class="text-xs text-slate-500">Akun Login (Username)</span>
+                                    <span class="font-medium text-slate-800 mt-0.5" x-text="'@' + currentSiswa.username"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Informasi Kontak & Domisili</h5>
+                            <ul class="space-y-3">
+                                <li class="flex flex-col">
+                                    <span class="text-xs text-slate-500">Nama Wali</span>
+                                    <span class="font-medium text-slate-800 mt-0.5" x-text="currentSiswa.nama_wali || '-'"></span>
+                                </li>
+                                <li class="flex flex-col">
+                                    <span class="text-xs text-slate-500">Nomor Telepon Keluarga / Orang Tua</span>
+                                    <span class="font-medium text-slate-800 mt-0.5" x-text="currentSiswa.no_hp_ortu || '-'"></span>
+                                </li>
+                                <li class="flex flex-col">
+                                    <span class="text-xs text-slate-500">Alamat Rumah</span>
+                                    <span class="font-medium text-slate-800 mt-0.5" x-text="currentSiswa.alamat || '-'"></span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
                 <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button type="button" @click="detailModalOpen = false" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:mt-0 sm:w-auto">Tutup</button>
+                    <button type="button" @click="detailModalOpen = false" class="inline-flex w-full justify-center rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:w-auto">Tutup</button>
                 </div>
             </div>
         </div>
@@ -601,6 +624,42 @@ function openEditModalSiswa(id) {
         // Buka modal Alpine dari luar
         window.dispatchEvent(new CustomEvent('open-edit-modal'));
     });
+}
+
+function openUltahModal() {
+    window.dispatchEvent(new CustomEvent('open-ultah-modal'));
+    document.getElementById('ultahContainer').innerHTML = '<div class="flex justify-center py-4"><i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i></div>';
+    
+    fetch('<?= BASEURL; ?>/siswa/getulangtahun')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('ultahContainer');
+            if(data.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-500 py-4">Belum ada siswa yang berulang tahun hari ini</div>';
+                return;
+            }
+            
+            let html = '';
+            data.forEach(s => {
+                let fotoHtml = s.foto ? `<img src="${s.foto}" class="w-10 h-10 rounded-full object-cover">` : `<div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">${s.nama_lengkap.substring(0,1).toUpperCase()}</div>`;
+                html += `
+                <div class="bg-white p-4 rounded-xl border border-slate-200 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3">
+                        ${fotoHtml}
+                        <div>
+                            <p class="font-bold text-slate-800">${s.nama_lengkap}</p>
+                            <p class="text-xs text-slate-500">NISN: ${s.nisn}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                            <i class="fas fa-gift mr-1"></i> Hari Ini
+                        </span>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        });
 }
 
 // Self-healing: Image Compression

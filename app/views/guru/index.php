@@ -5,6 +5,7 @@
     deleteModalOpen: false, 
     detailModalOpen: false, 
     waliKelasModalOpen: false,
+    ultahModalOpen: false,
     deleteUrl: '', 
     currentGuru: {} 
 }" 
@@ -12,10 +13,11 @@
      @open-detail-modal.window="detailModalOpen = true; currentGuru = $event.detail;"
      @open-delete-modal.window="deleteModalOpen = true; deleteUrl = $event.detail.url"
      @open-walikelas-modal.window="waliKelasModalOpen = true"
+     @open-ultah-modal.window="ultahModalOpen = true"
      class="space-y-6">
     
-    <!-- Stats Grid 4 Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Stat Card 1 -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group">
             <div class="flex items-center gap-4 mb-2">
@@ -63,11 +65,26 @@
                     <i class="fas fa-user-tie text-xl"></i>
                 </div>
                 <div>
-                    <p class="text-xs font-medium text-slate-400">Wali Kelas</p>
-                    <p class="text-2xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['wali_kelas']); ?></p>
+                <p class="text-sm font-medium text-slate-400 mb-1">Wali Kelas</p>
+                <p class="text-3xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['wali_kelas']); ?></p>
+            </div>
+        </div>
+        </div>
+
+        <!-- Stat Card 5 -->
+        <div @click="openUltahModal()" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-center hover:shadow-md transition-all group cursor-pointer">
+            <div class="flex items-center gap-4 mb-2">
+                <div class="w-12 h-12 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <i class="fas fa-birthday-cake text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ultah Hari Ini</h3>
                 </div>
             </div>
-            <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold border-t border-slate-100 pt-2">Thn Akd: Aktif</p>
+            <div>
+                <p class="text-sm font-medium text-slate-400 mb-1">Guru</p>
+                <p class="text-3xl font-bold text-slate-800 tracking-tight"><?= number_format($data['stats']['ultah_hari_ini']); ?></p>
+            </div>
         </div>
     </div>
 
@@ -376,12 +393,18 @@
                             <input type="text" name="nama_lengkap" id="edit_nama_lengkap" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Gender</label>
-                            <select name="jenis_kelamin" id="edit_jenis_kelamin" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="L">Laki-laki</option>
-                                <option value="P">Perempuan</option>
-                            </select>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
+                                <select name="jenis_kelamin" id="edit_jenis_kelamin" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="L">Laki-Laki</option>
+                                    <option value="P">Perempuan</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Lahir</label>
+                                <input type="date" name="tanggal_lahir" id="edit_tanggal_lahir" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                            </div>
                         </div>
 
                         <div>
@@ -438,45 +461,66 @@
         <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <div x-show="detailModalOpen" x-transition class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-slate-200">
                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="text-xl font-bold leading-6 text-slate-900"><i class="fas fa-id-badge mr-2 text-emerald-600"></i> Detail Informasi Guru</h3>
-                    <button @click="detailModalOpen = false" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+                    <h3 class="text-lg font-semibold leading-6 text-slate-900 flex items-center gap-2">
+                        <i class="fas fa-id-badge text-emerald-500"></i>
+                        Profil Detail Guru
+                    </h3>
+                    <button type="button" @click="detailModalOpen = false" class="text-slate-400 hover:text-slate-500 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
                 </div>
-                <div class="px-6 py-6 space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-4">
-                            <h4 class="font-semibold text-slate-700 border-b border-slate-200 pb-2"><i class="fas fa-user-circle mr-2"></i> Biodata Utama</h4>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">NIP/NUPTK</p>
-                                <p class="text-sm font-semibold text-slate-800" x-text="currentGuru.nip || '-'"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Nama Lengkap</p>
-                                <p class="text-sm font-semibold text-slate-800" x-text="currentGuru.nama_lengkap || '-'"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Jenis Kelamin</p>
-                                <p class="text-sm font-semibold text-slate-800" x-text="currentGuru.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan'"></p>
+                <div class="bg-slate-50 px-6 py-6">
+                    <!-- Profile Header with Photo -->
+                    <div class="flex flex-col sm:flex-row items-center gap-6 mb-6 pb-6 border-b border-slate-200">
+                        <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-lg overflow-hidden shrink-0 bg-white flex items-center justify-center text-4xl font-bold text-emerald-200">
+                            <template x-if="currentGuru.foto">
+                                <img :src="currentGuru.foto" class="w-full h-full object-cover" alt="Foto Guru">
+                            </template>
+                            <template x-if="!currentGuru.foto">
+                                <span x-text="currentGuru.nama_lengkap ? currentGuru.nama_lengkap.charAt(0).toUpperCase() : '?'"></span>
+                            </template>
+                        </div>
+                        <div class="text-center sm:text-left flex-1">
+                            <h4 class="text-2xl font-bold text-slate-800 mb-1" x-text="currentGuru.nama_lengkap"></h4>
+                            <p class="text-sm font-medium text-emerald-600 mb-3 bg-emerald-50 inline-block px-3 py-1 rounded-full border border-emerald-100" x-text="'NIP/NUPTK: ' + currentGuru.nip"></p>
+                            
+                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-sm text-slate-600">
+                                <span class="flex items-center gap-1"><i class="fas fa-venus-mars w-4 text-center text-slate-400"></i> <span x-text="currentGuru.jenis_kelamin === 'L' ? 'Laki-Laki' : 'Perempuan'"></span></span>
+                                <span class="text-slate-300">•</span>
+                                <span class="flex items-center gap-1"><i class="fas fa-calendar-alt w-4 text-center text-slate-400"></i> <span x-text="currentGuru.tanggal_lahir ? new Date(currentGuru.tanggal_lahir).toLocaleDateString('id-ID') : '-'"></span></span>
                             </div>
                         </div>
-                        <div class="space-y-4">
-                            <h4 class="font-semibold text-slate-700 border-b border-slate-200 pb-2"><i class="fas fa-info-circle mr-2"></i> Informasi Tambahan</h4>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">No. Handphone</p>
-                                <p class="text-sm font-semibold text-slate-800" x-text="currentGuru.no_hp || 'Belum Diatur'"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Alamat</p>
-                                <p class="text-sm font-semibold text-slate-800" x-text="currentGuru.alamat || 'Belum Diatur'"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Akun Login</p>
-                                <p class="text-sm font-semibold text-slate-800">@<span x-text="currentGuru.username"></span></p>
-                            </div>
+                    </div>
+
+                    <!-- Additional Details Info Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Informasi Kepegawaian</h5>
+                            <ul class="space-y-3">
+                                <li class="flex flex-col">
+                                    <span class="text-xs text-slate-500">Akun Login (Username)</span>
+                                    <span class="font-medium text-slate-800 mt-0.5" x-text="'@' + currentGuru.username"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Informasi Kontak & Domisili</h5>
+                            <ul class="space-y-3">
+                                <li class="flex flex-col">
+                                    <span class="text-xs text-slate-500">Nomor Handphone</span>
+                                    <span class="font-medium text-slate-800 mt-0.5" x-text="currentGuru.no_hp || '-'"></span>
+                                </li>
+                                <li class="flex flex-col">
+                                    <span class="text-xs text-slate-500">Alamat Rumah</span>
+                                    <span class="font-medium text-slate-800 mt-0.5" x-text="currentGuru.alamat || '-'"></span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
                 <div class="bg-slate-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button type="button" @click="detailModalOpen = false" class="inline-flex w-full justify-center rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:w-auto">Tutup</button>
+                    <button type="button" @click="detailModalOpen = false" class="inline-flex w-full justify-center rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 sm:w-auto">Tutup</button>
                 </div>
             </div>
         </div>
@@ -503,6 +547,32 @@
                 </div>
                 <div class="bg-white px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6 border-t border-slate-200 gap-3">
                     <button type="button" @click="waliKelasModalOpen = false" class="inline-flex w-full justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:w-auto transition-colors">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ulang Tahun -->
+    <div x-show="ultahModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div x-show="ultahModalOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="ultahModalOpen = false"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="ultahModalOpen" x-transition class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-slate-200">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold leading-6 text-slate-900 flex items-center gap-2">
+                        <i class="fas fa-birthday-cake text-pink-500"></i>
+                        Guru yang Berulang Tahun Hari Ini
+                    </h3>
+                    <button type="button" @click="ultahModalOpen = false" class="text-slate-400 hover:text-slate-500 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="bg-slate-50 px-6 py-6 max-h-[60vh] overflow-y-auto">
+                    <div id="ultahContainer" class="space-y-3">
+                        <div class="flex justify-center py-4"><i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i></div>
+                    </div>
+                </div>
+                <div class="bg-white px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6 border-t border-slate-200 gap-3">
+                    <button type="button" @click="ultahModalOpen = false" class="inline-flex w-full justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:w-auto transition-colors">Tutup</button>
                 </div>
             </div>
         </div>
@@ -534,6 +604,7 @@ function openEditModalGuru(id) {
         document.getElementById('edit_nip').value = data.nip;
         document.getElementById('edit_nama_lengkap').value = data.nama_lengkap;
         document.getElementById('edit_jenis_kelamin').value = data.jenis_kelamin;
+        document.getElementById('edit_tanggal_lahir').value = data.tanggal_lahir;
         document.getElementById('edit_no_hp').value = data.no_hp;
         document.getElementById('edit_alamat').value = data.alamat;
 
@@ -585,6 +656,42 @@ function openWaliKelasModal() {
                     <div class="text-right">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">
                             Kelas ${g.kelas}
+                        </span>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        });
+}
+
+function openUltahModal() {
+    window.dispatchEvent(new CustomEvent('open-ultah-modal'));
+    document.getElementById('ultahContainer').innerHTML = '<div class="flex justify-center py-4"><i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i></div>';
+    
+    fetch('<?= BASEURL; ?>/guru/getulangtahun')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('ultahContainer');
+            if(data.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-500 py-4">Belum ada guru yang berulang tahun hari ini</div>';
+                return;
+            }
+            
+            let html = '';
+            data.forEach(g => {
+                let fotoHtml = g.foto ? `<img src="${g.foto}" class="w-10 h-10 rounded-full object-cover">` : `<div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">${g.nama_lengkap.substring(0,1).toUpperCase()}</div>`;
+                html += `
+                <div class="bg-white p-4 rounded-xl border border-slate-200 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3">
+                        ${fotoHtml}
+                        <div>
+                            <p class="font-bold text-slate-800">${g.nama_lengkap}</p>
+                            <p class="text-xs text-slate-500">NIP: ${g.nip}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-800 border border-pink-200">
+                            <i class="fas fa-gift mr-1"></i> Hari Ini
                         </span>
                     </div>
                 </div>`;

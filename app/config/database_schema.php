@@ -19,7 +19,7 @@ return array (
       'id' => 'int(11) NOT NULL auto_increment',
       'rombel_id' => 'int(11) NOT NULL',
       'siswa_id' => 'int(11) NOT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'catatan_kedisiplinan' => 
@@ -50,7 +50,7 @@ return array (
       'poin_dicatat' => 'int(11) NOT NULL',
       'keterangan' => 'text DEFAULT NULL',
       'dicatat_oleh' => 'int(11) NOT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'elearning_materi' => 
@@ -73,7 +73,7 @@ return array (
       'judul' => 'varchar(255) NOT NULL',
       'deskripsi' => 'text DEFAULT NULL',
       'file_path' => 'varchar(255) DEFAULT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'elearning_pengumpulan' => 
@@ -121,7 +121,7 @@ return array (
       'judul' => 'varchar(255) NOT NULL',
       'deskripsi' => 'text DEFAULT NULL',
       'tenggat_waktu' => 'datetime NOT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'guru' => 
@@ -131,6 +131,7 @@ return array (
   `user_id` int(11) NOT NULL,
   `nip` varchar(50) NOT NULL,
   `jenis_kelamin` enum(\'L\',\'P\') NOT NULL,
+  `tanggal_lahir` date DEFAULT NULL,
   `no_hp` varchar(20) DEFAULT NULL,
   `alamat` text DEFAULT NULL,
   `foto` LONGTEXT DEFAULT NULL,
@@ -146,10 +147,11 @@ return array (
       'user_id' => 'int(11) NOT NULL',
       'nip' => 'varchar(50) NOT NULL',
       'jenis_kelamin' => 'enum(\'L\',\'P\') NOT NULL',
+      'tanggal_lahir' => 'date DEFAULT NULL',
       'no_hp' => 'varchar(20) DEFAULT NULL',
       'alamat' => 'text DEFAULT NULL',
       'foto' => 'LONGTEXT DEFAULT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'jadwal_pelajaran' => 
@@ -180,7 +182,7 @@ return array (
       'hari' => 'varchar(20) NOT NULL',
       'jam_mulai' => 'time NOT NULL',
       'jam_selesai' => 'time NOT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'kategori_kedisiplinan' => 
@@ -201,7 +203,7 @@ return array (
       'jenis' => 'enum(\'Pelanggaran\',\'Penghargaan\') NOT NULL',
       'tingkatan' => 'enum(\'Ringan\',\'Sedang\',\'Berat\',\'Prestasi\') NOT NULL',
       'poin' => 'int(11) NOT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'kearsipan' => 
@@ -230,7 +232,7 @@ return array (
       'perihal' => 'text NOT NULL',
       'file_surat' => 'varchar(255) DEFAULT NULL',
       'keterangan' => 'text DEFAULT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'kelas' => 
@@ -294,7 +296,7 @@ return array (
       'siswa_id' => 'int(11) NOT NULL',
       'jenis_nilai' => 'varchar(50) NOT NULL',
       'nilai' => 'decimal(5,2) DEFAULT 0.00',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'notifikasi' => 
@@ -319,7 +321,7 @@ return array (
       'pesan' => 'text NOT NULL',
       'link' => 'varchar(255) DEFAULT NULL',
       'is_read' => 'tinyint(1) DEFAULT 0',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'pembayaran_spp' => 
@@ -344,7 +346,7 @@ return array (
       'jumlah_bayar' => 'decimal(10,2) NOT NULL',
       'metode' => 'varchar(50) DEFAULT \'Cash\'',
       'keterangan' => 'text DEFAULT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'pengaturan' => 
@@ -384,7 +386,7 @@ return array (
       'judul' => 'varchar(255) NOT NULL',
       'isi' => 'text NOT NULL',
       'penulis_id' => 'int(11) NOT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'pesan' => 
@@ -411,7 +413,7 @@ return array (
       'subjek' => 'varchar(255) NOT NULL',
       'isi_pesan' => 'text NOT NULL',
       'is_read' => 'tinyint(1) DEFAULT 0',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'presensi_siswa' => 
@@ -438,7 +440,7 @@ return array (
       'siswa_id' => 'int(11) NOT NULL',
       'status' => 'enum(\'Hadir\',\'Izin\',\'Sakit\',\'Alpa\') DEFAULT \'Hadir\'',
       'keterangan' => 'varchar(255) DEFAULT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'rombel' => 
@@ -465,7 +467,7 @@ return array (
       'kelas_id' => 'int(11) NOT NULL',
       'nama_rombel' => 'varchar(50) NOT NULL',
       'wali_kelas_id' => 'int(11) DEFAULT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'siswa' => 
@@ -526,7 +528,7 @@ return array (
       'nominal' => 'decimal(10,2) NOT NULL',
       'status' => 'enum(\'Belum Lunas\',\'Lunas\') DEFAULT \'Belum Lunas\'',
       'jatuh_tempo' => 'date DEFAULT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'tahun_akademik' => 
@@ -545,7 +547,7 @@ return array (
       'nama_tahun' => 'varchar(20) NOT NULL',
       'semester' => 'enum(\'Ganjil\',\'Genap\') NOT NULL',
       'status' => 'enum(\'Aktif\',\'Tidak Aktif\') DEFAULT \'Tidak Aktif\'',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
   'users' => 
@@ -567,7 +569,7 @@ return array (
       'password' => 'varchar(255) NOT NULL',
       'role' => 'enum(\'admin\',\'guru\',\'siswa\') NOT NULL DEFAULT \'siswa\'',
       'nama_lengkap' => 'varchar(100) NOT NULL',
-      'created_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
 );

@@ -61,6 +61,11 @@ class Siswa extends Controller {
         echo json_encode($this->model('SiswaModel')->getSiswaById($_POST['id']));
     }
 
+    public function getulangtahun()
+    {
+        echo json_encode($this->model('SiswaModel')->getUlangTahunHariIni());
+    }
+
     public function ubah()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
