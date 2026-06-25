@@ -1,6 +1,7 @@
 {
     "name": "smanw/siakad",
     "require": {
-        "phpoffice/phpspreadsheet": "^5.8"
+        "phpoffice/phpspreadsheet": "^5.8",
+        "vlucas/phpdotenv": "^5.6"
     }
 }
