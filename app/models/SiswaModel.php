@@ -10,19 +10,26 @@ class SiswaModel {
 
     public function getAllSiswa($filters = [])
     {
-        $query = "SELECT siswa.*, users.username, users.nama_lengkap, kelas.nama_kelas, kelas.jurusan 
+        $query = "SELECT siswa.*, users.username, users.nama_lengkap, k.nama_kelas, k.jurusan 
                   FROM siswa 
                   JOIN users ON siswa.user_id = users.id 
-                  LEFT JOIN kelas ON siswa.kelas_id = kelas.id 
+                  LEFT JOIN (
+                      SELECT ar.siswa_id, kls.nama_kelas, kls.jurusan
+                      FROM anggota_rombel ar
+                      JOIN rombel r ON ar.rombel_id = r.id
+                      JOIN tahun_akademik ta ON r.tahun_akademik_id = ta.id
+                      JOIN kelas kls ON r.kelas_id = kls.id
+                      WHERE ta.status = 'Aktif'
+                  ) k ON siswa.id = k.siswa_id 
                   WHERE 1=1";
         
         $binds = [];
         if (!empty($filters['kelas'])) {
-            $query .= " AND kelas.nama_kelas = :kelas";
+            $query .= " AND k.nama_kelas = :kelas";
             $binds['kelas'] = $filters['kelas'];
         }
         if (!empty($filters['jurusan'])) {
-            $query .= " AND kelas.jurusan = :jurusan";
+            $query .= " AND k.jurusan = :jurusan";
             $binds['jurusan'] = $filters['jurusan'];
         }
         if (!empty($filters['jk'])) {
