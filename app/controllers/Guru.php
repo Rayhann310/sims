@@ -26,6 +26,7 @@ class Guru extends Controller {
         $chartData = $this->model('GuruModel')->getGuruChartStats();
         $data['chart_labels'] = json_encode(array_column($chartData, 'label'));
         $data['chart_data'] = json_encode(array_column($chartData, 'jumlah'));
+        $data['jabatan_list'] = $this->model('GuruModel')->getJabatanList();
 
         $this->view('templates/admin_header', $data);
         $this->view('guru/index', $data);

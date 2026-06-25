@@ -10,9 +10,10 @@ class GuruModel {
 
     public function getAllGuru($filters = [])
     {
-        $query = "SELECT guru.*, users.username, users.nama_lengkap 
-                  FROM guru 
-                  JOIN users ON guru.user_id = users.id 
+        $query = "SELECT guru.*, users.username, users.nama_lengkap, j.nama_jabatan
+                  FROM guru
+                  JOIN users ON guru.user_id = users.id
+                  LEFT JOIN jabatan j ON guru.jabatan_id = j.id
                   WHERE 1=1";
         
         $binds = [];
@@ -107,6 +108,12 @@ class GuruModel {
         return $this->db->single();
     }
 
+    public function getJabatanList()
+    {
+        $this->db->query("SELECT * FROM jabatan ORDER BY nama_jabatan ASC");
+        return $this->db->resultSet();
+    }
+
 
     public function tambahDataGuru($data)
     {
@@ -128,7 +135,7 @@ class GuruModel {
             $userId = $this->db->single()['last_id'];
 
             // 2. Tambah guru
-            $queryGuru = "INSERT INTO guru (user_id, nip, jenis_kelamin, tanggal_lahir, no_hp, alamat) VALUES (:user_id, :nip, :jenis_kelamin, :tanggal_lahir, :no_hp, :alamat)";
+            $queryGuru = "INSERT INTO guru (user_id, nip, jenis_kelamin, tanggal_lahir, no_hp, alamat, jabatan_id) VALUES (:user_id, :nip, :jenis_kelamin, :tanggal_lahir, :no_hp, :alamat, :jabatan_id)";
             $this->db->query($queryGuru);
             $this->db->bind('user_id', $userId);
             $this->db->bind('nip', htmlspecialchars($data['nip']));
@@ -136,6 +143,7 @@ class GuruModel {
             $this->db->bind('tanggal_lahir', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
             $this->db->bind('no_hp', htmlspecialchars($data['no_hp']));
             $this->db->bind('alamat', htmlspecialchars($data['alamat']));
+            $this->db->bind('jabatan_id', !empty($data['jabatan_id']) ? (int)$data['jabatan_id'] : null);
             $this->db->execute();
 
             $this->db->query("COMMIT");
@@ -189,15 +197,16 @@ class GuruModel {
 
             // 2. Ubah data guru
             if(!empty($data['foto'])) {
-                $this->db->query("UPDATE guru SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, no_hp = :no_hp, alamat = :alamat, foto = :foto WHERE id = :id");
+                $this->db->query("UPDATE guru SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, no_hp = :no_hp, alamat = :alamat, foto = :foto, jabatan_id = :jabatan_id WHERE id = :id");
                 $this->db->bind('foto', $data['foto']);
             } else {
-                $this->db->query("UPDATE guru SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, no_hp = :no_hp, alamat = :alamat WHERE id = :id");
+                $this->db->query("UPDATE guru SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, no_hp = :no_hp, alamat = :alamat, jabatan_id = :jabatan_id WHERE id = :id");
             }
             $this->db->bind('jenis_kelamin', htmlspecialchars($data['jenis_kelamin']));
             $this->db->bind('tanggal_lahir', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
             $this->db->bind('no_hp', htmlspecialchars($data['no_hp']));
             $this->db->bind('alamat', htmlspecialchars($data['alamat']));
+            $this->db->bind('jabatan_id', !empty($data['jabatan_id']) ? (int)$data['jabatan_id'] : null);
             $this->db->bind('id', $data['id']);
             $this->db->execute();
 

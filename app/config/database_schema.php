@@ -1,6 +1,23 @@
 <?php
 
 return array (
+  'jabatan' =>
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `jabatan` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nama_jabatan` varchar(100) NOT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' =>
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'nama_jabatan' => 'varchar(100) NOT NULL',
+      'deskripsi' => 'text DEFAULT NULL',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
+    ),
+  ),
   'anggota_rombel' => 
   array (
     'create_sql' => 'CREATE TABLE IF NOT EXISTS `anggota_rombel` (
@@ -151,6 +168,7 @@ return array (
       'no_hp' => 'varchar(20) DEFAULT NULL',
       'alamat' => 'text DEFAULT NULL',
       'foto' => 'LONGTEXT DEFAULT NULL',
+      'jabatan_id' => 'int(11) DEFAULT NULL',
       'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),

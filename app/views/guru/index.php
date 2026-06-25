@@ -278,6 +278,16 @@
                                     <option value="P">Perempuan</option>
                                 </select>
                             </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Jabatan</label>
+                                <select name="jabatan_id" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                    <option value="">-- Tidak Ada Jabatan --</option>
+                                    <?php foreach($data['jabatan_list'] ?? [] as $jab): ?>
+                                    <option value="<?= $jab['id'] ?>"><?= htmlspecialchars($jab['nama_jabatan']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
 
                         <!-- Kolom Detail & Akun -->
@@ -415,6 +425,16 @@
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
                             <textarea name="alamat" id="edit_alamat" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Jabatan</label>
+                            <select name="jabatan_id" id="edit_jabatan_id" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">-- Tidak Ada Jabatan --</option>
+                                <?php foreach($data['jabatan_list'] ?? [] as $jab): ?>
+                                <option value="<?= $jab['id'] ?>"><?= htmlspecialchars($jab['nama_jabatan']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
 
@@ -607,6 +627,12 @@ function openEditModalGuru(id) {
         document.getElementById('edit_tanggal_lahir').value = data.tanggal_lahir;
         document.getElementById('edit_no_hp').value = data.no_hp;
         document.getElementById('edit_alamat').value = data.alamat;
+        
+        // Set jabatan dropdown
+        const jabatanSelect = document.getElementById('edit_jabatan_id');
+        if(jabatanSelect) {
+            jabatanSelect.value = data.jabatan_id || '';
+        }
 
         const fotoPreview = document.getElementById('edit_foto_preview');
         const fotoInitials = document.getElementById('edit_foto_initials');

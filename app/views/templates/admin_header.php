@@ -112,6 +112,7 @@ $GLOBALS['pengaturan'] = $pengaturan;
                             <a href="<?= BASEURL; ?>/akademik/tahun" class="block py-2 text-sm text-slate-500 hover:text-blue-600 transition-colors">Tahun Akademik</a>
                             <a href="<?= BASEURL; ?>/akademik/kelas" class="block py-2 text-sm text-slate-500 hover:text-blue-600 transition-colors">Tingkat Kelas</a>
                             <a href="<?= BASEURL; ?>/akademik/mapel" class="block py-2 text-sm text-slate-500 hover:text-blue-600 transition-colors">Mata Pelajaran</a>
+                            <a href="<?= BASEURL; ?>/jabatan" class="block py-2 text-sm <?= (strpos($_SERVER['REQUEST_URI'], '/jabatan') !== false) ? 'text-emerald-400 font-semibold' : 'text-slate-500 hover:text-blue-600' ?> transition-colors">Jabatan Guru</a>
                         </div>
                     </div>
 
