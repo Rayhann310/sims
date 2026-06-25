@@ -90,9 +90,16 @@ class ElearningModel {
     public function getDiskusiByJadwal($jadwal_id)
     {
         $this->db->query("
-            SELECT d.*, u.nama_lengkap, u.role, u.foto 
+            SELECT d.*, u.nama_lengkap, u.role, 
+            CASE 
+                WHEN u.role = 'guru' THEN g.foto
+                WHEN u.role = 'siswa' THEN s.foto
+                ELSE NULL
+            END as foto
             FROM elearning_diskusi d 
             JOIN users u ON d.user_id = u.id 
+            LEFT JOIN guru g ON u.id = g.user_id AND u.role = 'guru'
+            LEFT JOIN siswa s ON u.id = s.user_id AND u.role = 'siswa'
             WHERE d.jadwal_id = :jadwal_id 
             ORDER BY d.created_at ASC
         ");
