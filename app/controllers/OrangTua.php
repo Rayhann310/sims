@@ -31,9 +31,9 @@ class OrangTua extends Controller {
     public function ubah()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $id = $_POST['id'];
-            $nama_wali = $_POST['nama_wali'];
-            $no_hp_wali = $_POST['no_hp_wali'];
+            $id = $_POST['id'] ?? '';
+            $nama_wali = $_POST['nama_wali'] ?? '';
+            $no_hp_wali = $_POST['no_hp_wali'] ?? '';
             
             $db = new Database();
             $db->query("UPDATE siswa SET nama_wali = :nama_wali, no_hp_wali = :no_hp_wali WHERE id = :id");

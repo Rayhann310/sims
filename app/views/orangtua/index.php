@@ -68,13 +68,13 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     <?php foreach($data['siswa'] as $s): ?>
-                    <tr class="hover:bg-slate-50 transition-colors" x-show="search === '' || '<?= strtolower(htmlspecialchars($s['nama_lengkap'] . ' ' . $s['nama_wali'])) ?>'.includes(search.toLowerCase())">
+                    <tr class="hover:bg-slate-50 transition-colors" x-show="search === '' || '<?= strtolower(htmlspecialchars(($s['nama_lengkap'] ?? '') . ' ' . ($s['nama_wali'] ?? ''))) ?>'.includes(search.toLowerCase())">
                         <td class="px-6 py-4">
-                            <div class="font-medium text-slate-800"><?= htmlspecialchars($s['nama_lengkap']); ?></div>
+                            <div class="font-medium text-slate-800"><?= htmlspecialchars($s['nama_lengkap'] ?? ''); ?></div>
                             <div class="text-xs text-slate-500 mt-1">Kelas: <?= htmlspecialchars($s['nama_kelas'] ?? 'Belum Diatur'); ?></div>
                         </td>
                         <td class="px-6 py-4 font-medium text-slate-700">
-                            <?= htmlspecialchars($s['nama_wali'] ?: '-'); ?>
+                            <?= htmlspecialchars(!empty($s['nama_wali']) ? $s['nama_wali'] : '-'); ?>
                         </td>
                         <td class="px-6 py-4 text-slate-600">
                             <?php if(!empty($s['no_hp_wali'])): ?>
@@ -86,7 +86,7 @@
                             <?php endif; ?>
                         </td>
                         <td class="px-6 py-4 flex justify-center">
-                            <button type="button" @click="currentId = '<?= $s['id']; ?>'; currentNama = '<?= addslashes($s['nama_wali'] ?? ''); ?>'; currentHp = '<?= addslashes($s['no_hp_wali'] ?? ''); ?>'; currentSiswa = '<?= addslashes($s['nama_lengkap']); ?>'; editModalOpen = true" class="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-2">
+                            <button type="button" @click="currentId = '<?= $s['id'] ?? ''; ?>'; currentNama = '<?= addslashes($s['nama_wali'] ?? ''); ?>'; currentHp = '<?= addslashes($s['no_hp_wali'] ?? ''); ?>'; currentSiswa = '<?= addslashes($s['nama_lengkap'] ?? ''); ?>'; editModalOpen = true" class="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-2">
                                 <i class="fas fa-edit"></i> Edit Kontak
                             </button>
                         </td>
