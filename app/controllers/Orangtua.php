@@ -41,10 +41,22 @@ class Orangtua extends Controller {
             $db->bind('no_hp_wali', htmlspecialchars($no_hp_wali));
             $db->bind('id', $id);
             
-            if($db->execute()) {
-                $_SESSION['flash'] = ['pesan' => 'Data Wali berhasil diperbarui', 'aksi' => '', 'tipe' => 'success'];
-            } else {
-                $_SESSION['flash'] = ['pesan' => 'Gagal', 'aksi' => 'memperbarui data wali', 'tipe' => 'danger'];
+            try {
+                if($db->execute()) {
+                    $_SESSION['flash'] = ['pesan' => 'Data Wali berhasil diperbarui', 'aksi' => '', 'tipe' => 'success'];
+                }
+            } catch (PDOException $e) {
+                if(strpos($e->getMessage(), 'Unknown column') !== false) {
+                    $db_heal = new Database();
+                    $db_heal->query("ALTER TABLE siswa ADD COLUMN no_hp_wali VARCHAR(20) DEFAULT NULL");
+                    $db_heal->execute();
+                    
+                    // Re-execute
+                    $db->execute();
+                    $_SESSION['flash'] = ['pesan' => 'Data Wali berhasil diperbarui', 'aksi' => '', 'tipe' => 'success'];
+                } else {
+                    $_SESSION['flash'] = ['pesan' => 'Gagal', 'aksi' => 'memperbarui data wali', 'tipe' => 'danger'];
+                }
             }
             header('Location: ' . BASEURL . '/orangtua');
             exit;
@@ -121,8 +133,21 @@ class Orangtua extends Controller {
                         $db->bind('nama_wali', htmlspecialchars($nama_wali));
                         $db->bind('no_hp_wali', htmlspecialchars($no_hp_wali));
                         $db->bind('nisn', $nisn);
-                        if($db->execute()) {
+                        
+                        try {
+                            if($db->execute()) {
+                                // Since execute returns void in Database.php, we just check rowCount
+                            }
                             if($db->rowCount() > 0) $berhasil++;
+                        } catch (PDOException $e) {
+                            if(strpos($e->getMessage(), 'Unknown column') !== false) {
+                                $db_heal = new Database();
+                                $db_heal->query("ALTER TABLE siswa ADD COLUMN no_hp_wali VARCHAR(20) DEFAULT NULL");
+                                $db_heal->execute();
+                                
+                                $db->execute(); // Retry
+                                if($db->rowCount() > 0) $berhasil++;
+                            }
                         }
                     }
                 }

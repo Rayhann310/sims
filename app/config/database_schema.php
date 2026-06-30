@@ -587,6 +587,7 @@ return array (
       'tanggal_lahir' => 'date DEFAULT NULL',
       'alamat' => 'text DEFAULT NULL',
       'nama_wali' => 'varchar(100) DEFAULT NULL',
+      'no_hp_wali' => 'varchar(20) DEFAULT NULL',
       'status' => 'enum(\'Aktif\',\'Alumni\',\'Keluar\') DEFAULT \'Aktif\'',
       'foto' => 'LONGTEXT DEFAULT NULL',
     ),
