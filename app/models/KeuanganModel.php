@@ -79,6 +79,9 @@ class KeuanganModel {
         if(!$tagihan || empty($tagihan['no_hp_wali'])) return false;
         
         $no_hp = preg_replace('/[^0-9]/', '', $tagihan['no_hp_wali']);
+        if (substr($no_hp, 0, 1) == '0') {
+            $no_hp = '62' . substr($no_hp, 1);
+        }
         $nominal = number_format($tagihan['nominal'], 0, ',', '.');
         $pesan = "Halo Bapak/Ibu {$tagihan['nama_wali']},\n\nKami menginformasikan bahwa pembayaran SPP atas nama:\nNama: {$tagihan['nama_lengkap']}\nNISN: {$tagihan['nisn']}\nBulan: {$tagihan['bulan']} {$tagihan['tahun']}\nSebesar: Rp {$nominal}\n\nTelah *LUNAS*.\nTerima kasih.";
         
@@ -88,14 +91,15 @@ class KeuanganModel {
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 5, // Short timeout to avoid hanging the app (self-healing)
+            CURLOPT_TIMEOUT => 15, // Ditingkatkan agar fonnte punya waktu proses
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => 0, // Disable SSL Verify untuk server hosting yang usang
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => array(
                 'target' => $no_hp,
-                'message' => $pesan, 
-                'countryCode' => '62',
+                'message' => $pesan
             ),
             CURLOPT_HTTPHEADER => array(
                 "Authorization: $token"
