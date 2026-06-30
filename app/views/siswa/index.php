@@ -1,5 +1,5 @@
 <div class="space-y-6" 
-     x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, detailModalOpen: false, ultahModalOpen: false, deleteUrl: '', currentSiswa: {}, selectedIds: [] }"
+     x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, detailModalOpen: false, ultahModalOpen: false, deleteUrl: '', currentSiswa: {} }"
      @open-edit-modal.window="editModalOpen = true"
      @open-detail-modal.window="detailModalOpen = true; currentSiswa = $event.detail;"
      @open-ultah-modal.window="ultahModalOpen = true"
@@ -108,8 +108,8 @@
                 </div>
             </div>
 
-            <button type="submit" form="formHapusMasal" x-cloak x-show="selectedIds.length > 0" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2" onclick="return confirm('Yakin ingin menghapus ' + selectedIds.length + ' siswa terpilih beserta seluruh data terkait (SPP, Catatan, dll)?')">
-                <i class="fas fa-trash"></i> Hapus (<span x-text="selectedIds.length"></span>)
+            <button type="button" id="btnHapusMasal" class="hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm items-center gap-2" onclick="submitHapusMasal()">
+                <i class="fas fa-trash"></i> Hapus (<span id="countHapusMasal">0</span>)
             </button>
             <button @click="showModal = true" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm shrink-0">
                 <i class="fas fa-plus"></i>
@@ -182,14 +182,11 @@
 
     <!-- Tabel -->
     <div class="overflow-x-auto">
-        <form id="formHapusMasal" action="<?= BASEURL; ?>/siswa/hapusMasal" method="POST">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200">
-                    <th class="px-6 py-4 w-10 text-center">
-                        <input type="checkbox" 
-                               @change="$event.target.checked ? selectedIds = [<?php echo implode(',', array_column($data['siswa'], 'id')); ?>] : selectedIds = []" 
-                               class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                    <th class="px-6 py-4 w-10 text-center" data-sortable="false">
+                        <input type="checkbox" id="chk-all-siswa" class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
                     </th>
                     <th class="px-6 py-4 font-semibold">NISN</th>
                     <th class="px-6 py-4 font-semibold">Nama Lengkap</th>
@@ -203,7 +200,7 @@
                 <?php foreach($data['siswa'] as $s): ?>
                 <tr class="hover:bg-slate-50 transition-colors">
                     <td class="px-6 py-4 text-center">
-                        <input type="checkbox" name="ids[]" value="<?= $s['id']; ?>" x-model="selectedIds" class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                        <input type="checkbox" value="<?= $s['id']; ?>" class="chk-siswa rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
                     </td>
                     <td class="px-6 py-4 font-medium text-slate-800"><?= htmlspecialchars($s['nisn']); ?></td>
                     <td class="px-6 py-4">
@@ -249,8 +246,8 @@
                 <?php endif; ?>
             </tbody>
         </table>
-        </form>
     </div>
+    <form id="formSubmitHapusMasal" action="<?= BASEURL; ?>/siswa/hapusMasal" method="POST" class="hidden"></form>
     </div> <!-- End Table Container -->
 
     <!-- Charts Grid -->
@@ -822,6 +819,56 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('siswaDoughnutChart').parentElement.innerHTML = '<p class="text-slate-400 text-sm">Tidak ada data kelas aktif</p>';
         document.getElementById('siswaBarChart').parentElement.innerHTML = '<p class="text-slate-400 text-sm">Tidak ada data kelas aktif</p>';
     }
+});});
+
+// Script Hapus Masal
+let selectedSiswaIds = new Set();
+document.addEventListener('change', function(e) {
+    if(e.target && e.target.classList.contains('chk-siswa')) {
+        if(e.target.checked) {
+            selectedSiswaIds.add(e.target.value);
+        } else {
+            selectedSiswaIds.delete(e.target.value);
+        }
+        updateHapusMasalButton();
+    }
+    if(e.target && e.target.id === 'chk-all-siswa') {
+        const checkboxes = document.querySelectorAll('.chk-siswa');
+        checkboxes.forEach(chk => {
+            chk.checked = e.target.checked;
+            if(e.target.checked) selectedSiswaIds.add(chk.value);
+            else selectedSiswaIds.delete(chk.value);
+        });
+        updateHapusMasalButton();
+    }
 });
+
+function updateHapusMasalButton() {
+    const btn = document.getElementById('btnHapusMasal');
+    const countSpan = document.getElementById('countHapusMasal');
+    if(selectedSiswaIds.size > 0) {
+        btn.classList.remove('hidden');
+        btn.classList.add('flex');
+        countSpan.textContent = selectedSiswaIds.size;
+    } else {
+        btn.classList.add('hidden');
+        btn.classList.remove('flex');
+    }
+}
+
+function submitHapusMasal() {
+    if(confirm(`Yakin ingin menghapus ${selectedSiswaIds.size} siswa terpilih beserta seluruh data terkait?`)) {
+        const form = document.getElementById('formSubmitHapusMasal');
+        form.innerHTML = ''; // clear
+        selectedSiswaIds.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ids[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+        form.submit();
+    }
+}
 </script>
 
