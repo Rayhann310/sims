@@ -30,7 +30,14 @@ class Keuangan extends Controller {
     public function riwayat()
     {
         $data['judul'] = 'Riwayat Pembayaran';
-        $data['riwayat'] = $this->model('KeuanganModel')->getRiwayatPembayaran();
+        
+        $tahun_list = $this->model('KeuanganModel')->getTahunPembayaran();
+        $data['tahun_tersedia'] = array_column($tahun_list, 'tahun');
+        
+        $tahun = isset($_GET['tahun']) ? $_GET['tahun'] : (isset($data['tahun_tersedia'][0]) ? $data['tahun_tersedia'][0] : date('Y'));
+        $data['tahun_aktif'] = $tahun;
+        
+        $data['riwayat_siswa'] = $this->model('KeuanganModel')->getRiwayatPembayaranBySiswa($tahun);
         
         $this->view('templates/admin_header', $data);
         $this->view('keuangan/riwayat', $data);

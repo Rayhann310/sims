@@ -34,6 +34,53 @@ class KeuanganModel {
         return $this->db->resultSet();
     }
 
+    public function getTahunPembayaran()
+    {
+        $this->db->query("SELECT DISTINCT t.tahun FROM tagihan_spp t JOIN pembayaran_spp p ON p.tagihan_id = t.id ORDER BY t.tahun DESC");
+        return $this->db->resultSet();
+    }
+
+    public function getRiwayatPembayaranBySiswa($tahun)
+    {
+        $this->db->query("
+            SELECT s.id as siswa_id, u.nama_lengkap, s.nisn, 
+                   t.bulan, t.tahun, p.tanggal_bayar, p.jumlah_bayar, p.metode, p.keterangan, p.created_at
+            FROM pembayaran_spp p
+            JOIN tagihan_spp t ON p.tagihan_id = t.id
+            JOIN siswa s ON t.siswa_id = s.id
+            JOIN users u ON s.user_id = u.id
+            WHERE t.tahun = :tahun
+            ORDER BY u.nama_lengkap ASC, p.tanggal_bayar DESC, p.created_at DESC
+        ");
+        $this->db->bind('tahun', $tahun);
+        $results = $this->db->resultSet();
+        
+        $grouped = [];
+        foreach($results as $row) {
+            $siswa_id = $row['siswa_id'];
+            if(!isset($grouped[$siswa_id])) {
+                $grouped[$siswa_id] = [
+                    'nama_lengkap' => $row['nama_lengkap'],
+                    'nisn' => $row['nisn'],
+                    'total_pembayaran' => 0,
+                    'pembayaran' => []
+                ];
+            }
+            $grouped[$siswa_id]['total_pembayaran'] += $row['jumlah_bayar'];
+            $grouped[$siswa_id]['pembayaran'][] = [
+                'bulan' => $row['bulan'],
+                'tahun' => $row['tahun'],
+                'tanggal_bayar' => $row['tanggal_bayar'],
+                'jumlah_bayar' => $row['jumlah_bayar'],
+                'metode' => $row['metode'],
+                'keterangan' => $row['keterangan'],
+                'created_at' => $row['created_at']
+            ];
+        }
+        
+        return array_values($grouped);
+    }
+
     public function generateTagihanMasal($data)
     {
         // Ambil semua siswa
