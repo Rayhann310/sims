@@ -90,6 +90,22 @@ class Siswa extends Controller {
         exit;
     }
 
+    public function hapusMasal()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ids']) && is_array($_POST['ids'])) {
+            $deleted = $this->model('SiswaModel')->hapusMasalDataSiswa($_POST['ids']);
+            if($deleted > 0) {
+                $_SESSION['flash'] = ['pesan' => "$deleted data berhasil", 'aksi' => 'dihapus', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'gagal', 'aksi' => 'dihapus masal (mungkin tidak ada yang dipilih atau terjadi kesalahan)', 'tipe' => 'danger'];
+            }
+        } else {
+            $_SESSION['flash'] = ['pesan' => 'Tidak ada data', 'aksi' => 'yang dipilih untuk dihapus', 'tipe' => 'danger'];
+        }
+        header('Location: ' . BASEURL . '/siswa');
+        exit;
+    }
+
     public function template()
     {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();

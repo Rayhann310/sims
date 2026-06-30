@@ -1,5 +1,5 @@
 <div class="space-y-6" 
-     x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, detailModalOpen: false, ultahModalOpen: false, deleteUrl: '', currentSiswa: {} }"
+     x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, detailModalOpen: false, ultahModalOpen: false, deleteUrl: '', currentSiswa: {}, selectedIds: [] }"
      @open-edit-modal.window="editModalOpen = true"
      @open-detail-modal.window="detailModalOpen = true; currentSiswa = $event.detail;"
      @open-ultah-modal.window="ultahModalOpen = true"
@@ -108,6 +108,9 @@
                 </div>
             </div>
 
+            <button type="submit" form="formHapusMasal" x-cloak x-show="selectedIds.length > 0" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center gap-2" onclick="return confirm('Yakin ingin menghapus ' + selectedIds.length + ' siswa terpilih beserta seluruh data terkait (SPP, Catatan, dll)?')">
+                <i class="fas fa-trash"></i> Hapus (<span x-text="selectedIds.length"></span>)
+            </button>
             <button @click="showModal = true" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm shrink-0">
                 <i class="fas fa-plus"></i>
                 Tambah Siswa
@@ -179,9 +182,15 @@
 
     <!-- Tabel -->
     <div class="overflow-x-auto">
+        <form id="formHapusMasal" action="<?= BASEURL; ?>/siswa/hapusMasal" method="POST">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200">
+                    <th class="px-6 py-4 w-10 text-center">
+                        <input type="checkbox" 
+                               @change="$event.target.checked ? selectedIds = [<?php echo implode(',', array_column($data['siswa'], 'id')); ?>] : selectedIds = []" 
+                               class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                    </th>
                     <th class="px-6 py-4 font-semibold">NISN</th>
                     <th class="px-6 py-4 font-semibold">Nama Lengkap</th>
                     <th class="px-6 py-4 font-semibold">L/P</th>
@@ -193,6 +202,9 @@
             <tbody class="divide-y divide-slate-100">
                 <?php foreach($data['siswa'] as $s): ?>
                 <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 text-center">
+                        <input type="checkbox" name="ids[]" value="<?= $s['id']; ?>" x-model="selectedIds" class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+                    </td>
                     <td class="px-6 py-4 font-medium text-slate-800"><?= htmlspecialchars($s['nisn']); ?></td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
@@ -229,7 +241,7 @@
                 
                 <?php if(empty($data['siswa'])): ?>
                 <tr>
-                    <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                    <td colspan="7" class="px-6 py-12 text-center text-slate-500">
                         <svg class="w-12 h-12 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         Belum ada data siswa. Klik tombol "Tambah Siswa" untuk memulai.
                     </td>
@@ -237,6 +249,7 @@
                 <?php endif; ?>
             </tbody>
         </table>
+        </form>
     </div>
     </div> <!-- End Table Container -->
 

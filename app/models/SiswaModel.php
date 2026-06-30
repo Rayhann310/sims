@@ -234,6 +234,32 @@ class SiswaModel {
         return 0;
     }
 
+    public function hapusMasalDataSiswa($ids)
+    {
+        if (empty($ids)) return 0;
+
+        $inQuery = implode(',', array_fill(0, count($ids), '?'));
+        
+        $this->db->query("SELECT user_id FROM siswa WHERE id IN ($inQuery)");
+        foreach ($ids as $k => $id) {
+            $this->db->bind($k + 1, $id);
+        }
+        
+        $siswaList = $this->db->resultSet();
+        $userIds = array_column($siswaList, 'user_id');
+        
+        if (empty($userIds)) return 0;
+        
+        $inUserQuery = implode(',', array_fill(0, count($userIds), '?'));
+        $this->db->query("DELETE FROM users WHERE id IN ($inUserQuery)");
+        foreach ($userIds as $k => $userId) {
+            $this->db->bind($k + 1, $userId);
+        }
+        
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
     public function importData($dataArray)
     {
         $sukses = 0;
