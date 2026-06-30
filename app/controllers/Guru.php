@@ -111,8 +111,9 @@ class Guru extends Controller {
         $sheet->setCellValue('A1', 'NIP');
         $sheet->setCellValue('B1', 'Nama Lengkap');
         $sheet->setCellValue('C1', 'Jenis Kelamin (L/P)');
-        $sheet->setCellValue('D1', 'No. HP');
-        $sheet->setCellValue('E1', 'Alamat');
+        $sheet->setCellValue('D1', 'Tanggal Lahir (YYYY-MM-DD)');
+        $sheet->setCellValue('E1', 'No. HP');
+        $sheet->setCellValue('F1', 'Alamat');
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="Template_Guru.xlsx"');
@@ -134,8 +135,8 @@ class Guru extends Controller {
         $sheet->setCellValue('B1', 'Nama Lengkap');
         $sheet->setCellValue('C1', 'Jenis Kelamin');
         $sheet->setCellValue('D1', 'Tanggal Lahir');
-        $sheet->setCellValue('E1', 'Mata Pelajaran');
-        $sheet->setCellValue('F1', 'No. Telepon');
+        $sheet->setCellValue('E1', 'No. HP');
+        $sheet->setCellValue('F1', 'Alamat');
 
         $row = 2;
         foreach($data as $d) {
@@ -143,8 +144,8 @@ class Guru extends Controller {
             $sheet->setCellValue('B'.$row, $d['nama_lengkap']);
             $sheet->setCellValue('C'.$row, $d['jenis_kelamin']);
             $sheet->setCellValue('D'.$row, $d['tanggal_lahir']);
-            $sheet->setCellValue('E'.$row, $d['mata_pelajaran']);
-            $sheet->setCellValue('F'.$row, $d['nomor_telepon']);
+            $sheet->setCellValue('E'.$row, $d['no_hp']);
+            $sheet->setCellValue('F'.$row, $d['alamat']);
             $row++;
         }
 
@@ -178,8 +179,9 @@ class Guru extends Controller {
                                 'nip' => $row[0],
                                 'nama_lengkap' => $row[1],
                                 'jenis_kelamin' => $row[2],
-                                'no_hp' => $row[3] ?? '',
-                                'alamat' => $row[4] ?? ''
+                                'tanggal_lahir' => $row[3] ?? null,
+                                'no_hp' => $row[4] ?? '',
+                                'alamat' => $row[5] ?? ''
                             ];
                         }
                     }
@@ -204,6 +206,31 @@ class Guru extends Controller {
             $_SESSION['flash'] = ['pesan' => 'Gagal', 'aksi' => 'Tidak ada file yang diunggah', 'tipe' => 'danger'];
         }
         
+        header('Location: ' . BASEURL . '/guru');
+        exit;
+    }
+    public function hapus_massal()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['guru_ids'])) {
+            $ids = $_POST['guru_ids'];
+            if(is_array($ids) && count($ids) > 0) {
+                $sukses = 0;
+                $gagal = 0;
+                foreach($ids as $id) {
+                    if($this->model('GuruModel')->hapusDataGuru($id) > 0) {
+                        $sukses++;
+                    } else {
+                        $gagal++;
+                    }
+                }
+                
+                if($sukses > 0) {
+                    $_SESSION['flash'] = ['pesan' => $sukses . ' data guru', 'aksi' => 'berhasil dihapus massal', 'tipe' => 'success'];
+                } else {
+                    $_SESSION['flash'] = ['pesan' => 'Data guru', 'aksi' => 'gagal dihapus massal', 'tipe' => 'danger'];
+                }
+            }
+        }
         header('Location: ' . BASEURL . '/guru');
         exit;
     }

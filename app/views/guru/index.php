@@ -138,6 +138,9 @@
                     <i class="fas fa-times"></i> Reset
                 </a>
                 <?php endif; ?>
+                <button type="button" onclick="submitHapusMassal()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ml-auto shadow-sm">
+                    <i class="fas fa-trash-alt"></i> Hapus Terpilih
+                </button>
             </div>
         </form>
     </div>
@@ -161,9 +164,13 @@
 
     <!-- Tabel -->
     <div class="overflow-x-auto">
+        <form id="formHapusMassal" action="<?= BASEURL; ?>/guru/hapus_massal" method="POST">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200">
+                    <th class="px-6 py-4 font-semibold w-12 text-center">
+                        <input type="checkbox" id="selectAll" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer w-4 h-4" onclick="toggleSelectAll(this)">
+                    </th>
                     <th class="px-6 py-4 font-semibold">NIP</th>
                     <th class="px-6 py-4 font-semibold">Nama Lengkap</th>
                     <th class="px-6 py-4 font-semibold">L/P</th>
@@ -174,6 +181,9 @@
             <tbody class="divide-y divide-slate-100">
                 <?php foreach($data['guru'] as $g): ?>
                 <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 text-center">
+                        <input type="checkbox" name="guru_ids[]" value="<?= $g['id']; ?>" class="guru-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer w-4 h-4">
+                    </td>
                     <td class="px-6 py-4 font-medium text-slate-800"><?= htmlspecialchars($g['nip']); ?></td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
@@ -205,7 +215,7 @@
                 
                 <?php if(empty($data['guru'])): ?>
                 <tr>
-                    <td colspan="5" class="px-6 py-12 text-center text-slate-500">
+                    <td colspan="6" class="px-6 py-12 text-center text-slate-500">
                         <svg class="w-12 h-12 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         Belum ada data guru. Klik tombol "Tambah Guru" untuk memulai.
                     </td>
@@ -213,6 +223,7 @@
                 <?php endif; ?>
             </tbody>
         </table>
+        </form>
     </div>
     </div> <!-- End Table Container -->
 
@@ -873,4 +884,22 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('guruDoughnutChart').parentElement.innerHTML = '<p class="text-slate-400 text-sm">Tidak ada data guru</p>';
     }
 });
+
+function toggleSelectAll(source) {
+    const checkboxes = document.querySelectorAll('.guru-checkbox');
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = source.checked;
+    }
+}
+
+function submitHapusMassal() {
+    const checkboxes = document.querySelectorAll('.guru-checkbox:checked');
+    if (checkboxes.length === 0) {
+        alert('Pilih setidaknya satu data guru untuk dihapus.');
+        return;
+    }
+    if (confirm('Apakah Anda yakin ingin menghapus ' + checkboxes.length + ' data guru yang dipilih secara permanen?')) {
+        document.getElementById('formHapusMassal').submit();
+    }
+}
 </script>

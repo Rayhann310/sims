@@ -350,11 +350,12 @@ class GuruModel {
                 $userId = $this->db->single()['last_id'];
 
                 // 2. Tambah guru
-                $queryGuru = "INSERT INTO guru (user_id, nip, jenis_kelamin, no_hp, alamat) VALUES (:user_id, :nip, :jenis_kelamin, :no_hp, :alamat)";
+                $queryGuru = "INSERT INTO guru (user_id, nip, jenis_kelamin, tanggal_lahir, no_hp, alamat) VALUES (:user_id, :nip, :jenis_kelamin, :tanggal_lahir, :no_hp, :alamat)";
                 $this->db->query($queryGuru);
                 $this->db->bind('user_id', $userId);
                 $this->db->bind('nip', $username);
                 $this->db->bind('jenis_kelamin', strtoupper($data['jenis_kelamin']) == 'P' ? 'P' : 'L');
+                $this->db->bind('tanggal_lahir', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
                 $this->db->bind('no_hp', $data['no_hp'] ?? '');
                 $this->db->bind('alamat', $data['alamat'] ?? '');
                 $this->db->execute();
