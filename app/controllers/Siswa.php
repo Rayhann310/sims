@@ -164,7 +164,7 @@ class Siswa extends Controller {
                 
                 // Simpan file sementara
                 $tmp_name = time() . '_' . $_FILES['file_excel']['name'];
-                move_uploaded_file($file_tmp, '../app/tmp/' . $tmp_name);
+                move_uploaded_file($file_tmp, __DIR__ . '/../tmp/' . $tmp_name);
                 $data['file_tmp'] = $tmp_name;
 
                 $this->view('templates/admin_header', $data);
@@ -181,7 +181,7 @@ class Siswa extends Controller {
     public function import()
     {
         if(isset($_POST['file_tmp'])) {
-            $file_path = '../app/tmp/' . $_POST['file_tmp'];
+            $file_path = __DIR__ . '/../tmp/' . $_POST['file_tmp'];
             
             if(file_exists($file_path)) {
                 $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file_path);
@@ -212,7 +212,11 @@ class Siswa extends Controller {
                 } else {
                     $_SESSION['flash'] = ['pesan' => 'Gagal', 'aksi' => 'semua data gagal diimport', 'tipe' => 'danger'];
                 }
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'Gagal', 'aksi' => 'File tidak ditemukan', 'tipe' => 'danger'];
             }
+        } else {
+            $_SESSION['flash'] = ['pesan' => 'Gagal', 'aksi' => 'Tidak ada file', 'tipe' => 'danger'];
         }
         header('Location: ' . BASEURL . '/siswa');
         exit;
