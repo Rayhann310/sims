@@ -107,7 +107,39 @@ class KeuanganModel {
         ));
         
         $response = curl_exec($curl);
+        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $error = curl_error($curl);
         curl_close($curl);
+        
+        $status = ($httpcode >= 200 && $httpcode < 300) ? 'Sukses' : 'Gagal';
+        $response_body = $response ?: $error;
+        
+        try {
+            $this->db->query("INSERT INTO log_fonnte (nomor_tujuan, pesan, response_code, response_body, status) VALUES (:no, :pesan, :code, :body, :status)");
+            $this->db->bind('no', $no_hp);
+            $this->db->bind('pesan', $pesan);
+            $this->db->bind('code', $httpcode);
+            $this->db->bind('body', $response_body);
+            $this->db->bind('status', $status);
+            $this->db->execute();
+        } catch(PDOException $e) {
+            if(strpos($e->getMessage(), 'Table') !== false && strpos($e->getMessage(), 'doesn\'t exist') !== false) {
+                $db_heal = new Database();
+                $db_heal->query("CREATE TABLE `log_fonnte` (
+                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `tanggal` timestamp NOT NULL DEFAULT current_timestamp(),
+                  `nomor_tujuan` varchar(20) NOT NULL,
+                  `pesan` text NOT NULL,
+                  `response_code` int(11) DEFAULT NULL,
+                  `response_body` text DEFAULT NULL,
+                  `status` varchar(50) DEFAULT NULL,
+                  PRIMARY KEY (`id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+                $db_heal->execute();
+                
+                $this->db->execute();
+            }
+        }
         
         return $response;
     }

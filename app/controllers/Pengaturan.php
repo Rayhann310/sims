@@ -46,4 +46,20 @@ class Pengaturan extends Controller {
             exit;
         }
     }
+    public function fonntelog()
+    {
+        $data['judul'] = 'Debug API Fonnte';
+        
+        try {
+            $db = new Database();
+            $db->query("SELECT * FROM log_fonnte ORDER BY tanggal DESC LIMIT 50");
+            $data['logs'] = $db->resultSet();
+        } catch (PDOException $e) {
+            $data['logs'] = [];
+        }
+        
+        $this->view('templates/admin_header', $data);
+        $this->view('pengaturan/fonntelog', $data);
+        $this->view('templates/admin_footer');
+    }
 }

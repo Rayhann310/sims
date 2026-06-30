@@ -320,6 +320,29 @@ return array (
       'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
+  'log_fonnte' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `log_fonnte` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tanggal` timestamp NOT NULL DEFAULT current_timestamp(),
+  `nomor_tujuan` varchar(20) NOT NULL,
+  `pesan` text NOT NULL,
+  `response_code` int(11) DEFAULT NULL,
+  `response_body` text DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'tanggal' => 'timestamp NOT NULL DEFAULT current_timestamp()',
+      'nomor_tujuan' => 'varchar(20) NOT NULL',
+      'pesan' => 'text NOT NULL',
+      'response_code' => 'int(11) DEFAULT NULL',
+      'response_body' => 'text DEFAULT NULL',
+      'status' => 'varchar(50) DEFAULT NULL',
+    ),
+  ),
   'kelas' => 
   array (
     'create_sql' => 'CREATE TABLE IF NOT EXISTS `kelas` (
