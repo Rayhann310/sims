@@ -819,8 +819,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('siswaDoughnutChart').parentElement.innerHTML = '<p class="text-slate-400 text-sm">Tidak ada data kelas aktif</p>';
         document.getElementById('siswaBarChart').parentElement.innerHTML = '<p class="text-slate-400 text-sm">Tidak ada data kelas aktif</p>';
     }
-});});
-
+});
 // Script Hapus Masal
 let selectedSiswaIds = new Set();
 document.addEventListener('change', function(e) {
