@@ -1,18 +1,23 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ activeAccordion: null }">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ activeAccordion: null, search: '' }">
     <div class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight"><?= $data['judul']; ?></h1>
             <p class="text-slate-500 mt-2">Daftar histori transaksi pembayaran SPP oleh siswa.</p>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="relative">
+                <input type="text" x-model="search" placeholder="Cari nama siswa..." class="pl-10 pr-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 shadow-sm w-full sm:w-64">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
             <form action="<?= BASEURL; ?>/keuangan/riwayat" method="GET" class="flex items-center">
                 <label for="tahun" class="mr-2 text-sm font-medium text-slate-700">Tahun:</label>
                 <select name="tahun" id="tahun" onchange="this.form.submit()" class="pl-3 pr-8 py-2 text-sm border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 shadow-sm border">
-                    <?php if(empty($data['tahun_tersedia'])): ?>
-                        <option value="<?= date('Y'); ?>"><?= date('Y'); ?></option>
-                    <?php else: ?>
+                    <option value="semua" <?= ($data['tahun_aktif'] === 'semua') ? 'selected' : ''; ?>>Semua</option>
+                    <?php if(!empty($data['tahun_tersedia'])): ?>
                         <?php foreach($data['tahun_tersedia'] as $thn): ?>
-                            <option value="<?= $thn; ?>" <?= ($data['tahun_aktif'] == $thn) ? 'selected' : ''; ?>><?= $thn; ?></option>
+                            <option value="<?= $thn; ?>" <?= ($data['tahun_aktif'] == $thn && $data['tahun_aktif'] !== 'semua') ? 'selected' : ''; ?>><?= $thn; ?></option>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </select>
@@ -39,7 +44,7 @@
         <?php else: ?>
             <div class="divide-y divide-slate-100">
                 <?php foreach($data['riwayat_siswa'] as $index => $siswa): ?>
-                <div class="accordion-item">
+                <div class="accordion-item" x-show="search === '' || '<?= strtolower(htmlspecialchars($siswa['nama_lengkap'])) ?>'.includes(search.toLowerCase())">
                     <!-- Accordion Header -->
                     <button @click="activeAccordion = activeAccordion === <?= $index ?> ? null : <?= $index ?>" 
                             class="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors focus:outline-none focus:bg-slate-50">

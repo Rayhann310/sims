@@ -61,6 +61,15 @@
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <?php if($t['status'] != 'Lunas'): ?>
                             <button @click="activeTagihanId = <?= $t['id']; ?>; sisaTagihan = <?= $sisa; ?>; modalBayar = true" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md transition-colors">Bayar</button>
+                            <?php else: ?>
+                                <?php if(!empty($t['no_hp_wali'])): 
+                                    $waNumber = preg_replace('/[^0-9]/', '', $t['no_hp_wali']);
+                                    $pesanWa = urlencode("Halo Bapak/Ibu {$t['nama_wali']}, kami menginformasikan bahwa pembayaran SPP atas nama {$t['nama_lengkap']} (NISN: {$t['nisn']}) untuk bulan {$t['bulan']} {$t['tahun']} sebesar Rp " . number_format($t['nominal'], 0, ',', '.') . " telah *LUNAS*. Terima kasih.");
+                                ?>
+                                <a href="https://wa.me/<?= $waNumber; ?>?text=<?= $pesanWa; ?>" target="_blank" class="text-emerald-600 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-md transition-colors inline-flex items-center gap-1">
+                                    <i class="fab fa-whatsapp"></i> WA Wali
+                                </a>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </td>
                     </tr>

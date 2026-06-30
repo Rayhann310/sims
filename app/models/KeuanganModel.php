@@ -11,7 +11,7 @@ class KeuanganModel {
     public function getAllTagihan()
     {
         $this->db->query("
-            SELECT t.*, u.nama_lengkap, s.nisn,
+            SELECT t.*, u.nama_lengkap, s.nisn, s.nama_wali, s.no_hp_wali,
                    (SELECT COALESCE(SUM(jumlah_bayar), 0) FROM pembayaran_spp WHERE tagihan_id = t.id) as total_dibayar
             FROM tagihan_spp t
             JOIN siswa s ON t.siswa_id = s.id
@@ -42,6 +42,11 @@ class KeuanganModel {
 
     public function getRiwayatPembayaranBySiswa($tahun)
     {
+        $whereClause = "";
+        if ($tahun !== 'semua') {
+            $whereClause = "WHERE t.tahun = :tahun";
+        }
+        
         $this->db->query("
             SELECT s.id as siswa_id, u.nama_lengkap, s.nisn, 
                    t.bulan, t.tahun, p.tanggal_bayar, p.jumlah_bayar, p.metode, p.keterangan, p.created_at
@@ -49,10 +54,14 @@ class KeuanganModel {
             JOIN tagihan_spp t ON p.tagihan_id = t.id
             JOIN siswa s ON t.siswa_id = s.id
             JOIN users u ON s.user_id = u.id
-            WHERE t.tahun = :tahun
+            $whereClause
             ORDER BY u.nama_lengkap ASC, p.tanggal_bayar DESC, p.created_at DESC
         ");
-        $this->db->bind('tahun', $tahun);
+        
+        if ($tahun !== 'semua') {
+            $this->db->bind('tahun', $tahun);
+        }
+        
         $results = $this->db->resultSet();
         
         $grouped = [];

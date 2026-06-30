@@ -152,7 +152,7 @@ class SiswaModel {
             $userId = $this->db->single()['last_id'];
 
             // 2. Tambah siswa
-            $querySiswa = "INSERT INTO siswa (user_id, nisn, jenis_kelamin, tanggal_lahir, alamat, nama_wali) VALUES (:user_id, :nisn, :jenis_kelamin, :tanggal_lahir, :alamat, :nama_wali)";
+            $querySiswa = "INSERT INTO siswa (user_id, nisn, jenis_kelamin, tanggal_lahir, alamat, nama_wali, no_hp_wali) VALUES (:user_id, :nisn, :jenis_kelamin, :tanggal_lahir, :alamat, :nama_wali, :no_hp_wali)";
             $this->db->query($querySiswa);
             $this->db->bind('user_id', $userId);
             $this->db->bind('nisn', htmlspecialchars($data['nisn']));
@@ -160,6 +160,7 @@ class SiswaModel {
             $this->db->bind('tanggal_lahir', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
             $this->db->bind('alamat', htmlspecialchars($data['alamat']));
             $this->db->bind('nama_wali', htmlspecialchars($data['nama_wali']));
+            $this->db->bind('no_hp_wali', htmlspecialchars($data['no_hp_wali'] ?? ''));
             $this->db->execute();
 
             $this->db->query("COMMIT");
@@ -195,15 +196,16 @@ class SiswaModel {
 
             // 2. Ubah data siswa
             if(!empty($data['foto'])) {
-                $this->db->query("UPDATE siswa SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, alamat = :alamat, nama_wali = :nama_wali, foto = :foto WHERE id = :id");
+                $this->db->query("UPDATE siswa SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, alamat = :alamat, nama_wali = :nama_wali, no_hp_wali = :no_hp_wali, foto = :foto WHERE id = :id");
                 $this->db->bind('foto', $data['foto']);
             } else {
-                $this->db->query("UPDATE siswa SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, alamat = :alamat, nama_wali = :nama_wali WHERE id = :id");
+                $this->db->query("UPDATE siswa SET jenis_kelamin = :jenis_kelamin, tanggal_lahir = :tanggal_lahir, alamat = :alamat, nama_wali = :nama_wali, no_hp_wali = :no_hp_wali WHERE id = :id");
             }
             $this->db->bind('jenis_kelamin', htmlspecialchars($data['jenis_kelamin']));
             $this->db->bind('tanggal_lahir', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
             $this->db->bind('alamat', htmlspecialchars($data['alamat']));
             $this->db->bind('nama_wali', htmlspecialchars($data['nama_wali']));
+            $this->db->bind('no_hp_wali', htmlspecialchars($data['no_hp_wali'] ?? ''));
             $this->db->bind('id', $data['id']);
             $this->db->execute();
 
@@ -276,7 +278,7 @@ class SiswaModel {
                 $userId = $this->db->single()['last_id'];
 
                 // 2. Tambah siswa
-                $querySiswa = "INSERT INTO siswa (user_id, nisn, jenis_kelamin, tanggal_lahir, alamat, nama_wali) VALUES (:user_id, :nisn, :jenis_kelamin, :tanggal_lahir, :alamat, :nama_wali)";
+                $querySiswa = "INSERT INTO siswa (user_id, nisn, jenis_kelamin, tanggal_lahir, alamat, nama_wali, no_hp_wali) VALUES (:user_id, :nisn, :jenis_kelamin, :tanggal_lahir, :alamat, :nama_wali, :no_hp_wali)";
                 $this->db->query($querySiswa);
                 $this->db->bind('user_id', $userId);
                 $this->db->bind('nisn', $username);
@@ -284,6 +286,7 @@ class SiswaModel {
                 $this->db->bind('tanggal_lahir', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
                 $this->db->bind('alamat', $data['alamat'] ?? '');
                 $this->db->bind('nama_wali', $data['nama_wali'] ?? '');
+                $this->db->bind('no_hp_wali', $data['no_hp_wali'] ?? '');
                 $this->db->execute();
 
                 $this->db->query("COMMIT");

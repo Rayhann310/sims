@@ -101,6 +101,7 @@ class Siswa extends Controller {
         $sheet->setCellValue('D1', 'Tanggal Lahir (YYYY-MM-DD)');
         $sheet->setCellValue('E1', 'Alamat');
         $sheet->setCellValue('F1', 'Nama Wali');
+        $sheet->setCellValue('G1', 'No HP Wali (Mulai dengan 62)');
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="Template_Siswa.xlsx"');
@@ -124,6 +125,7 @@ class Siswa extends Controller {
         $sheet->setCellValue('D1', 'Tanggal Lahir');
         $sheet->setCellValue('E1', 'Alamat');
         $sheet->setCellValue('F1', 'Nama Wali');
+        $sheet->setCellValue('G1', 'No HP Wali');
 
         $row = 2;
         foreach($data as $d) {
@@ -133,6 +135,7 @@ class Siswa extends Controller {
             $sheet->setCellValue('D'.$row, $d['tanggal_lahir']);
             $sheet->setCellValue('E'.$row, $d['alamat']);
             $sheet->setCellValue('F'.$row, $d['nama_wali']);
+            $sheet->setCellValue('G'.$row, $d['no_hp_wali'] ?? '');
             $row++;
         }
 
@@ -164,11 +167,12 @@ class Siswa extends Controller {
                         if(!empty($row[0])) { // validasi NISN
                             $dataArray[] = [
                                 'nisn' => $row[0],
-                                'nama_lengkap' => $row[1],
-                                'jenis_kelamin' => $row[2],
-                                'tanggal_lahir' => $row[3],
-                                'alamat' => $row[4],
-                                'nama_wali' => $row[5]
+                                'nama_lengkap' => $row[1] ?? '',
+                                'jenis_kelamin' => $row[2] ?? 'L',
+                                'tanggal_lahir' => $row[3] ?? null,
+                                'alamat' => $row[4] ?? '',
+                                'nama_wali' => $row[5] ?? '',
+                                'no_hp_wali' => $row[6] ?? ''
                             ];
                         }
                     }
@@ -191,6 +195,31 @@ class Siswa extends Controller {
             }
         } else {
             $_SESSION['flash'] = ['pesan' => 'Gagal', 'aksi' => 'Tidak ada file yang diunggah', 'tipe' => 'danger'];
+        }
+        header('Location: ' . BASEURL . '/siswa');
+        exit;
+    }
+    public function hapus_massal()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['siswa_ids'])) {
+            $ids = $_POST['siswa_ids'];
+            if(is_array($ids) && count($ids) > 0) {
+                $sukses = 0;
+                $gagal = 0;
+                foreach($ids as $id) {
+                    if($this->model('SiswaModel')->hapusDataSiswa($id) > 0) {
+                        $sukses++;
+                    } else {
+                        $gagal++;
+                    }
+                }
+                
+                if($sukses > 0) {
+                    $_SESSION['flash'] = ['pesan' => $sukses . ' data siswa', 'aksi' => 'berhasil dihapus massal', 'tipe' => 'success'];
+                } else {
+                    $_SESSION['flash'] = ['pesan' => 'Data siswa', 'aksi' => 'gagal dihapus massal', 'tipe' => 'danger'];
+                }
+            }
         }
         header('Location: ' . BASEURL . '/siswa');
         exit;

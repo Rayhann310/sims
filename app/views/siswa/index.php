@@ -331,6 +331,11 @@
                             </div>
                             
                             <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">No HP Wali (Mulai 62)</label>
+                                <input type="text" name="no_hp_wali" placeholder="628..." class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
+                            </div>
+                            
+                            <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
                                 <textarea name="alamat" rows="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white"></textarea>
                             </div>
@@ -448,9 +453,15 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Nama Wali</label>
-                            <input type="text" name="nama_wali" id="edit_nama_wali" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Wali</label>
+                                <input type="text" name="nama_wali" id="edit_nama_wali" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">No HP Wali</label>
+                                <input type="text" name="no_hp_wali" id="edit_no_hp_wali" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-secondary focus:border-secondary">
+                            </div>
                         </div>
 
                         <div>
@@ -558,8 +569,8 @@
                                     <span class="font-medium text-slate-800 mt-0.5" x-text="currentSiswa.nama_wali || '-'"></span>
                                 </li>
                                 <li class="flex flex-col">
-                                    <span class="text-xs text-slate-500">Nomor Telepon Keluarga / Orang Tua</span>
-                                    <span class="font-medium text-slate-800 mt-0.5" x-text="currentSiswa.no_hp_ortu || '-'"></span>
+                                    <span class="text-xs text-slate-500">Nomor Telepon Wali</span>
+                                    <span class="font-medium text-slate-800 mt-0.5" x-text="currentSiswa.no_hp_wali || '-'"></span>
                                 </li>
                                 <li class="flex flex-col">
                                     <span class="text-xs text-slate-500">Alamat Rumah</span>
@@ -604,6 +615,7 @@ function openEditModalSiswa(id) {
         document.getElementById('edit_jenis_kelamin').value = data.jenis_kelamin;
         document.getElementById('edit_tanggal_lahir').value = data.tanggal_lahir;
         document.getElementById('edit_nama_wali').value = data.nama_wali;
+        document.getElementById('edit_no_hp_wali').value = data.no_hp_wali;
         document.getElementById('edit_alamat').value = data.alamat;
         
         const fotoPreview = document.getElementById('edit_foto_preview');
