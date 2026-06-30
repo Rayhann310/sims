@@ -16,7 +16,7 @@ class PengaturanModel {
 
     public function updatePengaturan($data)
     {
-        $query = "UPDATE pengaturan SET nama_aplikasi = :nama_aplikasi, logo_teks = :logo_teks, teks_footer = :teks_footer";
+        $query = "UPDATE pengaturan SET nama_aplikasi = :nama_aplikasi, logo_teks = :logo_teks, teks_footer = :teks_footer, fonnte_token = :fonnte_token";
         
         if(isset($data['logo_sekolah'])) {
             $query .= ", logo_sekolah = :logo_sekolah";
@@ -28,6 +28,7 @@ class PengaturanModel {
         $this->db->bind('nama_aplikasi', $data['nama_aplikasi']);
         $this->db->bind('logo_teks', $data['logo_teks']);
         $this->db->bind('teks_footer', $data['teks_footer']);
+        $this->db->bind('fonnte_token', $data['fonnte_token'] ?? null);
         
         if(isset($data['logo_sekolah'])) {
             $this->db->bind('logo_sekolah', $data['logo_sekolah']);

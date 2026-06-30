@@ -49,6 +49,11 @@
                         <input type="text" name="logo_teks" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 px-4 py-2" maxlength="2" value="<?= htmlspecialchars($data['pengaturan']['logo_teks'] ?? 'N') ?>" required>
                         <p class="text-xs text-slate-500 mt-1">Muncul jika gambar logo kosong.</p>
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Token Fonnte (WA API)</label>
+                        <input type="text" name="fonnte_token" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 px-4 py-2" value="<?= htmlspecialchars($data['pengaturan']['fonnte_token'] ?? '') ?>">
+                        <p class="text-xs text-slate-500 mt-1">Kosongkan jika tidak menggunakan WA bot.</p>
+                    </div>
                 </div>
                 
                 <!-- Kolom 2 -->

@@ -34,6 +34,66 @@ class KeuanganModel {
         return $this->db->resultSet();
     }
 
+    public function hapusPembayaran($id)
+    {
+        $this->db->query("DELETE FROM pembayaran_spp WHERE id = :id");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+    
+    private function sendFonnteWA($tagihan_id) 
+    {
+        // Ambil token dari pengaturan
+        $this->db->query("SELECT fonnte_token FROM pengaturan LIMIT 1");
+        $pengaturan = $this->db->single();
+        $token = $pengaturan['fonnte_token'] ?? '';
+        
+        if(empty($token)) return false;
+        
+        // Ambil detail tagihan dan siswa
+        $this->db->query("
+            SELECT t.bulan, t.tahun, t.nominal, s.nama_wali, s.no_hp_wali, s.nisn, u.nama_lengkap 
+            FROM tagihan_spp t 
+            JOIN siswa s ON t.siswa_id = s.id 
+            JOIN users u ON s.user_id = u.id 
+            WHERE t.id = :tagihan_id
+        ");
+        $this->db->bind('tagihan_id', $tagihan_id);
+        $tagihan = $this->db->single();
+        
+        if(!$tagihan || empty($tagihan['no_hp_wali'])) return false;
+        
+        $no_hp = preg_replace('/[^0-9]/', '', $tagihan['no_hp_wali']);
+        $nominal = number_format($tagihan['nominal'], 0, ',', '.');
+        $pesan = "Halo Bapak/Ibu {$tagihan['nama_wali']},\n\nKami menginformasikan bahwa pembayaran SPP atas nama:\nNama: {$tagihan['nama_lengkap']}\nNISN: {$tagihan['nisn']}\nBulan: {$tagihan['bulan']} {$tagihan['tahun']}\nSebesar: Rp {$nominal}\n\nTelah *LUNAS*.\nTerima kasih.";
+        
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 5, // Short timeout to avoid hanging the app (self-healing)
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                'target' => $no_hp,
+                'message' => $pesan, 
+                'countryCode' => '62',
+            ),
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: $token"
+            ),
+        ));
+        
+        $response = curl_exec($curl);
+        curl_close($curl);
+        
+        return $response;
+    }
+
     public function getTahunPembayaran()
     {
         $this->db->query("SELECT DISTINCT t.tahun FROM tagihan_spp t JOIN pembayaran_spp p ON p.tagihan_id = t.id ORDER BY t.tahun DESC");
@@ -146,6 +206,13 @@ class KeuanganModel {
             $this->db->query("UPDATE tagihan_spp SET status = 'Lunas' WHERE id = :tagihan_id");
             $this->db->bind('tagihan_id', $data['tagihan_id']);
             $this->db->execute();
+            
+            // Fonnte Notification Self-Healing
+            try {
+                $this->sendFonnteWA($data['tagihan_id']);
+            } catch (Exception $e) {
+                // Silently ignore to prevent crashing the payment process
+            }
         }
         
         if ($rowCount > 0) {
