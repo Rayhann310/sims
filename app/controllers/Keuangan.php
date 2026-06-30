@@ -71,4 +71,13 @@ class Keuangan extends Controller {
             exit;
         }
     }
+    public function kirimWA($tagihan_id)
+    {
+        if(isset($tagihan_id)) {
+            $this->model('KeuanganModel')->sendFonnteWA($tagihan_id);
+            $_SESSION['flash'] = ['pesan' => 'Notifikasi WA', 'aksi' => 'sedang dikirim di latar belakang', 'tipe' => 'success'];
+        }
+        header('Location: ' . BASEURL . '/keuangan/tagihan');
+        exit;
+    }
 }

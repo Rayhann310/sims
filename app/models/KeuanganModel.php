@@ -42,7 +42,7 @@ class KeuanganModel {
         return $this->db->rowCount();
     }
     
-    private function sendFonnteWA($tagihan_id) 
+    public function sendFonnteWA($tagihan_id) 
     {
         // Ambil token dari pengaturan
         $token = '';
