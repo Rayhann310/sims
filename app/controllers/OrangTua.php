@@ -1,6 +1,6 @@
 <?php
 
-class OrangTua extends Controller {
+class Orangtua extends Controller {
     public function __construct()
     {
         if(!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
