@@ -24,14 +24,14 @@
                         <td class="px-6 py-4 font-medium"><?= $s['nama_lengkap'] ?? 'Siswa (Tanpa Nama)'; ?></td>
                         <td class="px-6 py-4"><?= $s['nama_rombel'] ? $s['nama_kelas'] . ' - ' . $s['nama_rombel'] : '-'; ?></td>
                         <td class="px-6 py-4 font-bold">
-                            <?php if($s['total_poin'] <= -50): ?>
+                            <?php if($s['total_poin'] <= 150): ?>
                                 <span class="text-red-600 bg-red-50 px-2.5 py-1 rounded-lg font-bold border border-red-200"><?= $s['total_poin']; ?> Poin</span>
-                            <?php elseif($s['total_poin'] < 0): ?>
+                            <?php elseif($s['total_poin'] < 200): ?>
                                 <span class="text-orange-500 bg-orange-50 px-2.5 py-1 rounded-lg font-bold border border-orange-200"><?= $s['total_poin']; ?> Poin</span>
-                            <?php elseif($s['total_poin'] > 0): ?>
-                                <span class="text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg font-bold border border-emerald-200">+<?= $s['total_poin']; ?> Poin</span>
+                            <?php elseif($s['total_poin'] > 200): ?>
+                                <span class="text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg font-bold border border-emerald-200"><?= $s['total_poin']; ?> Poin</span>
                             <?php else: ?>
-                                <span class="text-slate-500 bg-slate-50 px-2.5 py-1 rounded-lg font-bold border border-slate-200">0 Poin</span>
+                                <span class="text-slate-500 bg-slate-50 px-2.5 py-1 rounded-lg font-bold border border-slate-200">200 Poin</span>
                             <?php endif; ?>
                         </td>
                         <td class="px-6 py-4 text-center">

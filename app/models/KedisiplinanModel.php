@@ -41,6 +41,7 @@ class KedisiplinanModel {
         $this->db->query("
             SELECT s.id, s.nisn as nis, u.nama_lengkap, k.nama_kelas, r.nama_rombel,
                    (
+                       200 +
                        COALESCE((SELECT SUM(c2.poin_dicatat) FROM catatan_kedisiplinan c2 JOIN kategori_kedisiplinan kat2 ON c2.kategori_id = kat2.id WHERE c2.siswa_id = s.id AND kat2.jenis = 'Penghargaan'), 0)
                        -
                        COALESCE((SELECT SUM(c1.poin_dicatat) FROM catatan_kedisiplinan c1 JOIN kategori_kedisiplinan kat1 ON c1.kategori_id = kat1.id WHERE c1.siswa_id = s.id AND kat1.jenis = 'Pelanggaran'), 0)
@@ -93,7 +94,7 @@ class KedisiplinanModel {
         
         // Buat notifikasi ke siswa
         if ($rowCount > 0) {
-            $this->db->query("SELECT user_id FROM siswa WHERE id = :siswa_id");
+            $this->db->query("SELECT s.user_id, s.nama_wali, s.no_hp_wali, s.nisn, u.nama_lengkap FROM siswa s JOIN users u ON s.user_id = u.id WHERE s.id = :siswa_id");
             $this->db->bind('siswa_id', $data['siswa_id']);
             $siswa = $this->db->single();
             
@@ -107,9 +108,80 @@ class KedisiplinanModel {
                     "{$jenis_text}: {$kategori['nama_kategori']} (Poin: {$poin})", 
                     BASEURL . '/kedisiplinan/riwayatSaya'
                 );
+                
+                // Trigger WA ke Orang Tua
+                $this->sendFonnteWAKedisiplinan($siswa, $kategori, $poin, $data['keterangan']);
             }
         }
         
         return $rowCount;
+    }
+    
+    private function sendFonnteWAKedisiplinan($siswa, $kategori, $poin, $keterangan)
+    {
+        // Ambil token
+        $token = '';
+        try {
+            $this->db->query("SELECT fonnte_token FROM pengaturan LIMIT 1");
+            $token = $this->db->single()['fonnte_token'] ?? '';
+        } catch (PDOException $e) {
+            return false;
+        }
+        
+        if(empty($token) || empty($siswa['no_hp_wali'])) return false;
+        
+        $no_hp = preg_replace('/[^0-9]/', '', $siswa['no_hp_wali']);
+        if (substr($no_hp, 0, 1) == '0') {
+            $no_hp = '62' . substr($no_hp, 1);
+        }
+        
+        if($kategori['jenis'] == 'Penghargaan') {
+            $pesan = "Halo Bapak/Ibu {$siswa['nama_wali']},\n\nKami menginformasikan bahwa ananda *{$siswa['nama_lengkap']}* (NISN: {$siswa['nisn']}) baru saja mendapatkan *Penghargaan Kedisiplinan* di sekolah.\n\nDetail Penghargaan:\n- Kategori: {$kategori['nama_kategori']}\n- Keterangan: {$keterangan}\n- Poin Ditambahkan: +{$poin}\n\nSaat ini total poin kedisiplinan ananda bertambah. Terima kasih atas dukungan dan bimbingan Bapak/Ibu di rumah.";
+        } else {
+            $pesan = "Halo Bapak/Ibu {$siswa['nama_wali']},\n\nMohon maaf, kami menginformasikan bahwa ananda *{$siswa['nama_lengkap']}* (NISN: {$siswa['nisn']}) baru saja melakukan *Pelanggaran Kedisiplinan* di sekolah.\n\nDetail Pelanggaran:\n- Kategori: {$kategori['nama_kategori']}\n- Keterangan: {$keterangan}\n- Poin Dikurangi: -{$poin}\n\nKami mohon bantuan Bapak/Ibu untuk memberikan bimbingan lebih lanjut di rumah. Terima kasih.";
+        }
+        
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                'target' => $no_hp,
+                'message' => $pesan
+            ),
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: $token"
+            ),
+        ));
+        
+        $response = curl_exec($curl);
+        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $error = curl_error($curl);
+        curl_close($curl);
+        
+        $status = ($httpcode >= 200 && $httpcode < 300) ? 'Sukses' : 'Gagal';
+        $response_body = $response ?: $error;
+        
+        try {
+            $this->db->query("INSERT INTO log_fonnte (nomor_tujuan, pesan, response_code, response_body, status) VALUES (:no, :pesan, :code, :body, :status)");
+            $this->db->bind('no', $no_hp);
+            $this->db->bind('pesan', $pesan);
+            $this->db->bind('code', $httpcode);
+            $this->db->bind('body', $response_body);
+            $this->db->bind('status', $status);
+            $this->db->execute();
+        } catch(PDOException $e) {
+            // Abaikan jika tabel log belum ada, self-healing di handle Keuangan
+        }
+        
+        return true;
     }
 }
