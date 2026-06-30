@@ -175,9 +175,14 @@ class Guru extends Controller {
                 $data['preview_data'] = $rows;
                 
                 // Simpan file sementara
-                $tmp_name = time() . '_' . $_FILES['file_excel']['name'];
-                move_uploaded_file($file_tmp, __DIR__ . '/../tmp/' . $tmp_name);
-                $data['file_tmp'] = $tmp_name;
+                $tmp_name = time() . '_' . preg_replace("/[^a-zA-Z0-9.]/", "_", $_FILES['file_excel']['name']);
+                if(move_uploaded_file($file_tmp, __DIR__ . '/../tmp/' . $tmp_name)) {
+                    $data['file_tmp'] = $tmp_name;
+                } else {
+                    $_SESSION['flash'] = ['pesan' => 'Gagal menyimpan file', 'aksi' => 'ke direktori tmp', 'tipe' => 'danger'];
+                    header('Location: ' . BASEURL . '/guru');
+                    exit;
+                }
 
                 $this->view('templates/admin_header', $data);
                 $this->view('guru/preview', $data);
