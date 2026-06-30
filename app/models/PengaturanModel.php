@@ -35,7 +35,23 @@ class PengaturanModel {
         }
         
         $this->db->bind('id', 1);
-        $this->db->execute();
+        
+        try {
+            $this->db->execute();
+        } catch (PDOException $e) {
+            // Self healing jika kolom fonnte_token belum ada
+            if(strpos($e->getMessage(), 'Unknown column') !== false) {
+                $db_heal = new Database();
+                $db_heal->query("ALTER TABLE pengaturan ADD COLUMN fonnte_token VARCHAR(255) NULL DEFAULT NULL AFTER logo_sekolah");
+                $db_heal->execute();
+                
+                // Coba eksekusi ulang
+                $this->db->execute();
+            } else {
+                throw $e;
+            }
+        }
+        
         return $this->db->rowCount();
     }
 }

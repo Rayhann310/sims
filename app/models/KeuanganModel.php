@@ -45,9 +45,23 @@ class KeuanganModel {
     private function sendFonnteWA($tagihan_id) 
     {
         // Ambil token dari pengaturan
-        $this->db->query("SELECT fonnte_token FROM pengaturan LIMIT 1");
-        $pengaturan = $this->db->single();
-        $token = $pengaturan['fonnte_token'] ?? '';
+        $token = '';
+        try {
+            $this->db->query("SELECT fonnte_token FROM pengaturan LIMIT 1");
+            $pengaturan = $this->db->single();
+            $token = $pengaturan['fonnte_token'] ?? '';
+        } catch (PDOException $e) {
+            // Self healing jika kolom belum ada
+            if(strpos($e->getMessage(), 'Unknown column') !== false) {
+                $db_heal = new Database();
+                $db_heal->query("ALTER TABLE pengaturan ADD COLUMN fonnte_token VARCHAR(255) NULL DEFAULT NULL AFTER logo_sekolah");
+                $db_heal->execute();
+                
+                $this->db->query("SELECT fonnte_token FROM pengaturan LIMIT 1");
+                $pengaturan = $this->db->single();
+                $token = $pengaturan['fonnte_token'] ?? '';
+            }
+        }
         
         if(empty($token)) return false;
         

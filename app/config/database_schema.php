@@ -450,6 +450,7 @@ return array (
       'nama_aplikasi' => 'varchar(100) NOT NULL',
       'logo_teks' => 'varchar(10) NOT NULL',
       'logo_sekolah' => 'LONGTEXT DEFAULT NULL',
+      'fonnte_token' => 'varchar(255) DEFAULT NULL',
       'teks_footer' => 'varchar(255) NOT NULL',
       'updated_at' => 'timestamp NOT NULL DEFAULT \'current_timestamp()\' on update current_timestamp()',
     ),
