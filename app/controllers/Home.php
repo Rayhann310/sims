@@ -13,6 +13,14 @@ class Home extends Controller {
         }
         $data['kategori_biaya'] = $kategori_biaya;
         $data['hide_navbar'] = true;
+        
+        $db = new Database();
+        $db->query("SELECT * FROM pengaturan ORDER BY id ASC LIMIT 1");
+        $data['pengaturan'] = $db->single();
+
+        require_once '../app/models/AkademikModel.php';
+        $akademikModel = new AkademikModel();
+        $data['tahun_akademik'] = $akademikModel->getTahunAktif();
 
         $this->view('templates/header', $data);
         $this->view('home/index', $data);

@@ -60,8 +60,8 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Logo Sekolah (Gambar)</label>
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center border border-slate-200 overflow-hidden shrink-0">
+                        <div class="flex flex-col gap-3">
+                            <div class="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center border border-slate-200 overflow-hidden shrink-0">
                                 <template x-if="logoPreview">
                                     <img :src="logoPreview" class="w-full h-full object-contain">
                                 </template>
@@ -69,7 +69,7 @@
                                     <i class="fas fa-image text-slate-400"></i>
                                 </template>
                             </div>
-                            <input type="file" @change="handleFileChange" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                            <input type="file" @change="handleLogoChange" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
                             <input type="hidden" name="logo_sekolah" :value="logoBase64">
                         </div>
                         <p class="text-xs text-slate-500 mt-2">Disarankan rasio 1:1, format PNG/JPG transparan.</p>
@@ -80,7 +80,36 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Teks Footer</label>
-                        <textarea name="teks_footer" rows="4" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 px-4 py-2" required><?= htmlspecialchars($data['pengaturan']['teks_footer'] ?? '') ?></textarea>
+                        <textarea name="teks_footer" rows="2" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 px-4 py-2" required><?= htmlspecialchars($data['pengaturan']['teks_footer'] ?? '') ?></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Gambar Banner Landing Page (PPDB)</label>
+                        <div class="flex flex-col gap-3">
+                            <div class="w-full h-24 bg-slate-100 rounded-lg flex items-center justify-center border border-slate-200 overflow-hidden">
+                                <template x-if="heroPreview">
+                                    <img :src="heroPreview" class="w-full h-full object-cover">
+                                </template>
+                                <template x-if="!heroPreview">
+                                    <i class="fas fa-image text-slate-400"></i>
+                                </template>
+                            </div>
+                            <input type="file" @change="handleHeroChange" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                            <input type="hidden" name="gambar_hero_spmb" :value="heroBase64">
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">Disarankan rasio Landscape (16:9), format PNG/JPG.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Brosur PPDB (PDF/Gambar)</label>
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-center gap-2" x-show="brosurBase64">
+                                <i class="fas fa-check-circle text-emerald-500"></i>
+                                <span class="text-sm text-emerald-700 font-medium">File Brosur Tersimpan</span>
+                            </div>
+                            <input type="file" @change="handleBrosurChange" accept=".pdf,image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                            <input type="hidden" name="brosur_spmb" :value="brosurBase64">
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">Maksimal ukuran file 2MB.</p>
                     </div>
                 </div>
             </div>
@@ -100,43 +129,73 @@ document.addEventListener('alpine:init', () => {
         logoPreview: '<?= !empty($data['pengaturan']['logo_sekolah']) ? $data['pengaturan']['logo_sekolah'] : '' ?>',
         logoBase64: '<?= !empty($data['pengaturan']['logo_sekolah']) ? $data['pengaturan']['logo_sekolah'] : '' ?>',
         
-        handleFileChange(event) {
+        heroPreview: '<?= !empty($data['pengaturan']['gambar_hero_spmb']) ? $data['pengaturan']['gambar_hero_spmb'] : '' ?>',
+        heroBase64: '<?= !empty($data['pengaturan']['gambar_hero_spmb']) ? $data['pengaturan']['gambar_hero_spmb'] : '' ?>',
+        
+        brosurBase64: '<?= !empty($data['pengaturan']['brosur_spmb']) ? $data['pengaturan']['brosur_spmb'] : '' ?>',
+        
+        handleLogoChange(event) {
+            this.processImage(event, 200, (base64) => {
+                this.logoPreview = base64;
+                this.logoBase64 = base64;
+            });
+        },
+        
+        handleHeroChange(event) {
+            this.processImage(event, 800, (base64) => {
+                this.heroPreview = base64;
+                this.heroBase64 = base64;
+            });
+        },
+        
+        handleBrosurChange(event) {
             const file = event.target.files[0];
             if (!file) return;
             
-            // Validate file type
-            if (!file.type.match('image.*')) {
-                alert('Tolong unggah file gambar (JPG/PNG).');
-                event.target.value = '';
-                return;
-            }
-            
-            // Validate file size (max 1MB for base64)
-            if (file.size > 1024 * 1024) {
-                alert('Ukuran gambar maksimal 1MB.');
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Ukuran brosur maksimal 2MB.');
                 event.target.value = '';
                 return;
             }
             
             const reader = new FileReader();
             reader.onload = (e) => {
-                this.logoPreview = e.target.result;
-                
-                // Compress image before saving to base64
+                this.brosurBase64 = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        },
+        
+        processImage(event, maxDim, callback) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                alert('Tolong unggah file gambar (JPG/PNG).');
+                event.target.value = '';
+                return;
+            }
+            
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Ukuran gambar maksimal 2MB.');
+                event.target.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
                     
-                    // Max dimension 200px for logo
-                    if (width > 200 || height > 200) {
+                    if (width > maxDim || height > maxDim) {
                         if (width > height) {
-                            height = Math.round((height *= 200 / width));
-                            width = 200;
+                            height = Math.round((height *= maxDim / width));
+                            width = maxDim;
                         } else {
-                            width = Math.round((width *= 200 / height));
-                            height = 200;
+                            width = Math.round((width *= maxDim / height));
+                            height = maxDim;
                         }
                     }
                     
@@ -145,8 +204,7 @@ document.addEventListener('alpine:init', () => {
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Use PNG to preserve transparency if possible
-                    this.logoBase64 = canvas.toDataURL('image/png');
+                    callback(canvas.toDataURL('image/jpeg', 0.8));
                 };
                 img.src = e.target.result;
             };

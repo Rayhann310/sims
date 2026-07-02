@@ -5,11 +5,15 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row items-center justify-between mb-12 border-b border-slate-100 pb-6">
             <div class="flex items-center gap-4">
-                <div class="w-16 h-16 bg-emerald-700 rounded-full flex items-center justify-center text-white font-bold shadow-md">
-                    NW
-                </div>
+                <?php if(!empty($data['pengaturan']['logo_sekolah'])): ?>
+                    <img src="<?= $data['pengaturan']['logo_sekolah'] ?>" alt="Logo" class="w-16 h-16 object-contain bg-white rounded-full shadow-md p-1">
+                <?php else: ?>
+                    <div class="w-16 h-16 bg-emerald-700 rounded-full flex items-center justify-center text-white font-bold shadow-md">
+                        NW
+                    </div>
+                <?php endif; ?>
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-800 leading-tight">SMA NAHDLATUL WATHAN<br>JAKARTA</h1>
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-800 leading-tight whitespace-nowrap">SMA NAHDLATUL WATHAN JAKARTA</h1>
                     <p class="text-emerald-700 font-semibold italic text-sm mt-1">Religius • Nasionalis • Berkualitas</p>
                 </div>
             </div>
@@ -23,16 +27,25 @@
             
             <!-- Left Column: Title & Features -->
             <div class="lg:w-7/12">
-                <h1 class="text-7xl md:text-8xl font-black text-[#004d33] tracking-tighter mb-2 leading-none">PPDB</h1>
-                <h2 class="text-2xl md:text-4xl font-extrabold text-[#004d33] tracking-tight mb-4 uppercase">Penerimaan<br>Peserta Didik Baru</h2>
+                <h1 class="text-7xl md:text-8xl font-black text-[#004d33] tracking-tighter mb-2 leading-none">SPMB</h1>
+                <h2 class="text-2xl md:text-4xl font-extrabold text-[#004d33] tracking-tight mb-4 uppercase">Sistem Penerimaan<br>Murid Baru</h2>
                 
                 <div class="inline-block bg-amber-400 text-[#004d33] font-bold px-6 py-2 rounded-full text-lg mb-6 shadow-sm">
-                    TAHUN AJARAN 2026/2027
+                    TAHUN AJARAN <?= !empty($data['tahun_akademik']) ? htmlspecialchars($data['tahun_akademik']['nama_tahun']) : '2026/2027' ?>
                 </div>
 
-                <p class="text-xl md:text-2xl font-medium text-slate-600 italic mb-10 leading-snug">
+                <p class="text-xl md:text-2xl font-medium text-slate-600 italic mb-8 leading-snug">
                     Bersama NW, Membangun Generasi<br>Cerdas, Berakhlak Mulia, dan Berwawasan Global
                 </p>
+
+                <?php if(!empty($data['pengaturan']['brosur_spmb'])): ?>
+                <div class="mb-10">
+                    <a href="<?= $data['pengaturan']['brosur_spmb'] ?>" download="Brosur_PPDB_SMANW" class="inline-flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-transform transform hover:-translate-y-1">
+                        <i class="fas fa-file-download text-xl"></i> 
+                        <span>Download Brosur PPDB</span>
+                    </a>
+                </div>
+                <?php endif; ?>
 
                 <!-- Value Props Icons -->
                 <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-10 text-center">
@@ -80,7 +93,10 @@
             <div class="lg:w-5/12">
                 <!-- Hero Image -->
                 <div class="relative rounded-3xl overflow-hidden shadow-2xl mb-8 group h-64 md:h-80">
-                    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop" alt="Siswa SMA NW" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                    <?php 
+                    $hero_img = !empty($data['pengaturan']['gambar_hero_spmb']) ? $data['pengaturan']['gambar_hero_spmb'] : 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop'; 
+                    ?>
+                    <img src="<?= $hero_img ?>" alt="Siswa SMA NW" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-[#004d33]/80 to-transparent"></div>
                     <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-sm">
                         <p class="font-bold text-emerald-800 text-sm">SMA NAHDLATUL WATHAN JAKARTA</p>
