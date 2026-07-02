@@ -242,6 +242,101 @@ class KeuanganModel {
         return $response;
     }
 
+    public function sendFonnteTagihanWA($tagihan_id) 
+    {
+        // Ambil token dari pengaturan
+        $token = '';
+        try {
+            $this->db->query("SELECT fonnte_token FROM pengaturan LIMIT 1");
+            $pengaturan = $this->db->single();
+            $token = $pengaturan['fonnte_token'] ?? '';
+        } catch (PDOException $e) {
+            return false;
+        }
+        
+        if(empty($token)) return false;
+        
+        // Ambil detail tagihan dan siswa
+        $this->db->query("
+            SELECT t.bulan, t.tahun, t.nominal, s.nama_wali, s.no_hp_wali, s.nisn, u.nama_lengkap, k.nama_kategori,
+            (SELECT COALESCE(SUM(jumlah_bayar), 0) FROM pembayaran_spp WHERE tagihan_id = t.id) as total_dibayar
+            FROM tagihan_spp t 
+            JOIN siswa s ON t.siswa_id = s.id 
+            JOIN users u ON s.user_id = u.id 
+            LEFT JOIN keuangan_kategori k ON t.kategori_id = k.id
+            WHERE t.id = :tagihan_id
+        ");
+        $this->db->bind('tagihan_id', $tagihan_id);
+        $tagihan = $this->db->single();
+        
+        if(!$tagihan || empty($tagihan['no_hp_wali'])) return false;
+        
+        $sisa = $tagihan['nominal'] - $tagihan['total_dibayar'];
+        if ($sisa <= 0) return false;
+
+        $no_hp = preg_replace('/[^0-9]/', '', $tagihan['no_hp_wali']);
+        if (substr($no_hp, 0, 1) == '0') {
+            $no_hp = '62' . substr($no_hp, 1);
+        }
+        
+        $jenis = !empty($tagihan['nama_kategori']) ? $tagihan['nama_kategori'] : 'SPP Bulanan';
+        $sisa_rp = number_format($sisa, 0, ',', '.');
+        $nominal_rp = number_format($tagihan['nominal'], 0, ',', '.');
+        
+        $pesan = "Assalamu'alaikum Bapak/Ibu {$tagihan['nama_wali']},\n\n";
+        $pesan .= "Mohon maaf mengganggu waktunya. Kami dari bagian Keuangan SMA Nahdlatul Wathan Jakarta bermaksud menginformasikan rincian tagihan administrasi ananda:\n\n";
+        $pesan .= "Nama: {$tagihan['nama_lengkap']}\n";
+        $pesan .= "NISN: {$tagihan['nisn']}\n";
+        $pesan .= "Jenis: {$jenis} - {$tagihan['bulan']} {$tagihan['tahun']}\n";
+        $pesan .= "Total Tagihan: Rp {$nominal_rp}\n";
+        $pesan .= "Sisa Belum Dibayar: *Rp {$sisa_rp}*\n\n";
+        $pesan .= "Mohon perkenannya untuk melakukan pembayaran sesuai nominal di atas. Jika Bapak/Ibu sudah melakukan pembayaran, mohon abaikan pesan ini atau konfirmasikan bukti transfer kepada kami.\n\n";
+        $pesan .= "Terima kasih banyak atas perhatian dan kerja samanya. Semoga sehat selalu.\n\n";
+        $pesan .= "Wassalamu'alaikum Warahmatullahi Wabarakatuh.";
+        
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                'target' => $no_hp,
+                'message' => $pesan
+            ),
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: $token"
+            ),
+        ));
+        
+        $response = curl_exec($curl);
+        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $error = curl_error($curl);
+        curl_close($curl);
+        
+        $status = ($httpcode >= 200 && $httpcode < 300) ? 'Sukses' : 'Gagal';
+        $response_body = $response ?: $error;
+        
+        try {
+            $this->db->query("INSERT INTO log_fonnte (nomor_tujuan, pesan, response_code, response_body, status) VALUES (:no, :pesan, :code, :body, :status)");
+            $this->db->bind('no', $no_hp);
+            $this->db->bind('pesan', $pesan);
+            $this->db->bind('code', $httpcode);
+            $this->db->bind('body', $response_body);
+            $this->db->bind('status', $status);
+            $this->db->execute();
+        } catch (Exception $e) {
+        }
+        
+        return $status == 'Sukses';
+    }
+
     public function getTahunPembayaran()
     {
         $this->db->query("SELECT DISTINCT t.tahun FROM tagihan_spp t JOIN pembayaran_spp p ON p.tagihan_id = t.id ORDER BY t.tahun DESC");

@@ -22,6 +22,29 @@
         </button>
     </div>
 
+    <!-- Filters -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6" x-data="{ filterKategori: '', filterStatus: '' }">
+        <form id="filterForm" class="flex flex-col sm:flex-row gap-4 items-end">
+            <div class="w-full sm:w-1/3">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Jenis Tagihan</label>
+                <select x-model="filterKategori" @change="applyTableFilter()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="">Semua Jenis</option>
+                    <template x-for="k in kategoriList" :key="k.id">
+                        <option :value="k.nama_kategori" x-text="k.nama_kategori"></option>
+                    </template>
+                </select>
+            </div>
+            <div class="w-full sm:w-1/3">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                <select x-model="filterStatus" @change="applyTableFilter()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="">Semua Status</option>
+                    <option value="Lunas">Lunas</option>
+                    <option value="Belum Lunas">Belum Lunas</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
     <!-- Flash Message -->
     <div class="mb-6">
         <?php Flasher::flash(); ?>
@@ -49,8 +72,10 @@
                     <?php else: ?>
                     <?php foreach($data['tagihan'] as $t): 
                         $sisa = $t['nominal'] - $t['total_dibayar'];
+                        $jenisTagihan = !empty($t['nama_kategori']) ? $t['nama_kategori'] : 'SPP Bulanan';
+                        $statusTagihan = ($t['status'] == 'Lunas') ? 'Lunas' : 'Belum Lunas';
                     ?>
-                    <tr class="hover:bg-slate-50 transition-colors">
+                    <tr class="hover:bg-slate-50 transition-colors tagihan-row" data-kategori="<?= htmlspecialchars($jenisTagihan) ?>" data-status="<?= $statusTagihan ?>">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-slate-900"><?= $t['nama_lengkap']; ?></div>
                             <div class="text-sm text-slate-500">NISN: <?= $t['nisn']; ?></div>
@@ -76,7 +101,14 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <?php if($t['status'] != 'Lunas'): ?>
-                            <button @click="activeTagihanId = <?= $t['id']; ?>; sisaTagihan = <?= $sisa; ?>; modalBayar = true" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md transition-colors">Bayar</button>
+                            <div class="flex items-center justify-end gap-2">
+                                <button @click="activeTagihanId = <?= $t['id']; ?>; sisaTagihan = <?= $sisa; ?>; modalBayar = true" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md transition-colors">Bayar</button>
+                                <?php if(!empty($t['no_hp_wali'])): ?>
+                                <a href="<?= BASEURL; ?>/keuangan/kirimTagihanWA/<?= $t['id']; ?>" class="text-amber-600 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-md transition-colors inline-flex items-center" title="Tagih via WA">
+                                    <i class="fab fa-whatsapp"></i> Tagih
+                                </a>
+                                <?php endif; ?>
+                            </div>
                             <?php else: ?>
                                 <?php if(!empty($t['no_hp_wali'])): ?>
                                 <a href="<?= BASEURL; ?>/keuangan/kirimWA/<?= $t['id']; ?>" class="text-emerald-600 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-md transition-colors inline-flex items-center gap-1">
@@ -197,3 +229,19 @@
         </div>
     </div>
 </div>
+
+<script>
+function applyTableFilter() {
+    const kategori = document.querySelector('[x-model="filterKategori"]').value;
+    const status = document.querySelector('[x-model="filterStatus"]').value;
+    
+    const rows = document.querySelectorAll('.tagihan-row');
+    rows.forEach(row => {
+        let show = true;
+        if (kategori && row.dataset.kategori !== kategori) show = false;
+        if (status && row.dataset.status !== status) show = false;
+        
+        row.style.display = show ? '' : 'none';
+    });
+}
+</script>

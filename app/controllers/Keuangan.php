@@ -129,6 +129,19 @@ class Keuangan extends Controller {
         exit;
     }
 
+    public function kirimTagihanWA($tagihan_id)
+    {
+        if(isset($tagihan_id)) {
+            if($this->model('KeuanganModel')->sendFonnteTagihanWA($tagihan_id)) {
+                $_SESSION['flash'] = ['pesan' => 'Tagihan WA', 'aksi' => 'berhasil dikirim ke orang tua', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'Tagihan WA', 'aksi' => 'gagal dikirim (cek token/nomor)', 'tipe' => 'danger'];
+            }
+        }
+        header('Location: ' . BASEURL . '/keuangan/tagihan');
+        exit;
+    }
+
     // ==========================================
     // BUKU KAS & ANALISA KEUANGAN
     // ==========================================
