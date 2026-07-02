@@ -186,6 +186,71 @@ class SpmbModel {
         return $this->db->rowCount();
     }
 
+    public function ubahPeserta($data)
+    {
+        try {
+            $this->db->query("START TRANSACTION");
+            $this->db->execute();
+
+            // 1. Update users table (username & nama_lengkap)
+            // Fetch old user_id
+            $peserta = $this->getPesertaById($data['id']);
+            if($peserta) {
+                // Jika NISN diubah, pastikan tidak duplikat dengan user lain
+                if ($peserta['nisn'] != $data['nisn']) {
+                    $this->db->query("SELECT id FROM users WHERE username = :username AND id != :id");
+                    $this->db->bind('username', $data['nisn']);
+                    $this->db->bind('id', $peserta['user_id']);
+                    if($this->db->single()) {
+                        throw new Exception("NISN sudah terdaftar di akun lain.");
+                    }
+                }
+
+                $this->db->query("UPDATE users SET username = :username, nama_lengkap = :nama_lengkap WHERE id = :user_id");
+                $this->db->bind('username', $data['nisn']);
+                $this->db->bind('nama_lengkap', $data['nama_lengkap']);
+                $this->db->bind('user_id', $peserta['user_id']);
+                $this->db->execute();
+            }
+
+            // 2. Update spmb_peserta
+            $this->db->query("UPDATE spmb_peserta SET 
+                nisn = :nisn,
+                nama_lengkap = :nama_lengkap,
+                asal_sekolah = :asal_sekolah,
+                no_hp = :no_hp
+                WHERE id = :id");
+            
+            $this->db->bind('nisn', $data['nisn']);
+            $this->db->bind('nama_lengkap', $data['nama_lengkap']);
+            $this->db->bind('asal_sekolah', $data['asal_sekolah']);
+            $this->db->bind('no_hp', $data['no_hp']);
+            $this->db->bind('id', $data['id']);
+            $this->db->execute();
+
+            $this->db->query("COMMIT");
+            $this->db->execute();
+            return ['status' => true, 'pesan' => 'Data peserta berhasil diubah.'];
+        } catch (Exception $e) {
+            $this->db->query("ROLLBACK");
+            $this->db->execute();
+            return ['status' => false, 'pesan' => $e->getMessage()];
+        }
+    }
+
+    public function hapusPeserta($id)
+    {
+        // Jika dihapus, kita hapus juga dari users karena ada ON DELETE CASCADE
+        $peserta = $this->getPesertaById($id);
+        if ($peserta && $peserta['user_id']) {
+            $this->db->query("DELETE FROM users WHERE id = :user_id");
+            $this->db->bind('user_id', $peserta['user_id']);
+            $this->db->execute();
+            return $this->db->rowCount();
+        }
+        return 0;
+    }
+
     // ==========================================
     // PEMBAYARAN
     // ==========================================

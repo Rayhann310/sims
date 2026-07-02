@@ -197,4 +197,29 @@ class Adminspmb extends Controller {
         header('Location: ' . BASEURL . '/adminspmb/biaya');
         exit;
     }
+
+    public function editPeserta()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $result = $this->model('SpmbModel')->ubahPeserta($_POST);
+            if ($result['status']) {
+                Flasher::setFlash('Berhasil', $result['pesan'], 'success');
+            } else {
+                Flasher::setFlash('Gagal', $result['pesan'], 'danger');
+            }
+            header('Location: ' . BASEURL . '/adminspmb/peserta');
+            exit;
+        }
+    }
+
+    public function hapusPeserta($id)
+    {
+        if ($this->model('SpmbModel')->hapusPeserta($id) > 0) {
+            Flasher::setFlash('Berhasil', 'Data peserta dan akun terkait berhasil dihapus', 'success');
+        } else {
+            Flasher::setFlash('Gagal', 'Data peserta gagal dihapus', 'danger');
+        }
+        header('Location: ' . BASEURL . '/adminspmb/peserta');
+        exit;
+    }
 }
