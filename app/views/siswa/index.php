@@ -599,6 +599,31 @@
             </div>
         </div>
     </div>
+    <!-- Modal Ulang Tahun -->
+    <div x-show="ultahModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div x-show="ultahModalOpen" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="ultahModalOpen = false"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="ultahModalOpen" x-transition class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-slate-200">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="text-lg font-semibold leading-6 text-slate-900 flex items-center gap-2">
+                        <i class="fas fa-birthday-cake text-pink-500"></i>
+                        Siswa yang Berulang Tahun Hari Ini
+                    </h3>
+                    <button type="button" @click="ultahModalOpen = false" class="text-slate-400 hover:text-slate-500 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="bg-slate-50 px-6 py-6 max-h-[60vh] overflow-y-auto">
+                    <div id="ultahContainer" class="space-y-3">
+                        <div class="flex justify-center py-4"><i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i></div>
+                    </div>
+                </div>
+                <div class="bg-white px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6 border-t border-slate-200 gap-3">
+                    <button type="button" @click="ultahModalOpen = false" class="inline-flex w-full justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 sm:w-auto transition-colors">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
