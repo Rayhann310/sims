@@ -1,7 +1,11 @@
 <?php
 $db = new Database();
-$db->query("SELECT * FROM pengaturan ORDER BY id ASC LIMIT 1");
-$pengaturan = $db->single();
+try {
+    $db->query("SELECT * FROM pengaturan ORDER BY id ASC LIMIT 1");
+    $pengaturan = $db->single() ?: [];
+} catch (Exception $e) {
+    $pengaturan = [];
+}
 $app_name = $pengaturan ? htmlspecialchars($pengaturan['nama_aplikasi']) : 'SIAKAD';
 $app_logo = $pengaturan ? htmlspecialchars($pengaturan['logo_teks']) : 'S';
 // Make pengaturan available globally for this request

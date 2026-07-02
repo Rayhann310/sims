@@ -1,7 +1,11 @@
 <?php
 $db = new Database();
-$db->query("SELECT * FROM pengaturan ORDER BY id ASC LIMIT 1");
-$pengaturan = $db->single();
+try {
+    $db->query("SELECT * FROM pengaturan ORDER BY id ASC LIMIT 1");
+    $pengaturan = $db->single() ?: [];
+} catch (Exception $e) {
+    $pengaturan = [];
+}
 $app_name = $pengaturan ? htmlspecialchars($pengaturan['nama_aplikasi']) : 'SMA NAHDLATUL WATHAN JAKARTA';
 $app_logo = (!empty($pengaturan['logo_sekolah'])) ? htmlspecialchars($pengaturan['logo_sekolah']) : BASEURL . '/img/logo.png';
 ?>
