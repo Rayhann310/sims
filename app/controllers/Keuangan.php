@@ -128,4 +128,85 @@ class Keuangan extends Controller {
         header('Location: ' . BASEURL . '/keuangan/tagihan');
         exit;
     }
+
+    // ==========================================
+    // BUKU KAS & ANALISA KEUANGAN
+    // ==========================================
+
+    public function bukuKas()
+    {
+        $data['judul'] = 'Buku Kas & Analisa Keuangan';
+        
+        $bulan = isset($_GET['bulan']) ? $_GET['bulan'] : date('m');
+        $tahun = isset($_GET['tahun']) ? $_GET['tahun'] : date('Y');
+        
+        if (isset($_GET['filter']) && $_GET['filter'] == 'semua') {
+            $bulan = '';
+            $tahun = '';
+        }
+
+        $data['kas'] = $this->model('KeuanganModel')->getAllKas($bulan, $tahun);
+        $data['statistik'] = $this->model('KeuanganModel')->getStatistikKas();
+        $data['chart'] = $this->model('KeuanganModel')->getChartData(date('Y'));
+        
+        $data['filter_bulan'] = $bulan;
+        $data['filter_tahun'] = $tahun ?: date('Y');
+
+        $this->view('templates/admin_header', $data);
+        $this->view('keuangan/buku_kas', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    public function prosesTambahKas()
+    {
+        if(isset($_POST['jenis'])) {
+            if($this->model('KeuanganModel')->tambahKas($_POST) > 0) {
+                Flasher::setFlash('Data Kas berhasil', 'ditambahkan', 'success');
+            } else {
+                Flasher::setFlash('Data Kas gagal', 'ditambahkan', 'danger');
+            }
+        }
+        header('Location: ' . BASEURL . '/keuangan/bukuKas');
+        exit;
+    }
+
+    public function hapusKas($id)
+    {
+        if($this->model('KeuanganModel')->hapusKas($id) > 0) {
+            Flasher::setFlash('Data Kas berhasil', 'dihapus', 'success');
+        } else {
+            Flasher::setFlash('Data Kas gagal', 'dihapus (Mungkin terikat dengan SPP)', 'danger');
+        }
+        header('Location: ' . BASEURL . '/keuangan/bukuKas');
+        exit;
+    }
+
+    public function exportExcelKas()
+    {
+        $bulan = isset($_GET['bulan']) ? $_GET['bulan'] : '';
+        $tahun = isset($_GET['tahun']) ? $_GET['tahun'] : '';
+        
+        $kas = $this->model('KeuanganModel')->getAllKas($bulan, $tahun);
+        
+        $filename = "Buku_Kas_" . ($bulan ? $bulan . "_" : "") . ($tahun ? $tahun : "Semua") . ".csv";
+        
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=' . $filename);
+        
+        $output = fopen('php://output', 'w');
+        fputcsv($output, ['ID', 'Tanggal', 'Jenis', 'Sumber', 'Keterangan', 'Nominal']);
+        
+        foreach($kas as $row) {
+            fputcsv($output, [
+                $row['id'],
+                $row['tanggal'],
+                $row['jenis'],
+                $row['sumber'],
+                $row['keterangan'],
+                $row['nominal']
+            ]);
+        }
+        fclose($output);
+        exit;
+    }
 }

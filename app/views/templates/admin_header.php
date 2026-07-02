@@ -187,6 +187,12 @@ $GLOBALS['pengaturan'] = $pengaturan;
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Riwayat Bayar</span>
                     </a>
+                    <?php if($role == 'admin'): ?>
+                    <a href="<?= BASEURL; ?>/keuangan/bukuKas" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/keuangan/bukuKas') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Buku Kas & Analisa">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Buku Kas & Analisa</span>
+                    </a>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endif; ?>

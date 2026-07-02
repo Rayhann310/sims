@@ -72,4 +72,8 @@ class Database {
     public function exec($query) {
         return $this->dbh->exec($query);
     }
+
+    public function lastInsertId() {
+        return $this->dbh->lastInsertId();
+    }
 }

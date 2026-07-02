@@ -30,6 +30,35 @@ class KeuanganModel {
         } catch (Throwable $e) {
             // Abaikan jika error (kolom sudah ada)
         }
+
+        // Buat tabel Buku Kas Umum
+        try {
+            $this->db->query("CREATE TABLE IF NOT EXISTS `keuangan_kas` (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `jenis` enum('Pemasukan','Pengeluaran') NOT NULL,
+                `sumber` varchar(100) NOT NULL,
+                `tanggal` date NOT NULL,
+                `nominal` decimal(15,2) NOT NULL DEFAULT '0.00',
+                `keterangan` text DEFAULT NULL,
+                `referensi_id` int(11) DEFAULT NULL,
+                `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            $this->db->execute();
+
+            // Migrasi otomatis: Pindahkan semua data pembayaran SPP lama ke keuangan_kas jika belum ada
+            $this->db->query("
+                INSERT INTO keuangan_kas (jenis, sumber, tanggal, nominal, keterangan, referensi_id, created_at)
+                SELECT 'Pemasukan', 'Pembayaran SPP', p.tanggal_bayar, p.jumlah_bayar, p.keterangan, p.id, p.created_at
+                FROM pembayaran_spp p
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM keuangan_kas k WHERE k.referensi_id = p.id AND k.sumber = 'Pembayaran SPP'
+                )
+            ");
+            $this->db->execute();
+        } catch (Throwable $e) {
+            // Abaikan
+        }
     }
 
     // CRUD Master Tarif
@@ -100,6 +129,11 @@ class KeuanganModel {
 
     public function hapusPembayaran($id)
     {
+        // Hapus dari buku kas terlebih dahulu (referensi_id)
+        $this->db->query("DELETE FROM keuangan_kas WHERE referensi_id = :id AND sumber = 'Pembayaran SPP'");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+
         $this->db->query("DELETE FROM pembayaran_spp WHERE id = :id");
         $this->db->bind('id', $id);
         $this->db->execute();
@@ -312,7 +346,18 @@ class KeuanganModel {
         $this->db->bind('keterangan', $data['keterangan']);
         $this->db->execute();
         
+        $pembayaran_id = $this->db->lastInsertId();
         $rowCount = $this->db->rowCount();
+
+        if ($rowCount > 0) {
+            // Catat ke Buku Kas Umum sebagai Pemasukan
+            $this->db->query("INSERT INTO keuangan_kas (jenis, sumber, tanggal, nominal, keterangan, referensi_id) VALUES ('Pemasukan', 'Pembayaran SPP', :tanggal, :nominal, :keterangan, :ref_id)");
+            $this->db->bind('tanggal', date('Y-m-d'));
+            $this->db->bind('nominal', $data['jumlah_bayar']);
+            $this->db->bind('keterangan', 'SPP Ref: ' . $pembayaran_id . ($data['keterangan'] ? ' - ' . $data['keterangan'] : ''));
+            $this->db->bind('ref_id', $pembayaran_id);
+            $this->db->execute();
+        }
         
         // Update status tagihan (cek jika sudah lunas)
         $this->db->query("SELECT nominal, siswa_id, bulan, tahun FROM tagihan_spp WHERE id = :tagihan_id");
@@ -356,5 +401,103 @@ class KeuanganModel {
         }
         
         return $rowCount;
+    }
+
+    // ==========================================
+    // BUKU KAS UMUM & ANALISA KEUANGAN
+    // ==========================================
+    
+    public function getAllKas($bulan = '', $tahun = '')
+    {
+        $where = "";
+        if (!empty($bulan) && !empty($tahun)) {
+            $where = "WHERE MONTH(tanggal) = :bulan AND YEAR(tanggal) = :tahun";
+        } elseif (!empty($tahun)) {
+            $where = "WHERE YEAR(tanggal) = :tahun";
+        }
+
+        $this->db->query("SELECT * FROM keuangan_kas $where ORDER BY tanggal DESC, id DESC");
+        
+        if (!empty($bulan) && !empty($tahun)) {
+            $this->db->bind('bulan', $bulan);
+            $this->db->bind('tahun', $tahun);
+        } elseif (!empty($tahun)) {
+            $this->db->bind('tahun', $tahun);
+        }
+
+        return $this->db->resultSet();
+    }
+
+    public function getStatistikKas()
+    {
+        $this->db->query("
+            SELECT 
+                SUM(CASE WHEN jenis = 'Pemasukan' THEN nominal ELSE 0 END) as total_pemasukan,
+                SUM(CASE WHEN jenis = 'Pengeluaran' THEN nominal ELSE 0 END) as total_pengeluaran,
+                SUM(CASE WHEN jenis = 'Pemasukan' THEN nominal ELSE -nominal END) as saldo_akhir
+            FROM keuangan_kas
+        ");
+        $all = $this->db->single();
+
+        $bulan_ini = date('m');
+        $tahun_ini = date('Y');
+        
+        $this->db->query("
+            SELECT 
+                SUM(CASE WHEN jenis = 'Pemasukan' THEN nominal ELSE 0 END) as pemasukan_bulan_ini,
+                SUM(CASE WHEN jenis = 'Pengeluaran' THEN nominal ELSE 0 END) as pengeluaran_bulan_ini
+            FROM keuangan_kas
+            WHERE MONTH(tanggal) = :bulan AND YEAR(tanggal) = :tahun
+        ");
+        $this->db->bind('bulan', $bulan_ini);
+        $this->db->bind('tahun', $tahun_ini);
+        $month = $this->db->single();
+
+        return array_merge($all, $month);
+    }
+
+    public function getChartData($tahun)
+    {
+        $this->db->query("
+            SELECT 
+                MONTH(tanggal) as bulan,
+                SUM(CASE WHEN jenis = 'Pemasukan' THEN nominal ELSE 0 END) as pemasukan,
+                SUM(CASE WHEN jenis = 'Pengeluaran' THEN nominal ELSE 0 END) as pengeluaran
+            FROM keuangan_kas
+            WHERE YEAR(tanggal) = :tahun
+            GROUP BY MONTH(tanggal)
+            ORDER BY MONTH(tanggal) ASC
+        ");
+        $this->db->bind('tahun', $tahun);
+        $result = $this->db->resultSet();
+        
+        $chart = array_fill(1, 12, ['pemasukan' => 0, 'pengeluaran' => 0]);
+        foreach($result as $row) {
+            $chart[$row['bulan']]['pemasukan'] = $row['pemasukan'];
+            $chart[$row['bulan']]['pengeluaran'] = $row['pengeluaran'];
+        }
+        
+        return $chart;
+    }
+
+    public function tambahKas($data)
+    {
+        $this->db->query("INSERT INTO keuangan_kas (jenis, sumber, tanggal, nominal, keterangan) VALUES (:jenis, :sumber, :tanggal, :nominal, :keterangan)");
+        $this->db->bind('jenis', $data['jenis']);
+        $this->db->bind('sumber', $data['sumber']);
+        $this->db->bind('tanggal', $data['tanggal']);
+        $this->db->bind('nominal', $data['nominal']);
+        $this->db->bind('keterangan', $data['keterangan']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function hapusKas($id)
+    {
+        // Cegah hapus manual jika itu dari SPP (harus hapus dari riwayat pembayaran SPP)
+        $this->db->query("DELETE FROM keuangan_kas WHERE id = :id AND (sumber != 'Pembayaran SPP' OR referensi_id IS NULL)");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
     }
 }
