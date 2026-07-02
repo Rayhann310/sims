@@ -2,11 +2,28 @@
     <!-- Page Header -->
     <div class="sm:flex sm:justify-between sm:items-center mb-8">
         <div>
-            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold flex items-center gap-2">
-                <svg class="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
-                Kearsipan & Tata Usaha
+            <!-- Breadcrumbs -->
+            <div class="mb-2">
+                <nav class="flex" aria-label="Breadcrumb">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                        <li class="inline-flex items-center">
+                            <a href="<?= BASEURL; ?>/kearsipan" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                                Kearsipan
+                            </a>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                                <span class="ml-1 text-sm font-medium text-slate-700 md:ml-2"><?= htmlspecialchars($data['kategori_aktif']['nama_kategori']); ?></span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+            <h1 class="text-2xl md:text-3xl text-slate-800 font-bold">
+                <?= htmlspecialchars($data['kategori_aktif']['nama_kategori']); ?>
             </h1>
-            <p class="text-slate-500 mt-1">Manajemen data surat masuk, surat keluar, dan dokumen sekolah layaknya Google Drive.</p>
         </div>
         
         <div class="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-2 mt-4 sm:mt-0">
@@ -20,13 +37,9 @@
                 </button>
             </div>
             
-            <button onclick="document.getElementById('modalFolder').classList.remove('hidden')" class="btn bg-white border-slate-200 hover:border-slate-300 text-slate-600">
-                <svg class="w-4 h-4 fill-current text-slate-500 shrink-0" viewBox="0 0 16 16"><path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z"/></svg>
-                <span class="hidden xs:block ml-2">Folder Baru</span>
-            </button>
             <button onclick="document.getElementById('tambahModal').classList.remove('hidden')" class="btn bg-primary hover:bg-indigo-600 text-white">
                 <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16"><path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z"/></svg>
-                <span class="hidden xs:block ml-2">Upload File</span>
+                <span class="hidden xs:block ml-2">Upload File Disini</span>
             </button>
         </div>
     </div>
@@ -36,47 +49,11 @@
         <?php Flasher::flash(); ?>
     </div>
 
-    <!-- Folders Section -->
+    <!-- Files Section -->
     <div class="mb-8">
-        <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-            Folders
-        </h2>
-        
-        <?php if(empty($data['kategori'])): ?>
-            <div class="bg-white border border-slate-200 border-dashed rounded-lg p-6 text-center text-slate-500">
-                Belum ada folder. Silakan klik "Folder Baru" untuk mulai mengelompokkan dokumen.
-            </div>
-        <?php else: ?>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <?php foreach($data['kategori'] as $kat): ?>
-                <!-- Card Folder (GDrive style) -->
-                <div class="bg-white border border-slate-200 hover:border-indigo-400 hover:shadow-md rounded-xl p-4 cursor-pointer transition-all group flex items-center justify-between"
-                     ondblclick="window.location.href='<?= BASEURL; ?>/kearsipan/folder/<?= $kat['id']; ?>'">
-                    <div class="flex items-center gap-3 w-full">
-                        <svg class="w-8 h-8 text-slate-400 group-hover:text-indigo-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>
-                        <div class="truncate w-full">
-                            <h3 class="font-medium text-slate-800 group-hover:text-indigo-600 truncate"><?= htmlspecialchars($kat['nama_kategori']); ?></h3>
-                        </div>
-                    </div>
-                    <!-- Actions Menu (Hapus) -->
-                    <div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <a href="<?= BASEURL; ?>/kearsipan/hapuskategori/<?= $kat['id']; ?>" onclick="return confirm('Hapus folder ini? File di dalamnya akan menjadi Tanpa Kategori.');" class="text-rose-400 hover:text-rose-600 p-1" title="Hapus Folder">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </a>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-    </div>
-
-    <!-- Uncategorized Files Section -->
-    <div class="mb-8">
-        <h2 class="text-lg font-semibold text-slate-800 mb-4">Files (Tidak Berfolder)</h2>
-        
         <?php if(empty($data['surat'])): ?>
             <div class="bg-white border border-slate-200 border-dashed rounded-lg p-6 text-center text-slate-500">
-                Semua file sudah berada di dalam folder.
+                Folder ini masih kosong. Klik tombol "Upload File Disini" untuk menambahkan dokumen.
             </div>
         <?php else: ?>
             
@@ -156,29 +133,7 @@
     </div>
 </div>
 
-<!-- Modal Tambah Folder -->
-<div id="modalFolder" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
-        <div class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity" onclick="document.getElementById('modalFolder').classList.add('hidden')"></div>
-        <div class="inline-block bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-sm w-full">
-            <form action="<?= BASEURL; ?>/kearsipan/tambahkategori" method="POST">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4" id="modal-title">Buat Folder Baru</h3>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Nama Folder</label>
-                        <input type="text" name="nama_kategori" class="form-input w-full" placeholder="Cth: Surat Edaran 2026" required autofocus>
-                    </div>
-                </div>
-                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm">Buat</button>
-                    <button type="button" onclick="document.getElementById('modalFolder').classList.add('hidden')" class="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Batal</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Tambah Surat/Dokumen -->
+<!-- Modal Tambah Surat/Dokumen ke Folder Ini -->
 <div id="tambahModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="document.getElementById('tambahModal').classList.add('hidden')"></div>
@@ -189,6 +144,8 @@
                     <div class="sm:flex sm:items-start">
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                             <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4" id="modal-title">Upload Dokumen Kearsipan</h3>
+                            
+                            <input type="hidden" name="kategori_id" value="<?= $data['kategori_aktif']['id']; ?>">
                             
                             <div class="space-y-4">
                                 <div class="grid grid-cols-2 gap-4">
@@ -213,12 +170,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-slate-700 mb-1">Folder Tujuan</label>
-                                        <select name="kategori_id" class="form-select w-full">
-                                            <option value="">-- Tanpa Folder --</option>
-                                            <?php foreach($data['kategori'] as $kat): ?>
-                                                <option value="<?= $kat['id']; ?>"><?= $kat['nama_kategori']; ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
+                                        <input type="text" class="form-input w-full bg-slate-100 text-slate-500 cursor-not-allowed" value="<?= htmlspecialchars($data['kategori_aktif']['nama_kategori']); ?>" disabled>
                                     </div>
                                 </div>
 
