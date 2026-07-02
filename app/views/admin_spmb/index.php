@@ -1,6 +1,6 @@
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-slate-800">Manajemen Gelombang SPMB</h2>
-            <button type="button" data-modal-target="tambahModal" data-modal-toggle="tambahModal" class="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
+            <button type="button" onclick="document.getElementById('tambahModal').classList.remove('hidden'); document.getElementById('tambahModal').classList.add('flex')" class="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Tambah Gelombang
             </button>
@@ -39,8 +39,7 @@
                             </td>
                             <td class="px-6 py-4 text-center flex justify-center gap-2">
                                 <button type="button" 
-                                    data-modal-target="editModal<?= $g['id']; ?>" 
-                                    data-modal-toggle="editModal<?= $g['id']; ?>"
+                                    onclick="document.getElementById('editModal<?= $g['id']; ?>').classList.remove('hidden'); document.getElementById('editModal<?= $g['id']; ?>').classList.add('flex')"
                                     class="text-blue-600 hover:text-blue-900 bg-blue-50 p-2 rounded-lg" title="Edit">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                 </button>
@@ -56,12 +55,12 @@
                         </tr>
 
                         <!-- Edit Modal -->
-                        <div id="editModal<?= $g['id']; ?>" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                        <div id="editModal<?= $g['id']; ?>" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-slate-900 bg-opacity-50">
                             <div class="relative p-4 w-full max-w-md max-h-full">
                                 <div class="relative bg-white rounded-xl shadow">
                                     <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                                         <h3 class="text-xl font-semibold text-gray-900">Ubah Gelombang SPMB</h3>
-                                        <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="editModal<?= $g['id']; ?>">
+                                        <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="document.getElementById('editModal<?= $g['id']; ?>').classList.add('hidden'); document.getElementById('editModal<?= $g['id']; ?>').classList.remove('flex')">
                                             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/></svg>
                                             <span class="sr-only">Tutup modal</span>
                                         </button>
@@ -106,12 +105,12 @@
             </div>
         </div>
 <!-- Tambah Modal -->
-<div id="tambahModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+<div id="tambahModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-slate-900 bg-opacity-50">
     <div class="relative p-4 w-full max-w-md max-h-full">
         <div class="relative bg-white rounded-xl shadow">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-semibold text-gray-900">Tambah Gelombang SPMB</h3>
-                <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="tambahModal">
+                <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="document.getElementById('tambahModal').classList.add('hidden'); document.getElementById('tambahModal').classList.remove('flex')">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/></svg>
                     <span class="sr-only">Tutup modal</span>
                 </button>

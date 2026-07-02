@@ -52,8 +52,7 @@
                                 <div class="flex justify-center gap-2">
                                     <!-- Tombol Ubah Status -->
                                     <button type="button" 
-                                        data-modal-target="statusModal<?= $p['id']; ?>" 
-                                        data-modal-toggle="statusModal<?= $p['id']; ?>"
+                                        onclick="document.getElementById('statusModal<?= $p['id']; ?>').classList.remove('hidden'); document.getElementById('statusModal<?= $p['id']; ?>').classList.add('flex')"
                                         class="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg text-xs font-medium" title="Ubah Status">
                                         Seleksi
                                     </button>
@@ -69,12 +68,12 @@
                         </tr>
 
                         <!-- Status Modal -->
-                        <div id="statusModal<?= $p['id']; ?>" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                        <div id="statusModal<?= $p['id']; ?>" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-slate-900 bg-opacity-50">
                             <div class="relative p-4 w-full max-w-sm max-h-full">
                                 <div class="relative bg-white rounded-xl shadow">
                                     <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                                         <h3 class="text-xl font-semibold text-gray-900">Ubah Status Seleksi</h3>
-                                        <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="statusModal<?= $p['id']; ?>">
+                                        <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" onclick="document.getElementById('statusModal<?= $p['id']; ?>').classList.add('hidden'); document.getElementById('statusModal<?= $p['id']; ?>').classList.remove('flex')">
                                             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/></svg>
                                         </button>
                                     </div>
