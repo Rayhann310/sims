@@ -498,6 +498,104 @@ class KeuanganModel {
         return $rowCount;
     }
 
+    public function batalBayarTagihan($tagihan_id)
+    {
+        // 1. Ambil detail tagihan dan pembayaran
+        $this->db->query("
+            SELECT t.bulan, t.tahun, t.nominal, s.nama_wali, s.no_hp_wali, s.nisn, u.nama_lengkap, k.nama_kategori
+            FROM tagihan_spp t 
+            JOIN siswa s ON t.siswa_id = s.id 
+            JOIN users u ON s.user_id = u.id 
+            LEFT JOIN keuangan_kategori k ON t.kategori_id = k.id
+            WHERE t.id = :tagihan_id
+        ");
+        $this->db->bind('tagihan_id', $tagihan_id);
+        $tagihan = $this->db->single();
+
+        if (!$tagihan) return false;
+
+        // 2. Cari semua pembayaran untuk tagihan ini dan hapus
+        $this->db->query("SELECT id FROM pembayaran_spp WHERE tagihan_id = :tagihan_id");
+        $this->db->bind('tagihan_id', $tagihan_id);
+        $pembayaran_list = $this->db->resultSet();
+        
+        foreach ($pembayaran_list as $p) {
+            $this->hapusPembayaran($p['id']);
+        }
+
+        // 3. Update status tagihan kembali menjadi 'Belum Lunas'
+        $this->db->query("UPDATE tagihan_spp SET status = 'Belum Lunas' WHERE id = :tagihan_id");
+        $this->db->bind('tagihan_id', $tagihan_id);
+        $this->db->execute();
+
+        // 4. Kirim notifikasi Fonnte WA
+        $token = '';
+        try {
+            $this->db->query("SELECT fonnte_token FROM pengaturan LIMIT 1");
+            $pengaturan = $this->db->single();
+            $token = $pengaturan['fonnte_token'] ?? '';
+        } catch (Exception $e) {}
+
+        if(!empty($token) && !empty($tagihan['no_hp_wali'])) {
+            $no_hp = preg_replace('/[^0-9]/', '', $tagihan['no_hp_wali']);
+            if (substr($no_hp, 0, 1) == '0') {
+                $no_hp = '62' . substr($no_hp, 1);
+            }
+            $jenis = !empty($tagihan['nama_kategori']) ? $tagihan['nama_kategori'] : 'SPP Bulanan';
+            $nominal_rp = number_format($tagihan['nominal'], 0, ',', '.');
+            
+            $pesan = "Mohon maaf Bapak/Ibu {$tagihan['nama_wali']},\n\n";
+            $pesan .= "Terdapat pembatalan pembayaran untuk tagihan administrasi ananda:\n\n";
+            $pesan .= "Nama: {$tagihan['nama_lengkap']}\n";
+            $pesan .= "NISN: {$tagihan['nisn']}\n";
+            $pesan .= "Jenis: {$jenis} - {$tagihan['bulan']} {$tagihan['tahun']}\n";
+            $pesan .= "Sebesar: Rp {$nominal_rp}\n\n";
+            $pesan .= "Pembatalan ini dilakukan karena kesalahan sistem/input. Status tagihan kini kembali menjadi *Belum Lunas*. Mohon maaf atas ketidaknyamanannya.\n\n";
+            $pesan .= "Terima kasih.";
+
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.fonnte.com/send',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 15,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => array(
+                    'target' => $no_hp,
+                    'message' => $pesan
+                ),
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: $token"
+                ),
+            ));
+            
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $error = curl_error($curl);
+            curl_close($curl);
+            
+            $status = ($httpcode >= 200 && $httpcode < 300) ? 'Sukses' : 'Gagal';
+            $response_body = $response ?: $error;
+            
+            try {
+                $this->db->query("INSERT INTO log_fonnte (nomor_tujuan, pesan, response_code, response_body, status) VALUES (:no, :pesan, :code, :body, :status)");
+                $this->db->bind('no', $no_hp);
+                $this->db->bind('pesan', $pesan);
+                $this->db->bind('code', $httpcode);
+                $this->db->bind('body', $response_body);
+                $this->db->bind('status', $status);
+                $this->db->execute();
+            } catch(Exception $e) {}
+        }
+
+        return true;
+    }
+
     // ==========================================
     // BUKU KAS UMUM & ANALISA KEUANGAN
     // ==========================================

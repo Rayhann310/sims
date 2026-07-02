@@ -121,43 +121,49 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200 bg-white">
-                    <template x-if="filteredKas.length === 0">
+                    <?php if(empty($data['kas'])): ?>
                         <tr>
                             <td colspan="6" class="px-6 py-8 text-center text-slate-500">Tidak ada data transaksi ditemukan.</td>
                         </tr>
-                    </template>
-                    <template x-for="item in filteredKas" :key="item.id">
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900" x-text="formatDate(item.tanggal)"></td>
+                    <?php else: ?>
+                        <?php foreach($data['kas'] as $item): ?>
+                        <tr class="hover:bg-slate-50 transition-colors kas-row" 
+                            data-sumber="<?= htmlspecialchars(strtolower($item['sumber'] ?? '')) ?>" 
+                            data-keterangan="<?= htmlspecialchars(strtolower($item['keterangan'] ?? '')) ?>" 
+                            data-jenis="<?= htmlspecialchars(strtolower($item['jenis'] ?? '')) ?>">
+                            
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                                <?= date('d M Y', strtotime($item['tanggal'])) ?>
+                            </td>
                             <td class="px-6 py-4 text-sm">
-                                <div class="font-medium text-slate-900" x-text="item.sumber"></div>
-                                <div class="text-slate-500 text-xs mt-0.5 line-clamp-1" x-text="item.keterangan || '-'"></div>
+                                <div class="font-medium text-slate-900"><?= htmlspecialchars($item['sumber']) ?></div>
+                                <div class="text-slate-500 text-xs mt-0.5 line-clamp-1"><?= htmlspecialchars($item['keterangan']) ?: '-' ?></div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                                      :class="item.jenis === 'Pemasukan' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'"
-                                      x-text="item.jenis"></span>
+                                <?php if($item['jenis'] == 'Pemasukan'): ?>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Pemasukan</span>
+                                <?php else: ?>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800">Pengeluaran</span>
+                                <?php endif; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-emerald-600">
-                                <span x-show="item.jenis === 'Pemasukan'" x-text="'Rp ' + formatRupiah(item.nominal)"></span>
-                                <span x-show="item.jenis !== 'Pemasukan'">-</span>
+                                <?= $item['jenis'] == 'Pemasukan' ? 'Rp ' . number_format($item['nominal'], 0, ',', '.') : '-' ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-rose-600">
-                                <span x-show="item.jenis === 'Pengeluaran'" x-text="'Rp ' + formatRupiah(item.nominal)"></span>
-                                <span x-show="item.jenis !== 'Pengeluaran'">-</span>
+                                <?= $item['jenis'] == 'Pengeluaran' ? 'Rp ' . number_format($item['nominal'], 0, ',', '.') : '-' ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                <template x-if="item.sumber !== 'Pembayaran SPP'">
-                                    <a :href="'<?= BASEURL; ?>/keuangan/hapusKas/' + item.id" onclick="return confirm('Hapus transaksi ini?');" class="text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-md transition-colors">
+                                <?php if($item['sumber'] !== 'Pembayaran SPP'): ?>
+                                    <a href="<?= BASEURL; ?>/keuangan/hapusKas/<?= $item['id'] ?>" onclick="return confirm('Hapus transaksi ini?');" class="text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-md transition-colors">
                                         <i class="fas fa-trash-alt"></i>
                                     </a>
-                                </template>
-                                <template x-if="item.sumber === 'Pembayaran SPP'">
+                                <?php else: ?>
                                     <span class="text-xs text-slate-400 cursor-not-allowed" title="Hapus dari menu Riwayat Bayar SPP">Auto (SPP)</span>
-                                </template>
+                                <?php endif; ?>
                             </td>
                         </tr>
-                    </template>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -229,28 +235,27 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('bukuKasApp', () => ({
         modalTransaksi: false,
         searchQuery: '',
-        kasData: <?= json_encode($data['kas'] ?? []) ?>,
         
-        get filteredKas() {
-            if (this.searchQuery === '') {
-                return this.kasData;
-            }
-            const q = this.searchQuery.toLowerCase();
-            return this.kasData.filter(item => {
-                return (item.sumber && item.sumber.toLowerCase().includes(q)) || 
-                       (item.keterangan && item.keterangan.toLowerCase().includes(q)) ||
-                       (item.jenis && item.jenis.toLowerCase().includes(q));
+        init() {
+            this.$watch('searchQuery', value => {
+                const q = value.toLowerCase();
+                const rows = document.querySelectorAll('.kas-row');
+                rows.forEach(row => {
+                    if (q === '') {
+                        row.style.display = '';
+                        return;
+                    }
+                    const sumber = row.getAttribute('data-sumber') || '';
+                    const keterangan = row.getAttribute('data-keterangan') || '';
+                    const jenis = row.getAttribute('data-jenis') || '';
+                    
+                    if (sumber.includes(q) || keterangan.includes(q) || jenis.includes(q)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
             });
-        },
-        
-        formatRupiah(number) {
-            return new Intl.NumberFormat('id-ID').format(number);
-        },
-        
-        formatDate(dateStr) {
-            if(!dateStr) return '-';
-            const d = new Date(dateStr);
-            return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
         }
     }))
 });

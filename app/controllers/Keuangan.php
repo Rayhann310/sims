@@ -142,6 +142,19 @@ class Keuangan extends Controller {
         exit;
     }
 
+    public function batalBayar($tagihan_id)
+    {
+        if(isset($tagihan_id)) {
+            if($this->model('KeuanganModel')->batalBayarTagihan($tagihan_id)) {
+                $_SESSION['flash'] = ['pesan' => 'Pembayaran', 'aksi' => 'berhasil dibatalkan dan notifikasi WA telah terkirim', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'Pembatalan', 'aksi' => 'gagal diproses', 'tipe' => 'danger'];
+            }
+        }
+        header('Location: ' . BASEURL . '/keuangan/tagihan');
+        exit;
+    }
+
     // ==========================================
     // BUKU KAS & ANALISA KEUANGAN
     // ==========================================

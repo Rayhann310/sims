@@ -108,13 +108,23 @@
                                     <i class="fab fa-whatsapp"></i> Tagih
                                 </a>
                                 <?php endif; ?>
-                            </div>
-                            <?php else: ?>
-                                <?php if(!empty($t['no_hp_wali'])): ?>
-                                <a href="<?= BASEURL; ?>/keuangan/kirimWA/<?= $t['id']; ?>" class="text-emerald-600 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-md transition-colors inline-flex items-center gap-1">
-                                    <i class="fab fa-whatsapp"></i> WA Wali (Fonnte)
+                                <?php if($t['total_dibayar'] > 0): ?>
+                                <a href="<?= BASEURL; ?>/keuangan/batalBayar/<?= $t['id']; ?>" onclick="return confirm('Yakin ingin membatalkan pembayaran cicilan ini? Data kas akan dihapus dan notifikasi akan dikirim ke WA orang tua.')" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors inline-flex items-center" title="Batal Bayar">
+                                    <i class="fas fa-times"></i>
                                 </a>
                                 <?php endif; ?>
+                            </div>
+                            <?php else: ?>
+                            <div class="flex items-center justify-end gap-2">
+                                <?php if(!empty($t['no_hp_wali'])): ?>
+                                <a href="<?= BASEURL; ?>/keuangan/kirimWA/<?= $t['id']; ?>" class="text-emerald-600 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-md transition-colors inline-flex items-center gap-1" title="Kirim Resi WA">
+                                    <i class="fab fa-whatsapp"></i> Resi
+                                </a>
+                                <?php endif; ?>
+                                <a href="<?= BASEURL; ?>/keuangan/batalBayar/<?= $t['id']; ?>" onclick="return confirm('Yakin ingin membatalkan pelunasan ini? Data kas akan dihapus dan notifikasi pembatalan akan dikirim ke WA orang tua.')" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors inline-flex items-center gap-1" title="Batal Bayar">
+                                    <i class="fas fa-times-circle"></i> Batal
+                                </a>
+                            </div>
                             <?php endif; ?>
                         </td>
                     </tr>
