@@ -3,7 +3,7 @@ $db = new Database();
 try {
     $db->query("SELECT * FROM pengaturan ORDER BY id ASC LIMIT 1");
     $pengaturan = $db->single() ?: [];
-} catch (Exception $e) {
+} catch (Throwable $e) {
     $pengaturan = [];
 }
 $app_name = $pengaturan ? htmlspecialchars($pengaturan['nama_aplikasi']) : 'SMA NAHDLATUL WATHAN JAKARTA';

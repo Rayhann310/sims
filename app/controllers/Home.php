@@ -8,7 +8,7 @@ class Home extends Controller {
         
         try {
             $data['gelombang_aktif'] = $spmbModel->getGelombangAktif();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $data['gelombang_aktif'] = false;
         }
         
@@ -22,7 +22,7 @@ class Home extends Controller {
             } else {
                 $kategori_biaya = [];
             }
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $kategori_biaya = [];
         }
         $data['kategori_biaya'] = $kategori_biaya;
@@ -33,16 +33,15 @@ class Home extends Controller {
             $db->query("SELECT * FROM pengaturan ORDER BY id ASC LIMIT 1");
             $pengaturan = $db->single();
             $data['pengaturan'] = $pengaturan ? $pengaturan : [];
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $data['pengaturan'] = [];
         }
 
-        require_once '../app/models/AkademikModel.php';
-        $akademikModel = new AkademikModel();
+        $akademikModel = $this->model('AkademikModel');
         
         try {
             $data['tahun_akademik'] = $akademikModel->getTahunAktif();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $data['tahun_akademik'] = false;
         }
 
