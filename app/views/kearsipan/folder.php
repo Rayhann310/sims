@@ -37,9 +37,9 @@
                 </button>
             </div>
             
-            <button onclick="document.getElementById('tambahModal').classList.remove('hidden')" class="btn bg-primary hover:bg-indigo-600 text-white">
+            <button onclick="document.getElementById('tambahModal').classList.remove('hidden')" class="btn bg-primary hover:bg-indigo-600 text-white flex items-center px-3 py-2 shadow-sm rounded-lg transition-colors">
                 <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16"><path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z"/></svg>
-                <span class="hidden xs:block ml-2">Upload File Disini</span>
+                <span class="ml-2 font-medium text-sm">Upload File Disini</span>
             </button>
         </div>
     </div>
@@ -148,50 +148,64 @@
                             <input type="hidden" name="kategori_id" value="<?= $data['kategori_aktif']['id']; ?>">
                             
                             <div class="space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-2 gap-5">
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-1">Nomor Surat <span class="text-rose-500">*</span></label>
-                                        <input type="text" name="nomor_surat" class="form-input w-full" required>
+                                        <label class="block text-sm font-semibold text-slate-700 mb-2">Nomor Surat <span class="text-rose-500">*</span></label>
+                                        <input type="text" name="nomor_surat" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow shadow-sm" required>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Surat <span class="text-rose-500">*</span></label>
-                                        <input type="date" name="tanggal_surat" class="form-input w-full" required>
+                                        <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Surat <span class="text-rose-500">*</span></label>
+                                        <input type="date" name="tanggal_surat" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow shadow-sm" required>
                                     </div>
                                 </div>
                                 
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-2 gap-5">
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-1">Jenis <span class="text-rose-500">*</span></label>
-                                        <select name="jenis_surat" class="form-select w-full" required>
+                                        <label class="block text-sm font-semibold text-slate-700 mb-2">Jenis <span class="text-rose-500">*</span></label>
+                                        <select name="jenis_surat" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow shadow-sm" required>
                                             <option value="">Pilih Jenis</option>
                                             <option value="Masuk">Surat Masuk</option>
                                             <option value="Keluar">Surat Keluar</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-slate-700 mb-1">Folder Tujuan</label>
-                                        <input type="text" class="form-input w-full bg-slate-100 text-slate-500 cursor-not-allowed" value="<?= htmlspecialchars($data['kategori_aktif']['nama_kategori']); ?>" disabled>
+                                        <label class="block text-sm font-semibold text-slate-700 mb-2">Folder Tujuan</label>
+                                        <input type="text" class="w-full bg-slate-100 text-slate-500 rounded-lg px-4 py-2 text-sm border border-slate-200 cursor-not-allowed" value="<?= htmlspecialchars($data['kategori_aktif']['nama_kategori']); ?>" disabled>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Pengirim / Penerima <span class="text-rose-500">*</span></label>
-                                    <input type="text" name="pengirim_penerima" class="form-input w-full" placeholder="Cth: Dinas Pendidikan / Orang Tua Siswa" required>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Pengirim / Penerima <span class="text-rose-500">*</span></label>
+                                    <input type="text" name="pengirim_penerima" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow shadow-sm" placeholder="Cth: Dinas Pendidikan / Orang Tua Siswa" required>
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Perihal <span class="text-rose-500">*</span></label>
-                                    <textarea name="perihal" class="form-textarea w-full" rows="2" required></textarea>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Perihal <span class="text-rose-500">*</span></label>
+                                    <textarea name="perihal" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow shadow-sm" rows="2" required></textarea>
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Keterangan Tambahan</label>
-                                    <textarea name="keterangan" class="form-textarea w-full" rows="2"></textarea>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Keterangan Tambahan</label>
+                                    <textarea name="keterangan" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow shadow-sm" rows="2"></textarea>
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 mb-1">Upload Berkas (PDF/JPG/PNG)</label>
-                                    <input type="file" name="file_surat" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" accept=".pdf,.jpg,.jpeg,.png">
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Upload Berkas (PDF/JPG/PNG)</label>
+                                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-lg hover:border-indigo-400 transition-colors bg-slate-50">
+                                        <div class="space-y-1 text-center">
+                                            <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                            <div class="flex text-sm text-slate-600 justify-center">
+                                                <label class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                                    <span>Upload file</span>
+                                                    <input type="file" name="file_surat" class="sr-only" accept=".pdf,.jpg,.jpeg,.png">
+                                                </label>
+                                                <p class="pl-1">atau drag and drop</p>
+                                            </div>
+                                            <p class="text-xs text-slate-500">PDF, PNG, JPG up to 10MB</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
