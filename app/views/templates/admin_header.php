@@ -356,7 +356,7 @@ $role = $_SESSION['user']['role'] ?? '';
                     </button>
 
                     <!-- Dropdown -->
-                    <div x-show="open" @click.away="open = false" x-transition.opacity class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-slate-100 py-2 z-50" style="display: none;">
+                    <div x-show="open" @click.away="open = false" x-transition.opacity class="absolute right-[-10px] sm:right-0 mt-2 w-[90vw] sm:w-80 max-w-[320px] bg-white rounded-lg shadow-xl border border-slate-100 py-2 z-50" style="display: none;">
                         <div class="px-4 py-2 border-b border-slate-50 flex justify-between items-center">
                             <h3 class="text-sm font-bold text-slate-800">Notifikasi</h3>
                             <span class="text-xs text-slate-500" x-text="count + ' Baru'"></span>
