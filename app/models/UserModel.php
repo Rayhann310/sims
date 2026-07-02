@@ -47,14 +47,23 @@ class UserModel {
                 }
             }
 
+            // SELF-HEALING: Pastikan kolom password cukup panjang untuk bcrypt
+            $this->db->query("ALTER TABLE users MODIFY password VARCHAR(255)");
+            $this->db->execute();
+
             // SELF-HEALING: Cek jika belum ada admin, buat otomatis
             $this->db->query("SELECT id FROM users WHERE role = 'admin'");
             $this->db->execute();
             
+            $password = password_hash('admin123', PASSWORD_DEFAULT);
             if($this->db->rowCount() == 0) {
                 // Insert default admin (username: admin, password: admin123)
-                $password = password_hash('admin123', PASSWORD_DEFAULT);
                 $this->db->query("INSERT INTO users (username, password, role, nama_lengkap) VALUES ('admin', :password, 'admin', 'Administrator Sistem')");
+                $this->db->bind('password', $password);
+                $this->db->execute();
+            } else {
+                // Fix admin password if it was truncated by previous column size (bcrypt is 60 chars)
+                $this->db->query("UPDATE users SET password = :password WHERE role = 'admin' AND LENGTH(password) < 60");
                 $this->db->bind('password', $password);
                 $this->db->execute();
             }

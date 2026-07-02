@@ -75,13 +75,19 @@
             </div>
 
             <!-- Flash Message -->
-            <?php if(isset($_SESSION['flash'])): ?>
-                <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm mb-6 flex items-start gap-3" role="alert">
-                    <svg class="w-5 h-5 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <p class="font-medium text-sm"><?= $_SESSION['flash']; ?></p>
-                </div>
-                <?php unset($_SESSION['flash']); ?>
-            <?php endif; ?>
+            <?php 
+                if(isset($_SESSION['flash'])) {
+                    if(is_array($_SESSION['flash'])) {
+                        Flasher::flash();
+                    } else {
+                        echo '<div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm mb-6 flex items-start gap-3" role="alert">
+                                <svg class="w-5 h-5 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="font-medium text-sm">' . $_SESSION['flash'] . '</p>
+                              </div>';
+                        unset($_SESSION['flash']);
+                    }
+                }
+            ?>
 
             <form action="<?= BASEURL; ?>/login/proses" method="POST" class="space-y-5">
                 <div>
