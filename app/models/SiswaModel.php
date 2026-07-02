@@ -35,6 +35,8 @@ class SiswaModel {
         if (!empty($filters['status'])) {
             $query .= " AND siswa.status = :status";
             $binds['status'] = $filters['status'];
+        } else {
+            $query .= " AND siswa.status != 'Alumni'";
         }
 
         $query .= " ORDER BY users.nama_lengkap ASC";

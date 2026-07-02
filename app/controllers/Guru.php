@@ -103,6 +103,17 @@ class Guru extends Controller {
         exit;
     }
 
+    public function resetSandi($id)
+    {
+        if($this->model('GuruModel')->resetSandi($id)) {
+            $_SESSION['flash'] = ['pesan' => 'Kata sandi', 'aksi' => 'berhasil direset menjadi 123456', 'tipe' => 'success'];
+        } else {
+            $_SESSION['flash'] = ['pesan' => 'Kata sandi', 'aksi' => 'gagal direset', 'tipe' => 'danger'];
+        }
+        header('Location: ' . BASEURL . '/guru');
+        exit;
+    }
+
     public function template()
     {
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();

@@ -263,6 +263,20 @@ class GuruModel {
         return 0;
     }
 
+    public function resetSandi($id)
+    {
+        $guru = $this->getGuruById($id);
+        if ($guru) {
+            $password = password_hash('123456', PASSWORD_DEFAULT);
+            $this->db->query("UPDATE users SET password = :password WHERE id = :user_id");
+            $this->db->bind('password', $password);
+            $this->db->bind('user_id', $guru['user_id']);
+            $this->db->execute();
+            return true;
+        }
+        return false;
+    }
+
 
 
     public function ubahDataGuru($data)

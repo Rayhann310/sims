@@ -74,7 +74,13 @@ class UserModel {
 
     public function login($username, $password)
     {
-        $this->db->query("SELECT * FROM users WHERE username = :username");
+        $this->db->query("
+            SELECT u.* 
+            FROM users u
+            LEFT JOIN guru g ON u.id = g.user_id 
+            WHERE u.username = :username OR g.no_hp = :username
+            LIMIT 1
+        ");
         $this->db->bind('username', $username);
         $user = $this->db->single();
 
