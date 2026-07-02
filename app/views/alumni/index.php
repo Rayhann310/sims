@@ -98,7 +98,7 @@
                                 checkboxes.forEach(cb => cb.checked = selectAllAlumni);
                             " class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500">
                         </th>
-                        <th class="px-6 py-4 font-semibold">NISN</th>
+                        <th class="px-6 py-4 font-semibold">NISN / NIK</th>
                         <th class="px-6 py-4 font-semibold">Nama Lengkap</th>
                         <th class="px-6 py-4 font-semibold text-center">L/P</th>
                         <th class="px-6 py-4 font-semibold">Tahun Lulus</th>
@@ -181,7 +181,7 @@
                 <form action="<?= BASEURL; ?>/alumni/tambah" method="post" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-rose-500">*</span></label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">NISN / NIK <span class="text-rose-500">*</span></label>
                             <input type="text" name="nisn" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                         </div>
                         <div>
@@ -240,7 +240,7 @@
                     <input type="hidden" name="id" x-model="form.id">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">NISN (Tidak bisa diubah)</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">NISN / NIK (Tidak bisa diubah)</label>
                             <input type="text" x-model="form.nisn" readonly class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-500 outline-none">
                         </div>
                         <div>
