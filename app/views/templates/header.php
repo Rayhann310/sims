@@ -46,6 +46,7 @@ $app_logo = (!empty($pengaturan['logo_sekolah'])) ? htmlspecialchars($pengaturan
 <body class="bg-white font-sans text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- Navbar -->
+    <?php if (!isset($data['hide_navbar']) || !$data['hide_navbar']): ?>
     <nav x-data="{ mobileMenuOpen: false }" class="bg-primary w-full z-50 py-4">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center">
@@ -97,5 +98,6 @@ $app_logo = (!empty($pengaturan['logo_sekolah'])) ? htmlspecialchars($pengaturan
             </div>
         </div>
     </nav>
+    <?php endif; ?>
 
     <main class="flex-grow">

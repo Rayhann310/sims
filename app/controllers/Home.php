@@ -12,6 +12,7 @@ class Home extends Controller {
             $k['rincian'] = $this->model('SpmbModel')->getRincianBiayaByKategori($k['id']);
         }
         $data['kategori_biaya'] = $kategori_biaya;
+        $data['hide_navbar'] = true;
 
         $this->view('templates/header', $data);
         $this->view('home/index', $data);
