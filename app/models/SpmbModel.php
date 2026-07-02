@@ -301,4 +301,62 @@ class SpmbModel {
             return ['status' => false, 'pesan' => $e->getMessage()];
         }
     }
+
+    // ==========================================
+    // BIAYA PENDAFTARAN KUSTOM (KATEGORI & RINCIAN)
+    // ==========================================
+    public function getAllKategoriBiaya()
+    {
+        $this->db->query("SELECT * FROM spmb_kategori_biaya ORDER BY id ASC");
+        return $this->db->resultSet();
+    }
+
+    public function getKategoriBiayaById($id)
+    {
+        $this->db->query("SELECT * FROM spmb_kategori_biaya WHERE id = :id");
+        $this->db->bind('id', $id);
+        return $this->db->single();
+    }
+
+    public function getRincianBiayaByKategori($kategori_id)
+    {
+        $this->db->query("SELECT * FROM spmb_rincian_biaya WHERE kategori_id = :kategori_id ORDER BY id ASC");
+        $this->db->bind('kategori_id', $kategori_id);
+        return $this->db->resultSet();
+    }
+
+    public function tambahKategoriBiaya($data)
+    {
+        $this->db->query("INSERT INTO spmb_kategori_biaya (nama_kategori, deskripsi) VALUES (:nama_kategori, :deskripsi)");
+        $this->db->bind('nama_kategori', $data['nama_kategori']);
+        $this->db->bind('deskripsi', $data['deskripsi']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function hapusKategoriBiaya($id)
+    {
+        $this->db->query("DELETE FROM spmb_kategori_biaya WHERE id = :id");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function tambahRincianBiaya($data)
+    {
+        $this->db->query("INSERT INTO spmb_rincian_biaya (kategori_id, nama_rincian, nominal) VALUES (:kategori_id, :nama_rincian, :nominal)");
+        $this->db->bind('kategori_id', $data['kategori_id']);
+        $this->db->bind('nama_rincian', $data['nama_rincian']);
+        $this->db->bind('nominal', $data['nominal']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function hapusRincianBiaya($id)
+    {
+        $this->db->query("DELETE FROM spmb_rincian_biaya WHERE id = :id");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
 }

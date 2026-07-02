@@ -129,4 +129,72 @@ class Adminspmb extends Controller {
             exit;
         }
     }
+
+    // ===================================
+    // BIAYA PENDAFTARAN (KUSTOMISASI)
+    // ===================================
+    public function biaya()
+    {
+        $data['judul'] = 'Manajemen Biaya Pendaftaran';
+        
+        $kategori = $this->model('SpmbModel')->getAllKategoriBiaya();
+        
+        // Ambil rincian untuk setiap kategori
+        foreach ($kategori as &$k) {
+            $k['rincian'] = $this->model('SpmbModel')->getRincianBiayaByKategori($k['id']);
+        }
+        $data['kategori'] = $kategori;
+        
+        $this->view('templates/admin_header', $data);
+        $this->view('admin_spmb/biaya', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    public function tambahKategoriBiaya()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if ($this->model('SpmbModel')->tambahKategoriBiaya($_POST) > 0) {
+                Flasher::setFlash('Berhasil', 'Kategori biaya berhasil ditambahkan', 'success');
+            } else {
+                Flasher::setFlash('Gagal', 'Kategori biaya gagal ditambahkan', 'danger');
+            }
+            header('Location: ' . BASEURL . '/adminspmb/biaya');
+            exit;
+        }
+    }
+
+    public function hapusKategoriBiaya($id)
+    {
+        if ($this->model('SpmbModel')->hapusKategoriBiaya($id) > 0) {
+            Flasher::setFlash('Berhasil', 'Kategori biaya berhasil dihapus', 'success');
+        } else {
+            Flasher::setFlash('Gagal', 'Kategori biaya gagal dihapus', 'danger');
+        }
+        header('Location: ' . BASEURL . '/adminspmb/biaya');
+        exit;
+    }
+
+    public function tambahRincianBiaya()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if ($this->model('SpmbModel')->tambahRincianBiaya($_POST) > 0) {
+                Flasher::setFlash('Berhasil', 'Rincian biaya berhasil ditambahkan', 'success');
+            } else {
+                Flasher::setFlash('Gagal', 'Rincian biaya gagal ditambahkan', 'danger');
+            }
+            header('Location: ' . BASEURL . '/adminspmb/biaya');
+            exit;
+        }
+    }
+
+    public function hapusRincianBiaya($id)
+    {
+        if ($this->model('SpmbModel')->hapusRincianBiaya($id) > 0) {
+            Flasher::setFlash('Berhasil', 'Rincian biaya berhasil dihapus', 'success');
+        } else {
+            Flasher::setFlash('Gagal', 'Rincian biaya gagal dihapus', 'danger');
+        }
+        header('Location: ' . BASEURL . '/adminspmb/biaya');
+        exit;
+    }
 }

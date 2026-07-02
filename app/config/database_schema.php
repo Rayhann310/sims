@@ -782,4 +782,42 @@ return array (
       'tanggal_bayar' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
+  'spmb_kategori_biaya' =>
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `spmb_kategori_biaya` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nama_kategori` varchar(150) NOT NULL,
+  `deskripsi` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' =>
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'nama_kategori' => 'varchar(150) NOT NULL',
+      'deskripsi' => 'text DEFAULT NULL',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
+    ),
+  ),
+  'spmb_rincian_biaya' =>
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `spmb_rincian_biaya` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `kategori_id` int(11) NOT NULL,
+  `nama_rincian` varchar(150) NOT NULL,
+  `nominal` decimal(10,2) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `kategori_id` (`kategori_id`),
+  CONSTRAINT `spmb_rincian_biaya_ibfk_1` FOREIGN KEY (`kategori_id`) REFERENCES `spmb_kategori_biaya` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' =>
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'kategori_id' => 'int(11) NOT NULL',
+      'nama_rincian' => 'varchar(150) NOT NULL',
+      'nominal' => 'decimal(10,2) NOT NULL',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
+    ),
+  ),
 );

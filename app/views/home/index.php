@@ -146,7 +146,69 @@
     </div>
 </section>
 
-<!-- Features Section -->
+<!-- Features Section --><!-- Section Biaya Pendaftaran SPMB -->
+<?php if(!empty($data['kategori_biaya'])): ?>
+<section id="biaya" class="py-20 bg-white relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 max-w-3xl mx-auto">
+            <span class="text-primary font-semibold tracking-wider uppercase text-sm mb-2 block">Informasi SPMB</span>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">Rincian Biaya Pendaftaran</h2>
+            <p class="text-slate-500 text-lg">Pilih kategori yang sesuai dengan Anda. Kami menyediakan transparansi penuh untuk seluruh komponen biaya pendidikan.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start justify-center">
+            <?php foreach($data['kategori_biaya'] as $k): 
+                $total_biaya = 0;
+                foreach($k['rincian'] as $r) {
+                    $total_biaya += $r['nominal'];
+                }
+            ?>
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-slate-100 overflow-hidden flex flex-col h-full transform hover:-translate-y-1">
+                <div class="p-8 border-b border-slate-100 bg-slate-50/50 text-center">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2"><?= htmlspecialchars($k['nama_kategori']); ?></h3>
+                    <?php if(!empty($k['deskripsi'])): ?>
+                        <p class="text-sm text-slate-500 mb-6"><?= htmlspecialchars($k['deskripsi']); ?></p>
+                    <?php endif; ?>
+                    <div class="text-4xl font-extrabold text-primary mb-2">
+                        <span class="text-xl text-slate-500 font-medium">Rp</span> <?= number_format($total_biaya, 0, ',', '.'); ?>
+                    </div>
+                    <p class="text-xs text-slate-400 font-medium uppercase tracking-wide">Total Keseluruhan</p>
+                </div>
+                
+                <div class="p-8 flex-grow">
+                    <?php if(empty($k['rincian'])): ?>
+                        <div class="text-center text-slate-400 italic text-sm py-4">Rincian belum tersedia.</div>
+                    <?php else: ?>
+                        <table class="w-full text-sm">
+                            <tbody class="divide-y divide-slate-100">
+                                <?php foreach($k['rincian'] as $r): ?>
+                                <tr class="group">
+                                    <td class="py-3 text-slate-600 group-hover:text-slate-900 transition-colors">
+                                        <div class="flex items-center gap-2">
+                                            <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            <?= htmlspecialchars($r['nama_rincian']); ?>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-right font-medium text-slate-700">Rp <?= number_format($r['nominal'], 0, ',', '.'); ?></td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                </div>
+                
+                <div class="p-8 pt-0 mt-auto">
+                    <a href="<?= BASEURL; ?>/spmb" class="block w-full py-3 px-4 bg-slate-800 hover:bg-slate-900 text-white text-center font-medium rounded-xl transition-colors shadow-md hover:shadow-lg">
+                        Daftar Sekarang
+                    </a>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
 <section id="fitur" class="py-20 bg-slate-50 border-t border-slate-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16 max-w-2xl mx-auto">
