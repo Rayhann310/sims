@@ -13,7 +13,7 @@
                     </div>
                 <?php endif; ?>
                 <div>
-                    <h1 class="text-lg md:text-xl font-bold text-slate-800 leading-tight whitespace-nowrap">SMA NAHDLATUL WATHAN JAKARTA</h1>
+                    <h1 class="text-lg md:text-xl font-bold text-slate-800 leading-tight">SMA NAHDLATUL WATHAN JAKARTA</h1>
                     <p class="text-emerald-700 font-semibold italic text-sm mt-1">Religius • Nasionalis • Berkualitas</p>
                 </div>
             </div>
