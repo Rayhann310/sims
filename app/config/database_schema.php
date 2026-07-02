@@ -18,6 +18,24 @@ return array (
       'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
+  'hak_akses_menu' =>
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `hak_akses_menu` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `jabatan_id` int(11) NOT NULL,
+  `menu_key` varchar(100) NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `jabatan_menu_unique` (`jabatan_id`, `menu_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' =>
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'jabatan_id' => 'int(11) NOT NULL',
+      'menu_key' => 'varchar(100) NOT NULL',
+      'is_active' => 'tinyint(1) NOT NULL DEFAULT 0',
+    ),
+  ),
   'guru_jabatan' =>
   array (
     'create_sql' => 'CREATE TABLE IF NOT EXISTS `guru_jabatan` (
