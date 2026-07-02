@@ -1,6 +1,6 @@
 <?php
 
-class AdminSpmb extends Controller {
+class Adminspmb extends Controller {
 
     public function __construct()
     {
