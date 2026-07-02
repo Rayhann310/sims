@@ -5,7 +5,7 @@ class AdminSpmb extends Controller {
     public function __construct()
     {
         // Pastikan hanya admin yang bisa akses
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             header('Location: ' . BASEURL . '/login');
             exit;
         }

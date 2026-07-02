@@ -148,6 +148,33 @@ class SpmbModel {
         return $this->db->rowCount();
     }
 
+    public function simpanBiodata($data)
+    {
+        $this->db->query("UPDATE spmb_peserta SET 
+            tempat_lahir = :tempat_lahir,
+            tanggal_lahir = :tanggal_lahir,
+            alamat_lengkap = :alamat_lengkap,
+            nama_ayah = :nama_ayah,
+            nama_ibu = :nama_ibu,
+            pekerjaan_ortu = :pekerjaan_ortu,
+            penghasilan_ortu = :penghasilan_ortu,
+            no_hp_ortu = :no_hp_ortu
+            WHERE id = :id");
+            
+        $this->db->bind('tempat_lahir', $data['tempat_lahir']);
+        $this->db->bind('tanggal_lahir', $data['tanggal_lahir']);
+        $this->db->bind('alamat_lengkap', $data['alamat_lengkap']);
+        $this->db->bind('nama_ayah', $data['nama_ayah']);
+        $this->db->bind('nama_ibu', $data['nama_ibu']);
+        $this->db->bind('pekerjaan_ortu', $data['pekerjaan_ortu']);
+        $this->db->bind('penghasilan_ortu', $data['penghasilan_ortu']);
+        $this->db->bind('no_hp_ortu', $data['no_hp_ortu']);
+        $this->db->bind('id', $data['peserta_id']);
+        
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
     // ==========================================
     // PEMBAYARAN
     // ==========================================

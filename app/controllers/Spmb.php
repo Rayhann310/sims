@@ -10,7 +10,7 @@ class Spmb extends Controller {
     public function index()
     {
         // Cek jika sudah login sebagai siswa/peserta, arahkan ke dashboard
-        if (isset($_SESSION['user_id'])) {
+        if (isset($_SESSION['user'])) {
             header('Location: ' . BASEURL . '/spmb/dashboard');
             exit;
         }
@@ -55,15 +55,15 @@ class Spmb extends Controller {
 
     public function dashboard()
     {
-        if (!isset($_SESSION['user_id'])) {
+        if (!isset($_SESSION['user'])) {
             header('Location: ' . BASEURL . '/login');
             exit;
         }
 
         $data['judul'] = 'Dashboard Calon Siswa';
-        $data['user'] = $this->model('SiswaModel')->getSiswaById($_SESSION['user_id']); // This is for full student, but they might be peserta
+        $data['user'] = $this->model('SiswaModel')->getSiswaById($_SESSION['user']['id']); // This is for full student, but they might be peserta
         
-        $data['peserta'] = $this->model('SpmbModel')->getPesertaByUserId($_SESSION['user_id']);
+        $data['peserta'] = $this->model('SpmbModel')->getPesertaByUserId($_SESSION['user']['id']);
 
         if (!$data['peserta']) {
             // Jika bukan peserta SPMB, mungkin dia admin atau siswa biasa
@@ -81,13 +81,13 @@ class Spmb extends Controller {
 
     public function bayar()
     {
-        if (!isset($_SESSION['user_id'])) {
+        if (!isset($_SESSION['user'])) {
             header('Location: ' . BASEURL . '/login');
             exit;
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $peserta = $this->model('SpmbModel')->getPesertaByUserId($_SESSION['user_id']);
+            $peserta = $this->model('SpmbModel')->getPesertaByUserId($_SESSION['user']['id']);
             
             // Upload bukti
             $bukti = '';
@@ -116,6 +116,30 @@ class Spmb extends Controller {
                 Flasher::setFlash('Berhasil', 'Bukti pembayaran berhasil diunggah. Silakan tunggu verifikasi admin.', 'success');
             } else {
                 Flasher::setFlash('Gagal', 'Gagal mengunggah bukti pembayaran.', 'danger');
+            }
+
+            header('Location: ' . BASEURL . '/spmb/dashboard');
+            exit;
+        }
+    }
+
+    public function simpanBiodata()
+    {
+        if (!isset($_SESSION['user'])) {
+            header('Location: ' . BASEURL . '/login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $peserta = $this->model('SpmbModel')->getPesertaByUserId($_SESSION['user']['id']);
+            
+            // Tambahkan peserta_id ke data post
+            $_POST['peserta_id'] = $peserta['id'];
+            
+            if ($this->model('SpmbModel')->simpanBiodata($_POST) > 0) {
+                Flasher::setFlash('Berhasil', 'Biodata lengkap berhasil disimpan.', 'success');
+            } else {
+                Flasher::setFlash('Info', 'Tidak ada perubahan biodata yang disimpan.', 'info');
             }
 
             header('Location: ' . BASEURL . '/spmb/dashboard');

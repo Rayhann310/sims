@@ -50,8 +50,66 @@
                 </div>
             </div>
 
-            <!-- Pembayaran Form -->
+            <!-- Pembayaran Form & Biodata -->
             <div class="lg:col-span-2 space-y-8">
+                
+                <!-- Biodata Lengkap Form -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-4 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
+                        Lengkapi Biodata & Data Orang Tua
+                    </h3>
+                    <form action="<?= BASEURL; ?>/spmb/simpanBiodata" method="POST">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Tempat Lahir</label>
+                                <input type="text" name="tempat_lahir" value="<?= htmlspecialchars($data['peserta']['tempat_lahir'] ?? ''); ?>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Lahir</label>
+                                <input type="date" name="tanggal_lahir" value="<?= $data['peserta']['tanggal_lahir']; ?>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Alamat Lengkap</label>
+                            <textarea name="alamat_lengkap" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" required><?= htmlspecialchars($data['peserta']['alamat_lengkap'] ?? ''); ?></textarea>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 border-t border-slate-100 pt-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Ayah</label>
+                                <input type="text" name="nama_ayah" value="<?= htmlspecialchars($data['peserta']['nama_ayah'] ?? ''); ?>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Ibu</label>
+                                <input type="text" name="nama_ibu" value="<?= htmlspecialchars($data['peserta']['nama_ibu'] ?? ''); ?>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Pekerjaan Orang Tua</label>
+                                <input type="text" name="pekerjaan_ortu" value="<?= htmlspecialchars($data['peserta']['pekerjaan_ortu'] ?? ''); ?>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Penghasilan / Bulan</label>
+                                <select name="penghasilan_ortu" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" required>
+                                    <option value="" disabled <?= empty($data['peserta']['penghasilan_ortu']) ? 'selected' : ''; ?>>Pilih Penghasilan</option>
+                                    <option value="< Rp 1.000.000" <?= ($data['peserta']['penghasilan_ortu'] ?? '') == '< Rp 1.000.000' ? 'selected' : ''; ?>>< Rp 1.000.000</option>
+                                    <option value="Rp 1.000.000 - Rp 3.000.000" <?= ($data['peserta']['penghasilan_ortu'] ?? '') == 'Rp 1.000.000 - Rp 3.000.000' ? 'selected' : ''; ?>>Rp 1.000.000 - Rp 3.000.000</option>
+                                    <option value="Rp 3.000.000 - Rp 5.000.000" <?= ($data['peserta']['penghasilan_ortu'] ?? '') == 'Rp 3.000.000 - Rp 5.000.000' ? 'selected' : ''; ?>>Rp 3.000.000 - Rp 5.000.000</option>
+                                    <option value="> Rp 5.000.000" <?= ($data['peserta']['penghasilan_ortu'] ?? '') == '> Rp 5.000.000' ? 'selected' : ''; ?>>> Rp 5.000.000</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">No. HP Orang Tua (WhatsApp)</label>
+                                <input type="text" name="no_hp_ortu" value="<?= htmlspecialchars($data['peserta']['no_hp_ortu'] ?? ''); ?>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" required>
+                            </div>
+                        </div>
+                        <div class="flex justify-end mt-4">
+                            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                                Simpan Biodata
+                            </button>
+                        </div>
+                    </form>
+                </div>
                 
                 <?php if($data['peserta']['status_pembayaran'] != 'Lunas'): ?>
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
