@@ -332,7 +332,8 @@ class Akademik extends Controller {
             $dest_rombel_id = $_POST['dest_rombel_id'];
             if(isset($_POST['siswa_ids']) && is_array($_POST['siswa_ids']) && !empty($dest_rombel_id)) {
                 if ($dest_rombel_id === 'ALUMNI') {
-                    $inserted = $this->model('RombelModel')->luluskanSiswa($_POST['siswa_ids']);
+                    $tahun_lulus = isset($_POST['tahun_lulus']) ? $_POST['tahun_lulus'] : date('Y');
+                    $inserted = $this->model('RombelModel')->luluskanSiswa($_POST['siswa_ids'], $tahun_lulus);
                     $_SESSION['flash'] = ['pesan' => $inserted . ' siswa berhasil', 'aksi' => 'diluluskan menjadi alumni', 'tipe' => 'success'];
                 } else {
                     $inserted = $this->model('RombelModel')->prosesNaikKelas($dest_rombel_id, $_POST['siswa_ids']);

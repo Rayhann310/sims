@@ -206,12 +206,16 @@ class RombelModel {
         return $inserted;
     }
 
-    public function luluskanSiswa($siswa_ids)
+    public function luluskanSiswa($siswa_ids, $tahun_lulus = null)
     {
         $lulus = 0;
+        if(empty($tahun_lulus)) {
+            $tahun_lulus = date('Y');
+        }
         foreach($siswa_ids as $siswa_id) {
-            $this->db->query("UPDATE siswa SET status = 'Alumni' WHERE id = :siswa_id");
+            $this->db->query("UPDATE siswa SET status = 'Alumni', tahun_lulus = :tahun_lulus WHERE id = :siswa_id");
             $this->db->bind('siswa_id', $siswa_id);
+            $this->db->bind('tahun_lulus', $tahun_lulus);
             $this->db->execute();
             // count even if status is already Alumni so we just say 1 per ID
             $lulus++; 

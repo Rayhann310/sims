@@ -98,6 +98,12 @@
                             </select>
                             <p x-show="loading_dest_rombel" class="text-xs text-green-500 mt-1">Loading...</p>
                         </div>
+
+                        <div x-show="dest_rombel === 'ALUMNI'" x-transition class="bg-blue-50 p-4 rounded-lg border border-blue-200 mt-2">
+                            <label class="block text-sm font-medium text-blue-800 mb-1">Tahun Lulus <span class="text-rose-500">*</span></label>
+                            <input type="number" name="tahun_lulus" value="<?= date('Y') ?>" placeholder="Contoh: 2026" class="w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            <p class="text-xs text-blue-600 mt-1">Isi tahun lulus agar data alumni mudah difilter (misal: 2006).</p>
+                        </div>
                     </div>
                     
                     <div class="mt-8 bg-amber-50 rounded-lg p-4 border border-amber-200">
