@@ -45,7 +45,7 @@
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50 sticky top-0">
                                 <tr>
-                                    <th scope="col" class="px-4 py-2 text-left">
+                                    <th scope="col" class="px-4 py-2 text-left" data-sortable="false">
                                         <input type="checkbox" x-model="selectAll" @change="toggleSelectAll()" class="w-4 h-4 text-blue-600 bg-white border-slate-300 rounded">
                                     </th>
                                     <th scope="col" class="px-4 py-2 text-left text-xs font-semibold text-slate-500 uppercase">NISN</th>

@@ -91,7 +91,7 @@
                 <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200">
-                        <th class="px-6 py-4 font-semibold w-10">
+                        <th class="px-6 py-4 font-semibold w-10" data-sortable="false">
                             <input type="checkbox" @change="
                                 selectAllAlumni = !selectAllAlumni;
                                 const checkboxes = document.querySelectorAll('.alumni-checkbox');
@@ -102,7 +102,7 @@
                         <th class="px-6 py-4 font-semibold">Nama Lengkap</th>
                         <th class="px-6 py-4 font-semibold text-center">L/P</th>
                         <th class="px-6 py-4 font-semibold">Tahun Lulus</th>
-                        <th class="px-6 py-4 font-semibold text-right">Aksi</th>
+                        <th class="px-6 py-4 font-semibold text-right" data-sortable="false">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">

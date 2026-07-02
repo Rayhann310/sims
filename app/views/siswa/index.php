@@ -193,7 +193,7 @@
                     <th class="px-6 py-4 font-semibold">L/P</th>
                     <th class="px-6 py-4 font-semibold">Kelas</th>
                     <th class="px-6 py-4 font-semibold">Akun Login</th>
-                    <th class="px-6 py-4 font-semibold text-center w-32">Aksi</th>
+                    <th class="px-6 py-4 font-semibold text-center w-32" data-sortable="false">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">

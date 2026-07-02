@@ -76,7 +76,7 @@
                 <table class="min-w-full divide-y divide-slate-200">
                     <thead class="bg-slate-50">
                         <tr>
-                            <th scope="col" class="px-4 py-4 text-left">
+                            <th scope="col" class="px-4 py-4 text-left" data-sortable="false">
                                 <input type="checkbox" @change="
                                     selectAllAnggota = !selectAllAnggota; 
                                     const checkboxes = document.querySelectorAll('.anggota-checkbox');
@@ -87,7 +87,7 @@
                             <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">NISN</th>
                             <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Nama Siswa</th>
                             <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">L/P</th>
-                            <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
+                            <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider" data-sortable="false">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200 bg-white">
@@ -143,7 +143,7 @@
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50 sticky top-0 z-10">
                                 <tr>
-                                    <th scope="col" class="px-4 py-3 text-left">
+                                    <th scope="col" class="px-4 py-3 text-left" data-sortable="false">
                                         <input type="checkbox" id="selectAllCheckbox" @change="
                                             let cb = document.querySelectorAll('.siswa-checkbox');
                                             cb.forEach(c => c.checked = $event.target.checked);

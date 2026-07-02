@@ -168,14 +168,14 @@
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200">
-                    <th class="px-6 py-4 font-semibold w-12 text-center">
+                    <th class="px-6 py-4 font-semibold w-12 text-center" data-sortable="false">
                         <input type="checkbox" id="selectAll" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer w-4 h-4" onclick="toggleSelectAll(this)">
                     </th>
                     <th class="px-6 py-4 font-semibold">NIP</th>
                     <th class="px-6 py-4 font-semibold">Nama Lengkap</th>
                     <th class="px-6 py-4 font-semibold">L/P</th>
                     <th class="px-6 py-4 font-semibold">No. HP</th>
-                    <th class="px-6 py-4 font-semibold text-center w-32">Aksi</th>
+                    <th class="px-6 py-4 font-semibold text-center w-32" data-sortable="false">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
