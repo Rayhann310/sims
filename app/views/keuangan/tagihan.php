@@ -1,4 +1,16 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ modalGenerate: false, modalBayar: false, activeTagihanId: '', sisaTagihan: 0 }">
+<?php $kategoriJson = json_encode($data['kategori'] ?? []); ?>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ 
+    modalGenerate: false, 
+    modalBayar: false, 
+    activeTagihanId: '', 
+    sisaTagihan: 0,
+    kategoriList: <?= htmlspecialchars($kategoriJson, ENT_QUOTES) ?>,
+    selectedKategori: '',
+    nominalTagihan: 0
+}" x-init="$watch('selectedKategori', val => { 
+    const k = kategoriList.find(x => x.id == val);
+    if(k) nominalTagihan = k.nominal_default;
+})">
     <div class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight"><?= $data['judul']; ?></h1>
@@ -21,6 +33,7 @@
                 <thead class="bg-slate-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Siswa</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Jenis Tagihan</th>
                         <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Bulan / Tahun</th>
                         <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Nominal Tagihan</th>
                         <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Telah Dibayar</th>
@@ -41,6 +54,9 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-slate-900"><?= $t['nama_lengkap']; ?></div>
                             <div class="text-sm text-slate-500">NISN: <?= $t['nisn']; ?></div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-indigo-600"><?= !empty($t['nama_kategori']) ? $t['nama_kategori'] : 'SPP Bulanan'; ?></div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-slate-900"><?= $t['bulan']; ?> <?= $t['tahun']; ?></div>
@@ -92,6 +108,16 @@
                 <form action="<?= BASEURL; ?>/keuangan/generateTagihan" method="post">
                     <div class="space-y-4">
                         <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Jenis Tagihan (Tarif)</label>
+                            <select name="kategori_id" x-model="selectedKategori" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+                                <option value="">-- Pilih Jenis Tagihan --</option>
+                                <template x-for="k in kategoriList" :key="k.id">
+                                    <option :value="k.id" x-text="k.nama_kategori"></option>
+                                </template>
+                            </select>
+                            <p class="text-xs text-slate-500 mt-1">Pilih Master Tarif, nominal akan otomatis terisi.</p>
+                        </div>
+                        <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Bulan</label>
                             <select name="bulan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
                                 <?php $bulans = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; 
@@ -106,8 +132,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Nominal (Rp)</label>
-                            <input type="number" name="nominal" value="250000" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <p class="text-xs text-slate-500 mt-1">Masukkan nominal tanpa titik/koma.</p>
+                            <input type="number" name="nominal" x-model="nominalTagihan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Jatuh Tempo</label>

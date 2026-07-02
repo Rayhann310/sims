@@ -6,16 +6,80 @@ class KeuanganModel {
     public function __construct()
     {
         $this->db = new Database();
+        $this->selfHealing();
+    }
+
+    private function selfHealing()
+    {
+        // Buat tabel master tarif jika belum ada
+        try {
+            $this->db->query("CREATE TABLE IF NOT EXISTS `keuangan_kategori` (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `nama_kategori` varchar(100) NOT NULL,
+                `tipe` enum('Bulanan','Sekali') NOT NULL DEFAULT 'Bulanan',
+                `nominal_default` decimal(15,2) NOT NULL DEFAULT '0.00',
+                `keterangan` text DEFAULT NULL,
+                `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            $this->db->execute();
+            
+            // Tambahkan kolom kategori_id ke tagihan_spp untuk relasi jenis tagihan
+            $this->db->query("ALTER TABLE tagihan_spp ADD COLUMN kategori_id INT(11) NULL DEFAULT NULL AFTER siswa_id");
+            $this->db->execute();
+        } catch (Throwable $e) {
+            // Abaikan jika error (kolom sudah ada)
+        }
+    }
+
+    // CRUD Master Tarif
+    public function getAllKategori()
+    {
+        $this->db->query("SELECT * FROM keuangan_kategori ORDER BY id DESC");
+        return $this->db->resultSet();
+    }
+
+    public function tambahKategori($data)
+    {
+        $this->db->query("INSERT INTO keuangan_kategori (nama_kategori, tipe, nominal_default, keterangan) VALUES (:nama, :tipe, :nominal, :keterangan)");
+        $this->db->bind('nama', $data['nama_kategori']);
+        $this->db->bind('tipe', $data['tipe']);
+        $this->db->bind('nominal', $data['nominal_default']);
+        $this->db->bind('keterangan', $data['keterangan']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function ubahKategori($data)
+    {
+        $this->db->query("UPDATE keuangan_kategori SET nama_kategori = :nama, tipe = :tipe, nominal_default = :nominal, keterangan = :keterangan WHERE id = :id");
+        $this->db->bind('nama', $data['nama_kategori']);
+        $this->db->bind('tipe', $data['tipe']);
+        $this->db->bind('nominal', $data['nominal_default']);
+        $this->db->bind('keterangan', $data['keterangan']);
+        $this->db->bind('id', $data['id']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function hapusKategori($id)
+    {
+        $this->db->query("DELETE FROM keuangan_kategori WHERE id = :id");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
     }
 
     public function getAllTagihan()
     {
         $this->db->query("
             SELECT t.*, u.nama_lengkap, s.nisn, s.nama_wali, s.no_hp_wali,
+                   k.nama_kategori, k.tipe,
                    (SELECT COALESCE(SUM(jumlah_bayar), 0) FROM pembayaran_spp WHERE tagihan_id = t.id) as total_dibayar
             FROM tagihan_spp t
             JOIN siswa s ON t.siswa_id = s.id
             JOIN users u ON s.user_id = u.id
+            LEFT JOIN keuangan_kategori k ON t.kategori_id = k.id
             ORDER BY t.tahun DESC, FIELD(t.bulan, 'Desember', 'November', 'Oktober', 'September', 'Agustus', 'Juli', 'Juni', 'Mei', 'April', 'Maret', 'Februari', 'Januari') DESC, u.nama_lengkap ASC
         ");
         return $this->db->resultSet();
@@ -209,7 +273,13 @@ class KeuanganModel {
         $inserted = 0;
         foreach($siswa as $s) {
             // Cek apakah tagihan untuk siswa ini di bulan dan tahun tsb sudah ada
-            $this->db->query("SELECT id FROM tagihan_spp WHERE siswa_id = :siswa_id AND bulan = :bulan AND tahun = :tahun");
+            // Jika spesifik kategori, cek juga kategorinya
+            if (!empty($data['kategori_id'])) {
+                $this->db->query("SELECT id FROM tagihan_spp WHERE siswa_id = :siswa_id AND bulan = :bulan AND tahun = :tahun AND kategori_id = :kategori_id");
+                $this->db->bind('kategori_id', $data['kategori_id']);
+            } else {
+                $this->db->query("SELECT id FROM tagihan_spp WHERE siswa_id = :siswa_id AND bulan = :bulan AND tahun = :tahun AND kategori_id IS NULL");
+            }
             $this->db->bind('siswa_id', $s['id']);
             $this->db->bind('bulan', $data['bulan']);
             $this->db->bind('tahun', $data['tahun']);
@@ -217,8 +287,9 @@ class KeuanganModel {
             
             if($this->db->rowCount() == 0) {
                 // Buat tagihan baru
-                $this->db->query("INSERT INTO tagihan_spp (siswa_id, bulan, tahun, nominal, jatuh_tempo) VALUES (:siswa_id, :bulan, :tahun, :nominal, :jatuh_tempo)");
+                $this->db->query("INSERT INTO tagihan_spp (siswa_id, kategori_id, bulan, tahun, nominal, jatuh_tempo) VALUES (:siswa_id, :kategori_id, :bulan, :tahun, :nominal, :jatuh_tempo)");
                 $this->db->bind('siswa_id', $s['id']);
+                $this->db->bind('kategori_id', !empty($data['kategori_id']) ? $data['kategori_id'] : null);
                 $this->db->bind('bulan', $data['bulan']);
                 $this->db->bind('tahun', $data['tahun']);
                 $this->db->bind('nominal', $data['nominal']);

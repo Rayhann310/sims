@@ -19,12 +19,60 @@ class Keuangan extends Controller {
 
     public function tagihan()
     {
-        $data['judul'] = 'Data Tagihan SPP';
+        $data['judul'] = 'Data Tagihan & Pembayaran';
         $data['tagihan'] = $this->model('KeuanganModel')->getAllTagihan();
+        $data['kategori'] = $this->model('KeuanganModel')->getAllKategori();
         
         $this->view('templates/admin_header', $data);
         $this->view('keuangan/tagihan', $data);
         $this->view('templates/admin_footer');
+    }
+
+    public function tarif()
+    {
+        $data['judul'] = 'Master Tarif Keuangan';
+        $data['kategori'] = $this->model('KeuanganModel')->getAllKategori();
+        
+        $this->view('templates/admin_header', $data);
+        $this->view('keuangan/tarif', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    public function tambahTarif()
+    {
+        if(isset($_POST['nama_kategori'])) {
+            if($this->model('KeuanganModel')->tambahKategori($_POST) > 0) {
+                Flasher::setFlash('Tarif berhasil', 'ditambahkan', 'success');
+            } else {
+                Flasher::setFlash('Tarif gagal', 'ditambahkan', 'danger');
+            }
+        }
+        header('Location: ' . BASEURL . '/keuangan/tarif');
+        exit;
+    }
+
+    public function ubahTarif()
+    {
+        if(isset($_POST['id']) && isset($_POST['nama_kategori'])) {
+            if($this->model('KeuanganModel')->ubahKategori($_POST) > 0) {
+                Flasher::setFlash('Tarif berhasil', 'diubah', 'success');
+            } else {
+                Flasher::setFlash('Tarif gagal', 'diubah', 'danger');
+            }
+        }
+        header('Location: ' . BASEURL . '/keuangan/tarif');
+        exit;
+    }
+
+    public function hapusTarif($id)
+    {
+        if($this->model('KeuanganModel')->hapusKategori($id) > 0) {
+            Flasher::setFlash('Tarif berhasil', 'dihapus', 'success');
+        } else {
+            Flasher::setFlash('Tarif gagal', 'dihapus', 'danger');
+        }
+        header('Location: ' . BASEURL . '/keuangan/tarif');
+        exit;
     }
 
     public function riwayat()

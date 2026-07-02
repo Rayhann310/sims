@@ -173,9 +173,15 @@ $GLOBALS['pengaturan'] = $pengaturan;
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Keuangan</p>
                 <div class="space-y-1">
-                    <a href="<?= BASEURL; ?>/keuangan/tagihan" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/keuangan/tagihan') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Tagihan SPP">
+                    <?php if($role == 'admin'): ?>
+                    <a href="<?= BASEURL; ?>/keuangan/tarif" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/keuangan/tarif') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Master Tarif">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Master Tarif</span>
+                    </a>
+                    <?php endif; ?>
+                    <a href="<?= BASEURL; ?>/keuangan/tagihan" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/keuangan/tagihan') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Tagihan & Pembayaran">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Tagihan SPP</span>
+                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Tagihan & Pembayaran</span>
                     </a>
                     <a href="<?= BASEURL; ?>/keuangan/riwayat" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/keuangan/riwayat') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Riwayat Bayar">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
