@@ -15,11 +15,9 @@ class Adminspmb extends Controller {
     {
         $data['judul'] = 'Manajemen Gelombang SPMB';
         $data['gelombang'] = $this->model('SpmbModel')->getAllGelombang();
-        
-        $this->view('templates/header', $data);
-        $this->view('templates/sidebar', $data);
+        $this->view('templates/admin_header', $data);
         $this->view('admin_spmb/index', $data);
-        $this->view('templates/footer');
+        $this->view('templates/admin_footer');
     }
 
     public function tambahGelombang()
@@ -66,11 +64,9 @@ class Adminspmb extends Controller {
     {
         $data['judul'] = 'Data Peserta SPMB';
         $data['peserta'] = $this->model('SpmbModel')->getAllPeserta();
-        
-        $this->view('templates/header', $data);
-        $this->view('templates/sidebar', $data);
+        $this->view('templates/admin_header', $data);
         $this->view('admin_spmb/peserta', $data);
-        $this->view('templates/footer');
+        $this->view('templates/admin_footer');
     }
 
     public function ubahStatusSeleksi()
