@@ -68,6 +68,19 @@ class Kearsipan extends Controller {
         exit;
     }
 
+    public function ubahKategori()
+    {
+        if(isset($_POST['id']) && isset($_POST['nama_kategori']) && !empty(trim($_POST['nama_kategori']))) {
+            if($this->model('KearsipanModel')->ubahKategori($_POST) > 0) {
+                Flasher::setFlash('Folder berhasil', 'diubah', 'success');
+            } else {
+                Flasher::setFlash('Folder gagal', 'diubah', 'danger');
+            }
+        }
+        header('Location: ' . BASEURL . '/kearsipan');
+        exit;
+    }
+
     public function hapusKategori($id)
     {
         if($this->model('KearsipanModel')->hapusKategori($id) > 0) {

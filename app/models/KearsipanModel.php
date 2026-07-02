@@ -58,6 +58,15 @@ class KearsipanModel {
         return $this->db->rowCount();
     }
 
+    public function ubahKategori($data)
+    {
+        $this->db->query("UPDATE kearsipan_kategori SET nama_kategori = :nama WHERE id = :id");
+        $this->db->bind('nama', $data['nama_kategori']);
+        $this->db->bind('id', $data['id']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
     public function hapusKategori($id)
     {
         $this->db->query("DELETE FROM kearsipan_kategori WHERE id = :id");

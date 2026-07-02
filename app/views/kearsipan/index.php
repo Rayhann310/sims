@@ -58,9 +58,12 @@
                             <h3 class="font-medium text-slate-800 group-hover:text-indigo-600 truncate"><?= htmlspecialchars($kat['nama_kategori']); ?></h3>
                         </div>
                     </div>
-                    <!-- Actions Menu (Hapus) -->
-                    <div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <a href="<?= BASEURL; ?>/kearsipan/hapuskategori/<?= $kat['id']; ?>" onclick="return confirm('Hapus folder ini? File di dalamnya akan menjadi Tanpa Kategori.');" class="text-rose-400 hover:text-rose-600 p-1" title="Hapus Folder">
+                    <!-- Actions Menu -->
+                    <div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1">
+                        <button type="button" onclick="openEditFolder(<?= $kat['id']; ?>, '<?= htmlspecialchars(addslashes($kat['nama_kategori'])); ?>'); event.stopPropagation(); return false;" class="text-indigo-400 hover:text-indigo-600 p-1" title="Edit Folder">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        </button>
+                        <a href="<?= BASEURL; ?>/kearsipan/hapuskategori/<?= $kat['id']; ?>" onclick="event.stopPropagation(); return confirm('Hapus folder ini? File di dalamnya akan menjadi Tanpa Kategori.');" class="text-rose-400 hover:text-rose-600 p-1" title="Hapus Folder">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </a>
                     </div>
@@ -271,3 +274,34 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Edit Folder -->
+<div id="modalEditFolder" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+        <div class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity" onclick="document.getElementById('modalEditFolder').classList.add('hidden')"></div>
+        <div class="inline-block bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-sm w-full">
+            <form action="<?= BASEURL; ?>/kearsipan/ubahkategori" method="POST">
+                <input type="hidden" name="id" id="edit_folder_id">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-slate-900 mb-4" id="modal-title">Edit Folder</h3>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Folder</label>
+                        <input type="text" name="nama_kategori" id="edit_folder_nama" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow shadow-sm" required autofocus>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm">Simpan</button>
+                    <button type="button" onclick="document.getElementById('modalEditFolder').classList.add('hidden')" class="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openEditFolder(id, nama) {
+    document.getElementById('edit_folder_id').value = id;
+    document.getElementById('edit_folder_nama').value = nama;
+    document.getElementById('modalEditFolder').classList.remove('hidden');
+}
+</script>
