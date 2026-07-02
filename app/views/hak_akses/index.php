@@ -12,7 +12,7 @@ foreach($data['menu_list'] as $key => $menu) {
             <h1 class="text-2xl font-bold text-slate-900"><?= $data['judul']; ?></h1>
             <p class="text-sm text-slate-500 mt-1">Atur menu sidebar yang dapat diakses oleh masing-masing jabatan guru. Perubahan tersimpan secara otomatis.</p>
         </div>
-        <form action="<?= BASEURL; ?>/hakakses/reset" method="POST" onsubmit="return confirm('PERINGATAN: Anda yakin ingin me-reset (menghapus) SEMUA hak akses? Semua pengguna tidak akan memiliki akses menu khusus sampai Anda mengaturnya kembali.');">
+        <form action="<?= BASEURL; ?>/hakAkses/reset" method="POST" onsubmit="return confirm('PERINGATAN: Anda yakin ingin me-reset (menghapus) SEMUA hak akses? Semua pengguna tidak akan memiliki akses menu khusus sampai Anda mengaturnya kembali.');">
             <button type="submit" class="px-4 py-2 bg-rose-100 hover:bg-rose-200 text-rose-700 text-sm font-semibold rounded-lg transition-colors border border-rose-200 inline-flex items-center shadow-sm">
                 <i class="fas fa-trash-restore mr-2"></i> Reset Semua Hak Akses
             </button>

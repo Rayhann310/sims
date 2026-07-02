@@ -47,7 +47,7 @@ class HakAkses extends Controller {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->model('HakAksesModel')->resetSemua();
             $_SESSION['flash'] = ['pesan' => 'Semua hak akses berhasil di-reset', 'aksi' => '(semua menu dikembalikan ke default/nonaktif)', 'tipe' => 'success'];
-            header('Location: ' . BASEURL . '/hakakses');
+            header('Location: ' . BASEURL . '/hakAkses');
             exit;
         }
     }
