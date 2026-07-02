@@ -112,7 +112,10 @@ class SpmbModel {
             // 2. Insert User
             $this->db->query("INSERT INTO users (username, password, role, nama_lengkap) VALUES (:username, :password, 'siswa', :nama_lengkap)");
             $this->db->bind('username', $data['nisn']);
-            $this->db->bind('password', password_hash($data['password'], PASSWORD_DEFAULT));
+            // Generate Random Password (6 characters)
+            $raw_password = strtoupper(substr(uniqid(), -6));
+
+            $this->db->bind('password', password_hash($raw_password, PASSWORD_DEFAULT));
             $this->db->bind('nama_lengkap', $data['nama_lengkap']);
             $this->db->execute();
 
@@ -131,7 +134,15 @@ class SpmbModel {
 
             $this->db->query("COMMIT");
             $this->db->execute();
-            return ['status' => true, 'pesan' => 'Pendaftaran berhasil. Silakan login menggunakan NISN Anda.'];
+
+            // Send WhatsApp Notifications
+            try {
+                $this->sendFonnteWARegister($data, $raw_password);
+            } catch (Exception $e) {
+                // Ignore WA errors so registration still succeeds
+            }
+
+            return ['status' => true, 'pesan' => 'Pendaftaran berhasil. Silakan login menggunakan NISN Anda dan Password: <strong>' . $raw_password . '</strong> (Password juga telah dikirim ke WhatsApp)'];
         } catch (Exception $e) {
             $this->db->query("ROLLBACK");
             $this->db->execute();
@@ -358,5 +369,81 @@ class SpmbModel {
         $this->db->bind('id', $id);
         $this->db->execute();
         return $this->db->rowCount();
+    }
+
+    private function sendFonnteWARegister($data, $raw_password)
+    {
+        // 1. Ambil token dari pengaturan
+        $this->db->query("SELECT fonnte_token FROM pengaturan LIMIT 1");
+        $pengaturan = $this->db->single();
+        $token = $pengaturan['fonnte_token'] ?? '';
+
+        if(empty($token)) return false;
+
+        // 2. Siapkan Data
+        $no_hp_user = preg_replace('/[^0-9]/', '', $data['no_hp']);
+        if (substr($no_hp_user, 0, 1) == '0') {
+            $no_hp_user = '62' . substr($no_hp_user, 1);
+        }
+
+        $no_hp_admin = '6289684164091';
+
+        // Pesan untuk Pendaftar / Orang Tua
+        $pesan_user = "Halo {$data['nama_lengkap']},\n\nTerima kasih telah mendaftar. Data pendaftaran Anda sedang kami proses.\n\nBerikut adalah akses login Anda:\n*NISN:* {$data['nisn']}\n*Password:* {$raw_password}\n\nSilakan login ke portal SPMB untuk melengkapi biodata dan memantau status kelulusan Anda.\n\nTerima kasih.";
+
+        // Pesan untuk Admin
+        $pesan_admin = "Halo Admin,\n\nAda pendaftar SPMB baru masuk!\n\n*Nama:* {$data['nama_lengkap']}\n*NISN:* {$data['nisn']}\n*Asal Sekolah:* {$data['asal_sekolah']}\n*No HP:* {$data['no_hp']}\n\nMohon segera dicek pada dashboard admin.";
+
+        // 3. Eksekusi cURL untuk User
+        $this->executeFonnte($no_hp_user, $pesan_user, $token);
+
+        // 4. Eksekusi cURL untuk Admin
+        $this->executeFonnte($no_hp_admin, $pesan_admin, $token);
+
+        return true;
+    }
+
+    private function executeFonnte($no_hp, $pesan, $token)
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.fonnte.com/send',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => array(
+                'target' => $no_hp,
+                'message' => $pesan
+            ),
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: $token"
+            ),
+        ));
+        
+        $response = curl_exec($curl);
+        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $error = curl_error($curl);
+        curl_close($curl);
+        
+        $status = ($httpcode >= 200 && $httpcode < 300) ? 'Sukses' : 'Gagal';
+        $response_body = $response ?: $error;
+        
+        try {
+            $this->db->query("INSERT INTO log_fonnte (nomor_tujuan, pesan, response_code, response_body, status) VALUES (:no, :pesan, :code, :body, :status)");
+            $this->db->bind('no', $no_hp);
+            $this->db->bind('pesan', $pesan);
+            $this->db->bind('code', $httpcode);
+            $this->db->bind('body', $response_body);
+            $this->db->bind('status', $status);
+            $this->db->execute();
+        } catch(Exception $e) {
+            // Ignore insert errors to log_fonnte if table doesn't exist
+        }
     }
 }
