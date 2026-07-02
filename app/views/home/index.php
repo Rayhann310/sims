@@ -3,8 +3,8 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         <!-- Header -->
-        <div class="flex flex-col md:flex-row items-center justify-between mb-12 border-b border-slate-100 pb-6">
-            <div class="flex items-center gap-4">
+        <div class="flex flex-col md:flex-row items-center justify-between mb-8 md:mb-12 border-b border-slate-100 pb-6">
+            <div class="flex flex-col md:flex-row items-center gap-3 md:gap-4 text-center md:text-left">
                 <?php if(!empty($data['pengaturan']['logo_sekolah'])): ?>
                     <img src="<?= $data['pengaturan']['logo_sekolah'] ?>" alt="Logo" class="w-16 h-16 object-contain bg-white rounded-full shadow-md p-1">
                 <?php else: ?>
@@ -13,12 +13,12 @@
                     </div>
                 <?php endif; ?>
                 <div>
-                    <h1 class="text-lg md:text-xl font-bold text-slate-800 leading-tight">SMA NAHDLATUL WATHAN JAKARTA</h1>
+                    <h1 class="text-lg md:text-xl font-bold text-slate-800 leading-tight mt-2 md:mt-0">SMA NAHDLATUL WATHAN JAKARTA</h1>
                     <p class="text-emerald-700 font-semibold italic text-sm mt-1">Religius • Nasionalis • Berkualitas</p>
                 </div>
             </div>
-            <div class="hidden md:flex gap-4 mt-4 md:mt-0">
-                <a href="<?= BASEURL; ?>/login" class="px-6 py-2 border border-emerald-600 text-emerald-700 font-medium rounded-full hover:bg-emerald-50 transition-colors">Login Admin</a>
+            <div class="flex w-full md:w-auto gap-4 mt-6 md:mt-0">
+                <a href="<?= BASEURL; ?>/login" class="w-full md:w-auto text-center px-6 py-2 border border-emerald-600 text-emerald-700 font-medium rounded-full hover:bg-emerald-50 transition-colors">Login Admin</a>
             </div>
         </div>
 
