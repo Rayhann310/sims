@@ -12,8 +12,9 @@ $app_logo = $pengaturan ? htmlspecialchars($pengaturan['logo_teks']) : 'S';
 $GLOBALS['pengaturan'] = $pengaturan;
 
 // Load hak akses menu untuk guru yang sedang login
-$_hakAkses = [];
-$_guruJabatanId = null;
+$GLOBALS['hakAksesData'] = [];
+$GLOBALS['guruJabatanNames'] = '';
+
 try {
     if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'guru') {
         $guruUserId = $_SESSION['user']['id'] ?? null;
@@ -26,10 +27,11 @@ try {
 
             if ($guruId) {
                 // Get all jabatans for this guru
-                $db->query("SELECT jabatan_id FROM guru_jabatan WHERE guru_id = :gid");
+                $db->query("SELECT gj.jabatan_id, j.nama_jabatan FROM guru_jabatan gj JOIN jabatan j ON gj.jabatan_id = j.id WHERE gj.guru_id = :gid");
                 $db->bind('gid', $guruId);
                 $jabatans = $db->resultSet();
                 $jabatanIds = array_column($jabatans, 'jabatan_id');
+                $GLOBALS['guruJabatanNames'] = implode(', ', array_column($jabatans, 'nama_jabatan'));
 
                 if (!empty($jabatanIds)) {
                     $safeIds = array_map('intval', $jabatanIds);
@@ -40,7 +42,7 @@ try {
                     foreach ($hakRows as $hr) {
                         // If any jabatan gives access, grant it (OR logic)
                         if ((bool)$hr['is_active']) {
-                            $_hakAkses[$hr['menu_key']] = true;
+                            $GLOBALS['hakAksesData'][$hr['menu_key']] = true;
                         }
                     }
                 }
@@ -50,9 +52,10 @@ try {
 } catch (Throwable $e) {}
 
 // Helper: cek hak akses guru
-function guruCanAccess($key) {
-    global $_hakAkses;
-    return !empty($_hakAkses[$key]);
+if (!function_exists('guruCanAccess')) {
+    function guruCanAccess($key) {
+        return !empty($GLOBALS['hakAksesData'][$key]);
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -399,9 +402,14 @@ function guruCanAccess($key) {
 
                 <!-- Profile -->
                 <div class="flex items-center gap-3">
-                    <div class="text-right hidden sm:block">
-                        <p class="text-sm font-medium text-white"><?= htmlspecialchars($_SESSION['user']['nama_lengkap'] ?? 'User'); ?></p>
-                        <p class="text-[11px] text-emerald-100/70 uppercase font-bold tracking-wider"><?= htmlspecialchars($_SESSION['user']['role'] ?? 'Role'); ?></p>
+                    <div class="text-right hidden sm:block max-w-[200px]">
+                        <p class="text-sm font-medium text-white truncate"><?= htmlspecialchars($_SESSION['user']['nama_lengkap'] ?? 'User'); ?></p>
+                        <p class="text-[11px] text-emerald-100/70 uppercase font-bold tracking-wider truncate" title="<?= htmlspecialchars($_SESSION['user']['role'] ?? 'Role'); ?><?= !empty($GLOBALS['guruJabatanNames']) ? ' - ' . htmlspecialchars($GLOBALS['guruJabatanNames']) : '' ?>">
+                            <?= htmlspecialchars($_SESSION['user']['role'] ?? 'Role'); ?>
+                            <?php if(!empty($GLOBALS['guruJabatanNames'])): ?>
+                                <span class="font-normal opacity-80">- <?= htmlspecialchars($GLOBALS['guruJabatanNames']) ?></span>
+                            <?php endif; ?>
+                        </p>
                     </div>
                     <div class="w-9 h-9 rounded-full bg-emerald-700 flex items-center justify-center text-white font-bold border border-emerald-600">
                         <?= substr($_SESSION['user']['nama_lengkap'] ?? 'U', 0, 1); ?>
