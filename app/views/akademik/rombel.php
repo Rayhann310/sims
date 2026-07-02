@@ -1,4 +1,8 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ modalOpen: false }">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ 
+    modalOpen: false, 
+    modalEditOpen: false,
+    editData: { id: '', tahun_akademik_id: '', kelas_id: '', nama_rombel: '', wali_kelas_id: '' }
+}">
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-2xl font-bold text-slate-900"><?= $data['judul']; ?></h1>
@@ -86,6 +90,13 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                             <a href="<?= BASEURL; ?>/akademik/anggotaRombel/<?= $r['id']; ?>" class="text-blue-600 hover:text-blue-900" title="Kelola Siswa">Kelola Siswa</a>
+                            <button @click="editData = {
+                                id: '<?= $r['id']; ?>',
+                                tahun_akademik_id: '<?= $r['tahun_akademik_id']; ?>',
+                                kelas_id: '<?= $r['kelas_id']; ?>',
+                                nama_rombel: '<?= htmlspecialchars($r['nama_rombel'], ENT_QUOTES); ?>',
+                                wali_kelas_id: '<?= $r['wali_kelas_id'] ?? ''; ?>'
+                            }; modalEditOpen = true" class="text-amber-500 hover:text-amber-700 ml-2" title="Edit Rombel">Edit</button>
                             <a href="<?= BASEURL; ?>/akademik/hapusRombel/<?= $r['id']; ?>" class="text-red-600 hover:text-red-900 ml-2" onclick="return confirm('Yakin ingin menghapus rombel ini? Semua data anggota rombel akan ikut terhapus!');" title="Hapus">Hapus</a>
                         </td>
                     </tr>
@@ -158,4 +169,63 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Edit -->
+    <div x-show="modalEditOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <!-- Backdrop -->
+            <div x-show="modalEditOpen" x-transition.opacity class="fixed inset-0 transition-opacity bg-slate-900/50 backdrop-blur-sm" @click="modalEditOpen = false"></div>
+
+            <!-- Modal Panel -->
+            <div x-show="modalEditOpen" x-transition class="relative inline-block w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl sm:my-8">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-lg font-bold text-slate-900">Ubah Rombongan Belajar</h3>
+                    <button @click="modalEditOpen = false" class="text-slate-400 hover:text-slate-500 transition-colors">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                
+                <form action="<?= BASEURL; ?>/akademik/ubahRombel" method="post">
+                    <input type="hidden" name="id" x-model="editData.id">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Tahun Akademik</label>
+                            <select name="tahun_akademik_id" x-model="editData.tahun_akademik_id" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white">
+                                <?php foreach($data['tahun_akademik'] as $ta): ?>
+                                    <option value="<?= $ta['id'] ?>"><?= $ta['nama_tahun'] ?> - <?= $ta['semester'] ?> <?= $ta['status'] == 'Aktif' ? '(Aktif)' : '' ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Tingkat/Kelas Master</label>
+                            <select name="kelas_id" x-model="editData.kelas_id" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white">
+                                <?php foreach($data['kelas'] as $k): ?>
+                                    <option value="<?= $k['id'] ?>"><?= $k['nama_kelas'] ?> (Tingkat <?= $k['tingkat'] ?> - <?= $k['jurusan'] ?>)</option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Nama Rombel (Spesifik)</label>
+                            <input type="text" name="nama_rombel" x-model="editData.nama_rombel" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all uppercase">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Wali Kelas (Opsional)</label>
+                            <select name="wali_kelas_id" x-model="editData.wali_kelas_id" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white">
+                                <option value="">-- Pilih Wali Kelas --</option>
+                                <?php foreach($data['guru'] as $g): ?>
+                                    <option value="<?= $g['id'] ?>"><?= $g['nama_lengkap'] ?> (NIP: <?= $g['nip'] ?>)</option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button type="button" @click="modalEditOpen = false" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">Batal</button>
+                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">Simpan Perubahan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+

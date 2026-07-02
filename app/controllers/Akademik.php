@@ -201,6 +201,19 @@ class Akademik extends Controller {
         }
     }
 
+    public function ubahRombel()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if($this->model('RombelModel')->ubahRombel($_POST) > 0) {
+                $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'diubah', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'gagal atau tidak ada perubahan', 'aksi' => 'diubah', 'tipe' => 'warning'];
+            }
+            header('Location: ' . BASEURL . '/akademik/rombel');
+            exit;
+        }
+    }
+
     public function hapusRombel($id)
     {
         if($this->model('RombelModel')->hapusRombel($id) > 0) {

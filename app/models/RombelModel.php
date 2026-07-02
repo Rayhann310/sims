@@ -61,6 +61,23 @@ class RombelModel {
         return $this->db->rowCount();
     }
 
+    public function ubahRombel($data)
+    {
+        $this->db->query("UPDATE rombel SET 
+                            tahun_akademik_id = :tahun_akademik_id, 
+                            kelas_id = :kelas_id, 
+                            nama_rombel = :nama_rombel, 
+                            wali_kelas_id = :wali_kelas_id 
+                          WHERE id = :id");
+        $this->db->bind('tahun_akademik_id', $data['tahun_akademik_id']);
+        $this->db->bind('kelas_id', $data['kelas_id']);
+        $this->db->bind('nama_rombel', $data['nama_rombel']);
+        $this->db->bind('wali_kelas_id', !empty($data['wali_kelas_id']) ? $data['wali_kelas_id'] : null);
+        $this->db->bind('id', $data['id']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
     public function getAllGuru()
     {
         $this->db->query("SELECT g.id, u.nama_lengkap, g.nip FROM guru g JOIN users u ON g.user_id = u.id");
