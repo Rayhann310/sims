@@ -111,8 +111,6 @@ $role = $_SESSION['user']['role'] ?? '';
                 </div>
             </div>
             <?php endif; ?>
-            
-            <?php if($role == 'admin' || guruCanAccess('spmb') || guruCanAccess('spmb_peserta')): ?>
             <?php if(hasMenuAccess('spmb') || hasMenuAccess('spmb_peserta') || hasMenuAccess('spmb_biaya')): ?>
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">SPMB / PPDB</p>
@@ -206,6 +204,7 @@ $role = $_SESSION['user']['role'] ?? '';
                     <?php endif; ?>
                 </div>
             </div>
+            <?php endif; ?>
 
             <?php if(hasMenuAccess('keuangan_tarif') || hasMenuAccess('keuangan_tagihan') || hasMenuAccess('keuangan_riwayat') || hasMenuAccess('keuangan_bukukas')): ?>
             <div class="mb-6">
