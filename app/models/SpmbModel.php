@@ -1,0 +1,277 @@
+<?php
+
+class SpmbModel {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = new Database();
+    }
+
+    // ==========================================
+    // GELOMBANG
+    // ==========================================
+    public function getGelombangAktif()
+    {
+        $this->db->query("SELECT * FROM spmb_gelombang WHERE status = 'Buka' AND CURRENT_DATE() BETWEEN tanggal_mulai AND tanggal_selesai ORDER BY id DESC LIMIT 1");
+        return $this->db->single();
+    }
+
+    public function getAllGelombang()
+    {
+        $this->db->query("SELECT * FROM spmb_gelombang ORDER BY id DESC");
+        return $this->db->resultSet();
+    }
+
+    public function getGelombangById($id)
+    {
+        $this->db->query("SELECT * FROM spmb_gelombang WHERE id = :id");
+        $this->db->bind('id', $id);
+        return $this->db->single();
+    }
+
+    public function tambahGelombang($data)
+    {
+        $this->db->query("INSERT INTO spmb_gelombang (nama_gelombang, tanggal_mulai, tanggal_selesai, harga_formulir, status) VALUES (:nama, :mulai, :selesai, :harga, :status)");
+        $this->db->bind('nama', $data['nama_gelombang']);
+        $this->db->bind('mulai', $data['tanggal_mulai']);
+        $this->db->bind('selesai', $data['tanggal_selesai']);
+        $this->db->bind('harga', $data['harga_formulir']);
+        $this->db->bind('status', $data['status']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function ubahGelombang($data)
+    {
+        $this->db->query("UPDATE spmb_gelombang SET nama_gelombang = :nama, tanggal_mulai = :mulai, tanggal_selesai = :selesai, harga_formulir = :harga, status = :status WHERE id = :id");
+        $this->db->bind('nama', $data['nama_gelombang']);
+        $this->db->bind('mulai', $data['tanggal_mulai']);
+        $this->db->bind('selesai', $data['tanggal_selesai']);
+        $this->db->bind('harga', $data['harga_formulir']);
+        $this->db->bind('status', $data['status']);
+        $this->db->bind('id', $data['id']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function hapusGelombang($id)
+    {
+        $this->db->query("DELETE FROM spmb_gelombang WHERE id = :id");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    // ==========================================
+    // PESERTA
+    // ==========================================
+    public function getAllPeserta()
+    {
+        $this->db->query("SELECT p.*, g.nama_gelombang, u.email 
+                          FROM spmb_peserta p 
+                          JOIN spmb_gelombang g ON p.gelombang_id = g.id 
+                          JOIN users u ON p.user_id = u.id 
+                          ORDER BY p.id DESC");
+        return $this->db->resultSet();
+    }
+
+    public function getPesertaById($id)
+    {
+        $this->db->query("SELECT p.*, g.nama_gelombang, g.harga_formulir 
+                          FROM spmb_peserta p 
+                          JOIN spmb_gelombang g ON p.gelombang_id = g.id 
+                          WHERE p.id = :id");
+        $this->db->bind('id', $id);
+        return $this->db->single();
+    }
+
+    public function getPesertaByUserId($user_id)
+    {
+        $this->db->query("SELECT p.*, g.nama_gelombang, g.harga_formulir 
+                          FROM spmb_peserta p 
+                          JOIN spmb_gelombang g ON p.gelombang_id = g.id 
+                          WHERE p.user_id = :user_id");
+        $this->db->bind('user_id', $user_id);
+        return $this->db->single();
+    }
+
+    public function daftarPeserta($data)
+    {
+        try {
+            $this->db->query("START TRANSACTION");
+            $this->db->execute();
+
+            // 1. Cek username terdaftar
+            $this->db->query("SELECT id FROM users WHERE username = :username");
+            $this->db->bind('username', $data['nisn']);
+            if($this->db->single()) {
+                throw new Exception("NISN sudah terdaftar");
+            }
+
+            // 2. Insert User
+            $this->db->query("INSERT INTO users (username, password, role, nama_lengkap) VALUES (:username, :password, 'siswa', :nama_lengkap)");
+            $this->db->bind('username', $data['nisn']);
+            $this->db->bind('password', password_hash($data['password'], PASSWORD_DEFAULT));
+            $this->db->bind('nama_lengkap', $data['nama_lengkap']);
+            $this->db->execute();
+
+            $this->db->query("SELECT LAST_INSERT_ID() as last_id");
+            $userId = $this->db->single()['last_id'];
+
+            // 3. Insert Peserta SPMB
+            $this->db->query("INSERT INTO spmb_peserta (user_id, gelombang_id, nisn, nama_lengkap, asal_sekolah, no_hp) VALUES (:user_id, :gelombang_id, :nisn, :nama_lengkap, :asal_sekolah, :no_hp)");
+            $this->db->bind('user_id', $userId);
+            $this->db->bind('gelombang_id', $data['gelombang_id']);
+            $this->db->bind('nisn', $data['nisn']);
+            $this->db->bind('nama_lengkap', $data['nama_lengkap']);
+            $this->db->bind('asal_sekolah', $data['asal_sekolah']);
+            $this->db->bind('no_hp', $data['no_hp']);
+            $this->db->execute();
+
+            $this->db->query("COMMIT");
+            $this->db->execute();
+            return ['status' => true, 'pesan' => 'Pendaftaran berhasil. Silakan login menggunakan NISN Anda.'];
+        } catch (Exception $e) {
+            $this->db->query("ROLLBACK");
+            $this->db->execute();
+            return ['status' => false, 'pesan' => $e->getMessage()];
+        }
+    }
+
+    public function updateStatusSeleksi($id, $status)
+    {
+        $this->db->query("UPDATE spmb_peserta SET status_seleksi = :status WHERE id = :id");
+        $this->db->bind('status', $status);
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    // ==========================================
+    // PEMBAYARAN
+    // ==========================================
+    public function getPembayaranByPeserta($peserta_id)
+    {
+        $this->db->query("SELECT * FROM spmb_pembayaran WHERE peserta_id = :peserta_id ORDER BY id DESC");
+        return $this->db->resultSet();
+    }
+
+    public function tambahPembayaran($data)
+    {
+        $this->db->query("INSERT INTO spmb_pembayaran (peserta_id, jumlah_bayar, metode, bukti) VALUES (:peserta_id, :jumlah_bayar, :metode, :bukti)");
+        $this->db->bind('peserta_id', $data['peserta_id']);
+        $this->db->bind('jumlah_bayar', $data['jumlah_bayar']);
+        $this->db->bind('metode', $data['metode']);
+        $this->db->bind('bukti', $data['bukti']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function verifikasiPembayaran($id, $status, $peserta_id)
+    {
+        try {
+            $this->db->query("START TRANSACTION");
+            $this->db->execute();
+
+            $this->db->query("UPDATE spmb_pembayaran SET status = :status WHERE id = :id");
+            $this->db->bind('status', $status);
+            $this->db->bind('id', $id);
+            $this->db->execute();
+
+            if ($status == 'Diterima') {
+                $this->db->query("UPDATE spmb_peserta SET status_pembayaran = 'Lunas' WHERE id = :peserta_id");
+                $this->db->bind('peserta_id', $peserta_id);
+                $this->db->execute();
+            } else if ($status == 'Ditolak') {
+                $this->db->query("UPDATE spmb_peserta SET status_pembayaran = 'Belum Bayar' WHERE id = :peserta_id");
+                $this->db->bind('peserta_id', $peserta_id);
+                $this->db->execute();
+            }
+
+            $this->db->query("COMMIT");
+            $this->db->execute();
+            return true;
+        } catch (Exception $e) {
+            $this->db->query("ROLLBACK");
+            $this->db->execute();
+            return false;
+        }
+    }
+
+    // ==========================================
+    // MIGRASI KE SISWA
+    // ==========================================
+    public function migrasiKeSiswa($peserta_id)
+    {
+        try {
+            $this->db->query("START TRANSACTION");
+            $this->db->execute();
+
+            $peserta = $this->getPesertaById($peserta_id);
+            
+            if (!$peserta || $peserta['status_seleksi'] != 'Lulus') {
+                throw new Exception("Peserta belum lulus seleksi.");
+            }
+
+            // Cek apakah sudah ada di tabel siswa
+            $this->db->query("SELECT id FROM siswa WHERE user_id = :user_id");
+            $this->db->bind('user_id', $peserta['user_id']);
+            if($this->db->single()) {
+                throw new Exception("Peserta sudah dimigrasi sebelumnya.");
+            }
+
+            $this->db->query("INSERT INTO siswa (user_id, nisn, jenis_kelamin, status) VALUES (:user_id, :nisn, 'L', 'Aktif')");
+            $this->db->bind('user_id', $peserta['user_id']);
+            $this->db->bind('nisn', $peserta['nisn']);
+            // Jenis kelamin default L, bisa dilengkapi kemudian oleh siswa/admin
+            $this->db->execute();
+
+            $this->db->query("COMMIT");
+            $this->db->execute();
+            return ['status' => true, 'pesan' => 'Berhasil migrasi peserta ke data siswa.'];
+        } catch (Exception $e) {
+            $this->db->query("ROLLBACK");
+            $this->db->execute();
+            return ['status' => false, 'pesan' => $e->getMessage()];
+        }
+    }
+
+    public function migrasiMassalKeSiswa($gelombang_id)
+    {
+        try {
+            $this->db->query("START TRANSACTION");
+            $this->db->execute();
+
+            // Ambil semua peserta di gelombang ini yang lulus dan belum dimigrasi (belum ada di tabel siswa)
+            $this->db->query("SELECT p.* FROM spmb_peserta p 
+                              LEFT JOIN siswa s ON p.user_id = s.user_id 
+                              WHERE p.gelombang_id = :gelombang_id 
+                              AND p.status_seleksi = 'Lulus' 
+                              AND s.id IS NULL");
+            $this->db->bind('gelombang_id', $gelombang_id);
+            $pesertaLulus = $this->db->resultSet();
+
+            if (empty($pesertaLulus)) {
+                throw new Exception("Tidak ada peserta yang siap dimigrasi (Mungkin belum ada yang Lulus atau sudah dimigrasi semua).");
+            }
+
+            $count = 0;
+            foreach ($pesertaLulus as $p) {
+                $this->db->query("INSERT INTO siswa (user_id, nisn, jenis_kelamin, status) VALUES (:user_id, :nisn, 'L', 'Aktif')");
+                $this->db->bind('user_id', $p['user_id']);
+                $this->db->bind('nisn', $p['nisn']);
+                $this->db->execute();
+                $count++;
+            }
+
+            $this->db->query("COMMIT");
+            $this->db->execute();
+            return ['status' => true, 'pesan' => "Berhasil migrasi $count peserta ke data siswa."];
+        } catch (Exception $e) {
+            $this->db->query("ROLLBACK");
+            $this->db->execute();
+            return ['status' => false, 'pesan' => $e->getMessage()];
+        }
+    }
+}

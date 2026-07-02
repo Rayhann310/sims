@@ -683,4 +683,87 @@ return array (
       'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
+  'spmb_gelombang' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `spmb_gelombang` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nama_gelombang` varchar(100) NOT NULL,
+  `tanggal_mulai` date NOT NULL,
+  `tanggal_selesai` date NOT NULL,
+  `harga_formulir` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `status` enum(\'Buka\',\'Tutup\') DEFAULT \'Tutup\',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'nama_gelombang' => 'varchar(100) NOT NULL',
+      'tanggal_mulai' => 'date NOT NULL',
+      'tanggal_selesai' => 'date NOT NULL',
+      'harga_formulir' => 'decimal(10,2) NOT NULL DEFAULT 0.00',
+      'status' => 'enum(\'Buka\',\'Tutup\') DEFAULT \'Tutup\'',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
+    ),
+  ),
+  'spmb_peserta' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `spmb_peserta` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `gelombang_id` int(11) NOT NULL,
+  `nisn` varchar(20) NOT NULL,
+  `nama_lengkap` varchar(150) NOT NULL,
+  `asal_sekolah` varchar(150) NOT NULL,
+  `no_hp` varchar(20) NOT NULL,
+  `status_pembayaran` enum(\'Belum Bayar\',\'Lunas\') DEFAULT \'Belum Bayar\',
+  `status_seleksi` enum(\'Menunggu\',\'Lulus\',\'Tidak Lulus\') DEFAULT \'Menunggu\',
+  `bukti_bayar` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `gelombang_id` (`gelombang_id`),
+  CONSTRAINT `spmb_peserta_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `spmb_peserta_ibfk_2` FOREIGN KEY (`gelombang_id`) REFERENCES `spmb_gelombang` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'user_id' => 'int(11) NOT NULL',
+      'gelombang_id' => 'int(11) NOT NULL',
+      'nisn' => 'varchar(20) NOT NULL',
+      'nama_lengkap' => 'varchar(150) NOT NULL',
+      'asal_sekolah' => 'varchar(150) NOT NULL',
+      'no_hp' => 'varchar(20) NOT NULL',
+      'status_pembayaran' => 'enum(\'Belum Bayar\',\'Lunas\') DEFAULT \'Belum Bayar\'',
+      'status_seleksi' => 'enum(\'Menunggu\',\'Lulus\',\'Tidak Lulus\') DEFAULT \'Menunggu\'',
+      'bukti_bayar' => 'varchar(255) DEFAULT NULL',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
+    ),
+  ),
+  'spmb_pembayaran' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `spmb_pembayaran` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `peserta_id` int(11) NOT NULL,
+  `jumlah_bayar` decimal(10,2) NOT NULL,
+  `metode` varchar(50) NOT NULL,
+  `bukti` varchar(255) NOT NULL,
+  `status` enum(\'Pending\',\'Diterima\',\'Ditolak\') DEFAULT \'Pending\',
+  `tanggal_bayar` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `peserta_id` (`peserta_id`),
+  CONSTRAINT `spmb_pembayaran_ibfk_1` FOREIGN KEY (`peserta_id`) REFERENCES `spmb_peserta` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'peserta_id' => 'int(11) NOT NULL',
+      'jumlah_bayar' => 'decimal(10,2) NOT NULL',
+      'metode' => 'varchar(50) NOT NULL',
+      'bukti' => 'varchar(255) NOT NULL',
+      'status' => 'enum(\'Pending\',\'Diterima\',\'Ditolak\') DEFAULT \'Pending\'',
+      'tanggal_bayar' => 'timestamp NOT NULL DEFAULT current_timestamp()',
+    ),
+  ),
 );
