@@ -18,16 +18,36 @@ try {
     if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'guru') {
         $guruUserId = $_SESSION['user']['id'] ?? null;
         if ($guruUserId) {
-            $db->query("SELECT g.jabatan_id FROM guru g WHERE g.user_id = :uid LIMIT 1");
+            // Get guru_id first
+            $db->query("SELECT id FROM guru WHERE user_id = :uid LIMIT 1");
             $db->bind('uid', $guruUserId);
             $guruRow = $db->single();
-            $_guruJabatanId = $guruRow['jabatan_id'] ?? null;
-            if ($_guruJabatanId) {
-                $db->query("SELECT menu_key, is_active FROM hak_akses_menu WHERE jabatan_id = :jid");
-                $db->bind('jid', $_guruJabatanId);
-                $hakRows = $db->resultSet();
-                foreach ($hakRows as $hr) {
-                    $_hakAkses[$hr['menu_key']] = (bool)$hr['is_active'];
+            $guruId = $guruRow['id'] ?? null;
+
+            if ($guruId) {
+                // Get all jabatans for this guru
+                $db->query("SELECT jabatan_id FROM guru_jabatan WHERE guru_id = :gid");
+                $db->bind('gid', $guruId);
+                $jabatans = $db->resultSet();
+                $jabatanIds = array_column($jabatans, 'jabatan_id');
+
+                if (!empty($jabatanIds)) {
+                    $inQuery = implode(',', array_fill(0, count($jabatanIds), '?'));
+                    $db->query("SELECT menu_key, is_active FROM hak_akses_menu WHERE jabatan_id IN ($inQuery)");
+                    
+                    // PDO index is 1-based
+                    $index = 1;
+                    foreach ($jabatanIds as $jid) {
+                        $db->bind($index++, $jid);
+                    }
+                    
+                    $hakRows = $db->resultSet();
+                    foreach ($hakRows as $hr) {
+                        // If any jabatan gives access, grant it (OR logic)
+                        if ((bool)$hr['is_active']) {
+                            $_hakAkses[$hr['menu_key']] = true;
+                        }
+                    }
                 }
             }
         }

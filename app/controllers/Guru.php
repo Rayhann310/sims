@@ -66,7 +66,7 @@ class Guru extends Controller {
 
     public function getubah()
     {
-        echo json_encode($this->model('GuruModel')->getGuruById($_POST['id']));
+        echo json_encode($this->model('GuruModel')->getGuruByIdWithJabatan($_POST['id']));
     }
 
     public function getwalikelas()

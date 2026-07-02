@@ -10,10 +10,10 @@ class GuruModel {
 
     public function getAllGuru($filters = [])
     {
-        $query = "SELECT guru.*, users.username, users.nama_lengkap, j.nama_jabatan
+        $query = "SELECT guru.*, users.username, users.nama_lengkap, 
+                  (SELECT GROUP_CONCAT(j.nama_jabatan SEPARATOR ', ') FROM guru_jabatan gj JOIN jabatan j ON gj.jabatan_id = j.id WHERE gj.guru_id = guru.id) as nama_jabatan
                   FROM guru
                   JOIN users ON guru.user_id = users.id
-                  LEFT JOIN jabatan j ON guru.jabatan_id = j.id
                   WHERE 1=1";
         
         $binds = [];
