@@ -1,5 +1,3 @@
-<div class="p-4 sm:ml-64">
-    <div class="p-4 mt-14">
         <div class="mb-6">
             <h2 class="text-2xl font-bold text-slate-800">Manajemen Peserta SPMB</h2>
             <p class="text-slate-500 mt-1">Verifikasi pembayaran dan ubah status seleksi calon siswa.</p>
@@ -108,15 +106,7 @@
                         </div>
 
                         <?php endforeach; ?>
-                        
-                        <?php if(empty($data['peserta'])): ?>
-                        <tr>
-                            <td colspan="7" class="px-6 py-8 text-center text-slate-500">Belum ada data pendaftar.</td>
-                        </tr>
-                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
-</div>

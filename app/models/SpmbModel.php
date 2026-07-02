@@ -68,7 +68,7 @@ class SpmbModel {
     // ==========================================
     public function getAllPeserta()
     {
-        $this->db->query("SELECT p.*, g.nama_gelombang, u.email 
+        $this->db->query("SELECT p.*, g.nama_gelombang, u.username as akun_username
                           FROM spmb_peserta p 
                           JOIN spmb_gelombang g ON p.gelombang_id = g.id 
                           JOIN users u ON p.user_id = u.id 

@@ -1,5 +1,3 @@
-<div class="p-4 sm:ml-64">
-    <div class="p-4 mt-14">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-slate-800">Manajemen Gelombang SPMB</h2>
             <button type="button" data-modal-target="tambahModal" data-modal-toggle="tambahModal" class="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
@@ -103,19 +101,10 @@
                             </div>
                         </div>
                         <?php endforeach; ?>
-                        
-                        <?php if(empty($data['gelombang'])): ?>
-                        <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-slate-500">Belum ada data gelombang pendaftaran.</td>
-                        </tr>
-                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
-</div>
-
 <!-- Tambah Modal -->
 <div id="tambahModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-md max-h-full">
