@@ -128,7 +128,7 @@
                         <td class="px-6 py-4 text-slate-600 font-medium"><?= $s['tahun_lulus'] ? $s['tahun_lulus'] : '-'; ?></td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <button @click="
+                                <button type="button" @click="
                                     form.id = '<?= $s['id'] ?>';
                                     form.nisn = '<?= htmlspecialchars($s['nisn']) ?>';
                                     form.nama_lengkap = '<?= htmlspecialchars($s['nama_lengkap']) ?>';
