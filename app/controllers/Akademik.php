@@ -254,6 +254,12 @@ class Akademik extends Controller {
 
         $data['anggota'] = $this->model('RombelModel')->getAnggotaRombel($rombel_id);
         $data['siswa_tersedia'] = $this->model('RombelModel')->getSiswaBelumAdaRombel($data['rombel']['tahun_akademik_id']);
+        
+        // Ambil rombel di tahun akademik yang sama untuk tujuan pemindahan masal
+        $semua_rombel = $this->model('RombelModel')->getRombelByTahunAkademik($data['rombel']['tahun_akademik_id']);
+        $data['rombel_tujuan'] = array_filter($semua_rombel, function($r) use ($rombel_id) {
+            return $r['id'] != $rombel_id;
+        });
 
         $this->view('templates/admin_header', $data);
         $this->view('akademik/anggota_rombel', $data);
@@ -272,6 +278,23 @@ class Akademik extends Controller {
                 $_SESSION['flash'] = ['pesan' => 'Tidak ada siswa yang', 'aksi' => 'dipilih', 'tipe' => 'warning'];
             }
             header('Location: ' . BASEURL . '/akademik/anggotaRombel/' . $rombel_id);
+            exit;
+        }
+    }
+
+    public function pindahSiswaMasal()
+    {
+        requireAccess('akademik_rombel');
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $rombel_asal = $_POST['rombel_asal'];
+            $rombel_tujuan = $_POST['rombel_tujuan'];
+            if(isset($_POST['siswa_ids']) && is_array($_POST['siswa_ids']) && !empty($rombel_tujuan)) {
+                $updated = $this->model('RombelModel')->pindahSiswaMasal($rombel_asal, $rombel_tujuan, $_POST['siswa_ids']);
+                $_SESSION['flash'] = ['pesan' => $updated . ' siswa berhasil', 'aksi' => 'dipindahkan', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'Gagal memindahkan', 'aksi' => 'pastikan siswa dan kelas tujuan dipilih', 'tipe' => 'danger'];
+            }
+            header('Location: ' . BASEURL . '/akademik/anggotaRombel/' . $rombel_asal);
             exit;
         }
     }

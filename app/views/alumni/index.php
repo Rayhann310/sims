@@ -2,6 +2,7 @@
     modalTambah: false, 
     modalEdit: false, 
     modalImport: false,
+    selectAllAlumni: false,
     form: {
         id: '',
         nisn: '',
@@ -79,10 +80,24 @@
 
     <!-- Table Container -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+        <form action="<?= BASEURL; ?>/alumni/kembalikanMasal" method="POST" id="formKembalikanMasal">
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                <button type="submit" onclick="if(document.querySelectorAll('.alumni-checkbox:checked').length == 0) { alert('Pilih minimal 1 alumni!'); return false; } return confirm('Yakin ingin mengembalikan alumni terpilih menjadi siswa aktif?');" class="inline-flex items-center px-3 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-medium rounded-lg transition-colors shadow-sm">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+                    Kembalikan Terpilih ke Siswa
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200">
+                        <th class="px-6 py-4 font-semibold w-10">
+                            <input type="checkbox" @change="
+                                selectAllAlumni = !selectAllAlumni;
+                                const checkboxes = document.querySelectorAll('.alumni-checkbox');
+                                checkboxes.forEach(cb => cb.checked = selectAllAlumni);
+                            " class="w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500">
+                        </th>
                         <th class="px-6 py-4 font-semibold">NISN</th>
                         <th class="px-6 py-4 font-semibold">Nama Lengkap</th>
                         <th class="px-6 py-4 font-semibold text-center">L/P</th>
@@ -93,6 +108,9 @@
                 <tbody class="divide-y divide-slate-100">
                     <?php foreach($data['alumni'] as $s): ?>
                     <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <input type="checkbox" name="siswa_ids[]" value="<?= $s['id']; ?>" class="alumni-checkbox w-4 h-4 text-indigo-600 bg-white border-slate-300 rounded focus:ring-indigo-500">
+                        </td>
                         <td class="px-6 py-4 font-medium text-slate-800"><?= htmlspecialchars($s['nisn']); ?></td>
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
@@ -136,7 +154,7 @@
                     
                     <?php if(empty($data['alumni'])): ?>
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-slate-500">
+                        <td colspan="6" class="px-6 py-12 text-center text-slate-500">
                             <svg class="w-12 h-12 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                             Belum ada data alumni.
                         </td>
@@ -145,6 +163,7 @@
                 </tbody>
             </table>
         </div>
+        </form>
     </div>
 
     <!-- Modal Tambah -->

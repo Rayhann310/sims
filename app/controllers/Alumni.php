@@ -166,4 +166,18 @@ class Alumni extends Controller {
         header('Location: ' . BASEURL . '/alumni');
         exit;
     }
+
+    public function kembalikanMasal()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if(isset($_POST['siswa_ids']) && is_array($_POST['siswa_ids'])) {
+                $updated = $this->model('AlumniModel')->kembalikanSiswaMasal($_POST['siswa_ids']);
+                $_SESSION['flash'] = ['pesan' => $updated . ' data berhasil', 'aksi' => 'dikembalikan sebagai siswa aktif', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'Gagal', 'aksi' => 'mohon pilih minimal 1 alumni', 'tipe' => 'danger'];
+            }
+            header('Location: ' . BASEURL . '/alumni');
+            exit;
+        }
+    }
 }

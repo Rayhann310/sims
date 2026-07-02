@@ -137,6 +137,18 @@ class AlumniModel {
         return $this->db->rowCount();
     }
 
+    public function kembalikanSiswaMasal($siswa_ids)
+    {
+        $updated = 0;
+        foreach($siswa_ids as $id) {
+            $this->db->query("UPDATE siswa SET status = 'Aktif', tahun_lulus = NULL WHERE id = :id");
+            $this->db->bind('id', $id);
+            $this->db->execute();
+            $updated += $this->db->rowCount();
+        }
+        return $updated;
+    }
+
     public function importData($dataArray)
     {
         $berhasil = 0;

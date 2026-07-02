@@ -131,6 +131,38 @@ class RombelModel {
         return $inserted;
     }
 
+    public function pindahSiswaMasal($rombel_asal, $rombel_tujuan, $siswa_ids)
+    {
+        $updated = 0;
+        foreach($siswa_ids as $siswa_id) {
+            // Cek apakah siswa sudah ada di rombel tujuan agar tidak duplikat
+            $this->db->query("SELECT id FROM anggota_rombel WHERE rombel_id = :tujuan AND siswa_id = :siswa");
+            $this->db->bind('tujuan', $rombel_tujuan);
+            $this->db->bind('siswa', $siswa_id);
+            $exists = $this->db->single();
+
+            if($exists) {
+                // Jika sudah ada di tujuan, cukup hapus dari asal
+                $this->db->query("DELETE FROM anggota_rombel WHERE rombel_id = :asal AND siswa_id = :siswa");
+                $this->db->bind('asal', $rombel_asal);
+                $this->db->bind('siswa', $siswa_id);
+                $this->db->execute();
+                $updated++;
+            } else {
+                // Jika belum, update id rombel
+                $this->db->query("UPDATE anggota_rombel SET rombel_id = :tujuan WHERE rombel_id = :asal AND siswa_id = :siswa");
+                $this->db->bind('tujuan', $rombel_tujuan);
+                $this->db->bind('asal', $rombel_asal);
+                $this->db->bind('siswa', $siswa_id);
+                $this->db->execute();
+                if($this->db->rowCount() > 0) {
+                    $updated++;
+                }
+            }
+        }
+        return $updated;
+    }
+
     public function hapusAnggota($anggota_id)
     {
         $this->db->query("DELETE FROM anggota_rombel WHERE id = :id");
