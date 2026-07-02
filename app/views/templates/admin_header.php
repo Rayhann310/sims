@@ -32,14 +32,9 @@ try {
                 $jabatanIds = array_column($jabatans, 'jabatan_id');
 
                 if (!empty($jabatanIds)) {
-                    $inQuery = implode(',', array_fill(0, count($jabatanIds), '?'));
+                    $safeIds = array_map('intval', $jabatanIds);
+                    $inQuery = implode(',', $safeIds);
                     $db->query("SELECT menu_key, is_active FROM hak_akses_menu WHERE jabatan_id IN ($inQuery)");
-                    
-                    // PDO index is 1-based
-                    $index = 1;
-                    foreach ($jabatanIds as $jid) {
-                        $db->bind($index++, $jid);
-                    }
                     
                     $hakRows = $db->resultSet();
                     foreach ($hakRows as $hr) {
