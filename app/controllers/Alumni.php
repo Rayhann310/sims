@@ -3,25 +3,34 @@
 class Alumni extends Controller {
     public function __construct()
     {
-        if(!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
-            header('Location: ' . BASEURL . '/login');
-            exit;
-        }
+        requireAccess('data_alumni');
     }
 
     public function index()
     {
         $data['judul'] = 'Manajemen Data Alumni';
-        $data['alumni'] = $this->model('AlumniModel')->getAllAlumni();
+        $tahun_filter = isset($_GET['tahun']) ? $_GET['tahun'] : '';
+        $data['alumni'] = $this->model('AlumniModel')->getAllAlumni($tahun_filter);
+        $data['tahun_list'] = $this->model('AlumniModel')->getTahunLulusList();
+        $data['tahun_aktif'] = $tahun_filter;
 
         $db = new Database();
-        $db->query("SELECT COUNT(id) as total FROM siswa WHERE status = 'Alumni'");
+        
+        $filterQuery = "WHERE status = 'Alumni'";
+        if (!empty($tahun_filter)) {
+            $filterQuery .= " AND tahun_lulus = :tahun";
+        }
+        
+        $db->query("SELECT COUNT(id) as total FROM siswa $filterQuery");
+        if (!empty($tahun_filter)) $db->bind('tahun', $tahun_filter);
         $data['total_alumni'] = $db->single()['total'] ?? 0;
         
-        $db->query("SELECT COUNT(id) as total FROM siswa WHERE status = 'Alumni' AND jenis_kelamin = 'L'");
+        $db->query("SELECT COUNT(id) as total FROM siswa $filterQuery AND jenis_kelamin = 'L'");
+        if (!empty($tahun_filter)) $db->bind('tahun', $tahun_filter);
         $data['alumni_l'] = $db->single()['total'] ?? 0;
         
-        $db->query("SELECT COUNT(id) as total FROM siswa WHERE status = 'Alumni' AND jenis_kelamin = 'P'");
+        $db->query("SELECT COUNT(id) as total FROM siswa $filterQuery AND jenis_kelamin = 'P'");
+        if (!empty($tahun_filter)) $db->bind('tahun', $tahun_filter);
         $data['alumni_p'] = $db->single()['total'] ?? 0;
 
         $this->view('templates/admin_header', $data);

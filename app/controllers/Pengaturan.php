@@ -3,10 +3,7 @@
 class Pengaturan extends Controller {
     public function __construct()
     {
-        if(!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
-            header('Location: ' . BASEURL . '/login');
-            exit;
-        }
+        requireAccess('pengaturan');
     }
 
     public function index()

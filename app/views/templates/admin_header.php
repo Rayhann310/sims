@@ -11,52 +11,8 @@ $app_logo = $pengaturan ? htmlspecialchars($pengaturan['logo_teks']) : 'S';
 // Make pengaturan available globally for this request
 $GLOBALS['pengaturan'] = $pengaturan;
 
-// Load hak akses menu untuk guru yang sedang login
-$GLOBALS['hakAksesData'] = [];
-$GLOBALS['guruJabatanNames'] = '';
-
-try {
-    if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'guru') {
-        $guruUserId = $_SESSION['user']['id'] ?? null;
-        if ($guruUserId) {
-            // Get guru_id first
-            $db->query("SELECT id FROM guru WHERE user_id = :uid LIMIT 1");
-            $db->bind('uid', $guruUserId);
-            $guruRow = $db->single();
-            $guruId = $guruRow['id'] ?? null;
-
-            if ($guruId) {
-                // Get all jabatans for this guru
-                $db->query("SELECT gj.jabatan_id, j.nama_jabatan FROM guru_jabatan gj JOIN jabatan j ON gj.jabatan_id = j.id WHERE gj.guru_id = :gid");
-                $db->bind('gid', $guruId);
-                $jabatans = $db->resultSet();
-                $jabatanIds = array_column($jabatans, 'jabatan_id');
-                $GLOBALS['guruJabatanNames'] = implode(', ', array_column($jabatans, 'nama_jabatan'));
-
-                if (!empty($jabatanIds)) {
-                    $safeIds = array_map('intval', $jabatanIds);
-                    $inQuery = implode(',', $safeIds);
-                    $db->query("SELECT menu_key, is_active FROM hak_akses_menu WHERE jabatan_id IN ($inQuery)");
-                    
-                    $hakRows = $db->resultSet();
-                    foreach ($hakRows as $hr) {
-                        // If any jabatan gives access, grant it (OR logic)
-                        if ((bool)$hr['is_active']) {
-                            $GLOBALS['hakAksesData'][$hr['menu_key']] = true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-} catch (Throwable $e) {}
-
-// Helper: cek hak akses guru
-if (!function_exists('guruCanAccess')) {
-    function guruCanAccess($key) {
-        return !empty($GLOBALS['hakAksesData'][$key]);
-    }
-}
+// Helper `hasMenuAccess` sekarang sudah ada di `app/core/HakAksesHelper.php` yang dimuat di `init.php`
+$role = $_SESSION['user']['role'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -115,7 +71,6 @@ if (!function_exists('guruCanAccess')) {
 
         <!-- Sidebar Menu -->
         <nav class="flex-1 overflow-y-auto py-4 px-3 scrollbar-hide">
-            <?php $role = $_SESSION['user']['role'] ?? ''; ?>
             
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Menu Utama</p>
@@ -125,29 +80,29 @@ if (!function_exists('guruCanAccess')) {
                 </a>
             </div>
 
-            <?php if($role == 'admin' || guruCanAccess('data_guru') || guruCanAccess('data_siswa') || guruCanAccess('orangtua') || guruCanAccess('data_alumni')): ?>
+            <?php if(hasMenuAccess('data_siswa') || hasMenuAccess('data_guru') || hasMenuAccess('orangtua') || hasMenuAccess('data_alumni')): ?>
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Master Data</p>
                 <div class="space-y-1">
-                    <?php if($role == 'admin' || guruCanAccess('data_guru')): ?>
-                    <a href="<?= BASEURL; ?>/guru" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'guru') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Data Guru">
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Data Guru</span>
-                    </a>
-                    <?php endif; ?>
-                    <?php if($role == 'admin' || guruCanAccess('data_siswa')): ?>
+                    <?php if(hasMenuAccess('data_siswa')): ?>
                     <a href="<?= BASEURL; ?>/siswa" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'siswa') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Data Siswa">
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Data Siswa</span>
                     </a>
                     <?php endif; ?>
-                    <?php if($role == 'admin' || guruCanAccess('orangtua')): ?>
+                    <?php if(hasMenuAccess('data_guru')): ?>
+                    <a href="<?= BASEURL; ?>/guru" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'guru') !== false && strpos($_SERVER['REQUEST_URI'], 'pengaturan') === false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Data Guru">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Data Guru</span>
+                    </a>
+                    <?php endif; ?>
+                    <?php if(hasMenuAccess('orangtua')): ?>
                     <a href="<?= BASEURL; ?>/orangtua" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'orangtua') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Data Orang Tua">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Data Orang Tua</span>
                     </a>
                     <?php endif; ?>
-                    <?php if($role == 'admin' || guruCanAccess('data_alumni')): ?>
+                    <?php if(hasMenuAccess('data_alumni')): ?>
                     <a href="<?= BASEURL; ?>/alumni" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'alumni') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Data Alumni">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14v6"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Data Alumni</span>
@@ -158,23 +113,26 @@ if (!function_exists('guruCanAccess')) {
             <?php endif; ?>
             
             <?php if($role == 'admin' || guruCanAccess('spmb') || guruCanAccess('spmb_peserta')): ?>
+            <?php if(hasMenuAccess('spmb') || hasMenuAccess('spmb_peserta') || hasMenuAccess('spmb_biaya')): ?>
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">SPMB / PPDB</p>
                 <div class="space-y-1">
-                    <?php if($role == 'admin' || guruCanAccess('spmb')): ?>
-                    <a href="<?= BASEURL; ?>/adminspmb" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'adminspmb') !== false && strpos($_SERVER['REQUEST_URI'], 'peserta') === false && strpos($_SERVER['REQUEST_URI'], 'biaya') === false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Gelombang Pendaftaran">
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Gelombang</span>
+                    <?php if(hasMenuAccess('spmb')): ?>
+                    <a href="<?= BASEURL; ?>/adminspmb" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= ($_SERVER['REQUEST_URI'] == '/smanw/adminspmb' || $_SERVER['REQUEST_URI'] == '/smanw/adminspmb/') ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Gelombang & Info">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Gelombang & Info</span>
                     </a>
                     <?php endif; ?>
-                    <?php if($role == 'admin' || guruCanAccess('spmb_peserta')): ?>
-                    <a href="<?= BASEURL; ?>/adminspmb/peserta" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'adminspmb/peserta') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Data Peserta">
+                    
+                    <?php if(hasMenuAccess('spmb_peserta')): ?>
+                    <a href="<?= BASEURL; ?>/adminspmb/peserta" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/adminspmb/peserta') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Data Peserta">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Data Peserta</span>
                     </a>
                     <?php endif; ?>
-                    <?php if($role == 'admin' || guruCanAccess('spmb')): ?>
-                    <a href="<?= BASEURL; ?>/adminspmb/biaya" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'adminspmb/biaya') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Biaya Pendaftaran">
+
+                    <?php if(hasMenuAccess('spmb_biaya')): ?>
+                    <a href="<?= BASEURL; ?>/adminspmb/biaya" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/adminspmb/biaya') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Biaya Pendaftaran">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Biaya Pendaftaran</span>
                     </a>
@@ -183,11 +141,12 @@ if (!function_exists('guruCanAccess')) {
             </div>
             <?php endif; ?>
             
+            <?php if(hasMenuAccess('akademik_tahun') || hasMenuAccess('akademik_kelas') || hasMenuAccess('akademik_mapel') || hasMenuAccess('jabatan') || hasMenuAccess('rombel') || hasMenuAccess('naik_kelas') || hasMenuAccess('jadwal') || hasMenuAccess('elearning') || hasMenuAccess('nilai')): ?>
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Akademik</p>
                 <div class="space-y-1">
                     
-                    <?php if($role == 'admin'): ?>
+                    <?php if(hasMenuAccess('akademik_tahun') || hasMenuAccess('akademik_kelas') || hasMenuAccess('akademik_mapel') || hasMenuAccess('jabatan')): ?>
                     <!-- Dropdown Master Akademik -->
                     <div x-data="{ expanded: false }">
                         <button @click="expanded = !expanded" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors group text-emerald-100/70 hover:bg-emerald-800 hover:text-white">
@@ -198,36 +157,48 @@ if (!function_exists('guruCanAccess')) {
                             <svg x-show="sidebarOpen || mobileOpen" :class="{'rotate-180': expanded}" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <div x-show="expanded && (sidebarOpen || mobileOpen)" x-collapse class="pl-11 pr-3 py-1 space-y-1">
+                            <?php if(hasMenuAccess('akademik_tahun')): ?>
                             <a href="<?= BASEURL; ?>/akademik/tahun" class="block py-2 text-sm text-slate-500 hover:text-blue-600 transition-colors">Tahun Akademik</a>
+                            <?php endif; ?>
+                            <?php if(hasMenuAccess('akademik_kelas')): ?>
                             <a href="<?= BASEURL; ?>/akademik/kelas" class="block py-2 text-sm text-slate-500 hover:text-blue-600 transition-colors">Tingkat Kelas</a>
+                            <?php endif; ?>
+                            <?php if(hasMenuAccess('akademik_mapel')): ?>
                             <a href="<?= BASEURL; ?>/akademik/mapel" class="block py-2 text-sm text-slate-500 hover:text-blue-600 transition-colors">Mata Pelajaran</a>
+                            <?php endif; ?>
+                            <?php if(hasMenuAccess('jabatan')): ?>
                             <a href="<?= BASEURL; ?>/jabatan" class="block py-2 text-sm <?= (strpos($_SERVER['REQUEST_URI'], '/jabatan') !== false) ? 'text-emerald-400 font-semibold' : 'text-slate-500 hover:text-blue-600' ?> transition-colors">Jabatan Guru</a>
+                            <?php endif; ?>
                         </div>
                     </div>
+                    <?php endif; ?>
 
+                    <?php if(hasMenuAccess('rombel')): ?>
                     <a href="<?= BASEURL; ?>/akademik/rombel" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'akademik/rombel') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Rombongan Belajar">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Rombel & Siswa</span>
                     </a>
+                    <?php endif; ?>
+                    <?php if(hasMenuAccess('naik_kelas')): ?>
                     <a href="<?= BASEURL; ?>/akademik/naikKelas" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'akademik/naikKelas') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Kenaikan Kelas">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Naik Kelas</span>
                     </a>
                     <?php endif; ?>
 
-                    <?php if($role == 'admin' || guruCanAccess('jadwal')): ?>
+                    <?php if(hasMenuAccess('jadwal')): ?>
                     <a href="<?= BASEURL; ?>/jadwal" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group text-emerald-100/70 hover:bg-emerald-800 hover:text-white" title="Jadwal Pelajaran">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Jadwal Pelajaran</span>
                     </a>
                     <?php endif; ?>
-                    <?php if($role == 'admin' || guruCanAccess('elearning')): ?>
+                    <?php if(hasMenuAccess('elearning')): ?>
                     <a href="<?= BASEURL; ?>/elearning" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group text-emerald-100/70 hover:bg-emerald-800 hover:text-white" title="E-Learning">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">E-Learning</span>
                     </a>
                     <?php endif; ?>
-                    <?php if($role == 'admin' || guruCanAccess('nilai')): ?>
+                    <?php if(hasMenuAccess('nilai')): ?>
                     <a href="<?= BASEURL; ?>/nilai" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/nilai') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Presensi & Nilai">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Presensi & Nilai</span>
@@ -236,29 +207,29 @@ if (!function_exists('guruCanAccess')) {
                 </div>
             </div>
 
-            <?php if($role == 'admin' || $role == 'siswa' || guruCanAccess('keuangan_tarif') || guruCanAccess('keuangan_tagihan') || guruCanAccess('keuangan_riwayat') || guruCanAccess('keuangan_bukukas')): ?>
+            <?php if(hasMenuAccess('keuangan_tarif') || hasMenuAccess('keuangan_tagihan') || hasMenuAccess('keuangan_riwayat') || hasMenuAccess('keuangan_bukukas')): ?>
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Keuangan</p>
                 <div class="space-y-1">
-                    <?php if($role == 'admin' || guruCanAccess('keuangan_tarif')): ?>
+                    <?php if(hasMenuAccess('keuangan_tarif')): ?>
                     <a href="<?= BASEURL; ?>/keuangan/tarif" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/keuangan/tarif') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Master Tarif">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Master Tarif</span>
                     </a>
                     <?php endif; ?>
-                    <?php if($role == 'admin' || $role == 'siswa' || guruCanAccess('keuangan_tagihan')): ?>
+                    <?php if(hasMenuAccess('keuangan_tagihan')): ?>
                     <a href="<?= BASEURL; ?>/keuangan/tagihan" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/keuangan/tagihan') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Tagihan & Pembayaran">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Tagihan & Pembayaran</span>
                     </a>
                     <?php endif; ?>
-                    <?php if($role == 'admin' || $role == 'siswa' || guruCanAccess('keuangan_riwayat')): ?>
+                    <?php if(hasMenuAccess('keuangan_riwayat')): ?>
                     <a href="<?= BASEURL; ?>/keuangan/riwayat" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/keuangan/riwayat') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Riwayat Bayar">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Riwayat Bayar</span>
                     </a>
                     <?php endif; ?>
-                    <?php if($role == 'admin' || guruCanAccess('keuangan_bukukas')): ?>
+                    <?php if(hasMenuAccess('keuangan_bukukas')): ?>
                     <a href="<?= BASEURL; ?>/keuangan/bukuKas" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/keuangan/bukuKas') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Buku Kas & Analisa">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Buku Kas & Analisa</span>
@@ -268,16 +239,16 @@ if (!function_exists('guruCanAccess')) {
             </div>
             <?php endif; ?>
 
-            <?php if($role == 'admin' || $role == 'siswa' || guruCanAccess('pengumuman') || guruCanAccess('pesan')): ?>
+            <?php if(hasMenuAccess('pengumuman') || hasMenuAccess('pesan')): ?>
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Komunikasi</p>
-                <?php if($role == 'admin' || $role == 'siswa' || guruCanAccess('pengumuman')): ?>
+                <?php if(hasMenuAccess('pengumuman')): ?>
                 <a href="<?= BASEURL; ?>/komunikasi/pengumuman" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/komunikasi/pengumuman') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Pengumuman">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
                     <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Pengumuman</span>
                 </a>
                 <?php endif; ?>
-                <?php if($role == 'admin' || $role == 'siswa' || guruCanAccess('pesan')): ?>
+                <?php if(hasMenuAccess('pesan')): ?>
                 <a href="<?= BASEURL; ?>/komunikasi/pesan" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/komunikasi/pesan') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Pesan Masuk">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Pesan Masuk</span>
@@ -286,25 +257,25 @@ if (!function_exists('guruCanAccess')) {
             </div>
             <?php endif; ?>
             
-            <?php if($role == 'admin' || $role == 'siswa' || guruCanAccess('kedisiplinan') || guruCanAccess('ked_kategori')): ?>
+            <?php if(hasMenuAccess('kedisiplinan') || hasMenuAccess('ked_kategori') || hasMenuAccess('ked_riwayat_siswa')): ?>
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Kedisiplinan</p>
                 <div class="space-y-1">
-                    <?php if($role == 'admin' || guruCanAccess('kedisiplinan')): ?>
+                    <?php if(hasMenuAccess('kedisiplinan')): ?>
                     <a href="<?= BASEURL; ?>/kedisiplinan/rekap" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/kedisiplinan/rekap') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Rekap & Catatan">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Rekap & Catatan</span>
                     </a>
                     <?php endif; ?>
 
-                    <?php if($role == 'siswa'): ?>
+                    <?php if(hasMenuAccess('ked_riwayat_siswa')): ?>
                     <a href="<?= BASEURL; ?>/kedisiplinan/riwayat" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/kedisiplinan/riwayat') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Riwayat Saya">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Riwayat Saya</span>
                     </a>
                     <?php endif; ?>
 
-                    <?php if($role == 'admin' || guruCanAccess('ked_kategori')): ?>
+                    <?php if(hasMenuAccess('ked_kategori')): ?>
                     <a href="<?= BASEURL; ?>/kedisiplinan/kategori" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/kedisiplinan/kategori') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Master Kategori">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Master Kategori</span>
@@ -314,7 +285,7 @@ if (!function_exists('guruCanAccess')) {
             </div>
             <?php endif; ?>
 
-            <?php if($role == 'admin' || guruCanAccess('kearsipan')): ?>
+            <?php if(hasMenuAccess('kearsipan')): ?>
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Kearsipan & TU</p>
                 <a href="<?= BASEURL; ?>/kearsipan" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/kearsipan') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Data Surat">
@@ -322,21 +293,28 @@ if (!function_exists('guruCanAccess')) {
                     <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Data Surat</span>
                 </a>
             </div>
+            <?php endif; ?>
 
+            <?php if(hasMenuAccess('pengaturan') || hasMenuAccess('hak_akses')): ?>
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Sistem</p>
+                <?php if(hasMenuAccess('pengaturan')): ?>
                 <a href="<?= BASEURL; ?>/pengaturan" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'pengaturan') !== false && strpos($_SERVER['REQUEST_URI'], 'fonntelog') === false && strpos($_SERVER['REQUEST_URI'], 'hakAkses') === false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Pengaturan">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Pengaturan Utama</span>
-                </a>
-                <a href="<?= BASEURL; ?>/hakAkses" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'hakAkses') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Hak Akses Menu">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                    <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Hak Akses Menu</span>
                 </a>
                 <a href="<?= BASEURL; ?>/pengaturan/fonntelog" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'fonntelog') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Debug Fonnte">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Debug Fonnte API</span>
                 </a>
+                <?php endif; ?>
+                
+                <?php if(hasMenuAccess('hak_akses')): ?>
+                <a href="<?= BASEURL; ?>/hakAkses" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'hakAkses') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Hak Akses Menu">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Hak Akses Menu</span>
+                </a>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
 

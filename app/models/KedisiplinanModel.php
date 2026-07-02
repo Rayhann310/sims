@@ -51,8 +51,9 @@ class KedisiplinanModel {
             LEFT JOIN anggota_rombel ar ON s.id = ar.siswa_id
             LEFT JOIN rombel r ON ar.rombel_id = r.id
             LEFT JOIN kelas k ON r.kelas_id = k.id
+            WHERE s.status = 'Aktif'
             GROUP BY s.id
-            ORDER BY total_poin DESC, u.nama_lengkap ASC
+            ORDER BY k.nama_kelas ASC, total_poin DESC, u.nama_lengkap ASC
         ");
         return $this->db->resultSet();
     }

@@ -4,7 +4,7 @@ class Akademik extends Controller {
 
     public function __construct()
     {
-        if(!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
+        if(!isset($_SESSION['user'])) {
             header('Location: ' . BASEURL . '/login');
             exit;
         }
@@ -21,6 +21,7 @@ class Akademik extends Controller {
     // ==========================================
     public function tahun()
     {
+        requireAccess('akademik_tahun');
         $data['judul'] = 'Manajemen Tahun Akademik';
         $data['tahun'] = $this->model('AkademikModel')->getAllTahun();
 
@@ -31,6 +32,7 @@ class Akademik extends Controller {
 
     public function tambahTahun()
     {
+        requireAccess('akademik_tahun');
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             if($this->model('AkademikModel')->tambahTahun($_POST) > 0) {
                 $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'ditambahkan', 'tipe' => 'success'];
@@ -44,6 +46,7 @@ class Akademik extends Controller {
 
     public function hapusTahun($id)
     {
+        requireAccess('akademik_tahun');
         if($this->model('AkademikModel')->hapusTahun($id) > 0) {
             $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'dihapus', 'tipe' => 'success'];
         } else {
@@ -55,6 +58,7 @@ class Akademik extends Controller {
 
     public function setAktifTahun($id)
     {
+        requireAccess('akademik_tahun');
         if($this->model('AkademikModel')->setAktifTahun($id) > 0) {
             $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'diaktifkan', 'tipe' => 'success'];
         } else {
@@ -69,6 +73,7 @@ class Akademik extends Controller {
     // ==========================================
     public function mapel()
     {
+        requireAccess('akademik_mapel');
         $data['judul'] = 'Manajemen Mata Pelajaran';
         $data['mapel'] = $this->model('AkademikModel')->getAllMapel();
 
@@ -79,6 +84,7 @@ class Akademik extends Controller {
 
     public function tambahMapel()
     {
+        requireAccess('akademik_mapel');
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             if($this->model('AkademikModel')->tambahMapel($_POST) > 0) {
                 $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'ditambahkan', 'tipe' => 'success'];
@@ -92,6 +98,7 @@ class Akademik extends Controller {
 
     public function hapusMapel($id)
     {
+        requireAccess('akademik_mapel');
         if($this->model('AkademikModel')->hapusMapel($id) > 0) {
             $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'dihapus', 'tipe' => 'success'];
         } else {
@@ -103,6 +110,7 @@ class Akademik extends Controller {
 
     public function exportMapel()
     {
+        requireAccess('akademik_mapel');
         $mapel = $this->model('AkademikModel')->getAllMapel();
         
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -134,6 +142,7 @@ class Akademik extends Controller {
 
     public function importMapel()
     {
+        requireAccess('akademik_mapel');
         if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file_excel'])) {
             $file = $_FILES['file_excel']['tmp_name'];
             $extension = pathinfo($_FILES['file_excel']['name'], PATHINFO_EXTENSION);
@@ -177,6 +186,7 @@ class Akademik extends Controller {
     // ==========================================
     public function rombel()
     {
+        requireAccess('akademik_rombel');
         $data['judul'] = 'Manajemen Rombongan Belajar';
         $data['rombel'] = $this->model('RombelModel')->getAllRombel();
         $data['tahun_akademik'] = $this->model('AkademikModel')->getAllTahun();
@@ -190,6 +200,7 @@ class Akademik extends Controller {
 
     public function tambahRombel()
     {
+        requireAccess('akademik_rombel');
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             if($this->model('RombelModel')->tambahRombel($_POST) > 0) {
                 $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'ditambahkan', 'tipe' => 'success'];
@@ -203,6 +214,7 @@ class Akademik extends Controller {
 
     public function ubahRombel()
     {
+        requireAccess('akademik_rombel');
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             if($this->model('RombelModel')->ubahRombel($_POST) > 0) {
                 $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'diubah', 'tipe' => 'success'];
@@ -216,6 +228,7 @@ class Akademik extends Controller {
 
     public function hapusRombel($id)
     {
+        requireAccess('akademik_rombel');
         if($this->model('RombelModel')->hapusRombel($id) > 0) {
             $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'dihapus', 'tipe' => 'success'];
         } else {
@@ -230,6 +243,7 @@ class Akademik extends Controller {
     // ==========================================
     public function anggotaRombel($rombel_id)
     {
+        requireAccess('akademik_rombel');
         $data['judul'] = 'Kelola Anggota Rombel';
         $data['rombel'] = $this->model('RombelModel')->getRombelById($rombel_id);
         
@@ -248,6 +262,7 @@ class Akademik extends Controller {
 
     public function tambahAnggotaMasal()
     {
+        requireAccess('akademik_rombel');
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $rombel_id = $_POST['rombel_id'];
             if(isset($_POST['siswa_ids']) && is_array($_POST['siswa_ids'])) {
@@ -263,6 +278,7 @@ class Akademik extends Controller {
 
     public function hapusAnggota($rombel_id, $anggota_id)
     {
+        requireAccess('akademik_rombel');
         if($this->model('RombelModel')->hapusAnggota($anggota_id) > 0) {
             $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'dihapus dari rombel', 'tipe' => 'success'];
         } else {
@@ -277,6 +293,7 @@ class Akademik extends Controller {
     // ==========================================
     public function naikKelas()
     {
+        requireAccess('akademik_naik_kelas');
         $data['judul'] = 'Fitur Naik Kelas / Promosi';
         $data['tahun_akademik'] = $this->model('AkademikModel')->getAllTahun();
         
@@ -287,6 +304,7 @@ class Akademik extends Controller {
 
     public function prosesNaikKelas()
     {
+        requireAccess('akademik_naik_kelas');
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $dest_rombel_id = $_POST['dest_rombel_id'];
             if(isset($_POST['siswa_ids']) && is_array($_POST['siswa_ids']) && !empty($dest_rombel_id)) {
@@ -325,6 +343,7 @@ class Akademik extends Controller {
     // ==========================================
     public function kelas()
     {
+        requireAccess('akademik_kelas');
         $data['judul'] = 'Manajemen Master Kelas';
         $data['kelas'] = $this->model('AkademikModel')->getAllKelas();
 
@@ -348,6 +367,7 @@ class Akademik extends Controller {
 
     public function hapusKelas($id)
     {
+        requireAccess('akademik_kelas');
         if($this->model('AkademikModel')->hapusKelas($id) > 0) {
             $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'dihapus', 'tipe' => 'success'];
         } else {

@@ -5,10 +5,31 @@
     </div>
 
     <!-- Table -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" x-data="{ currentTab: '<?= !empty($data['siswa']) ? ($data['siswa'][0]['nama_kelas'] ?? 'Tanpa Kelas') : 'Semua' ?>' }">
+        
+        <!-- Tab Navigation -->
+        <div class="bg-slate-50 p-2 border-b border-slate-200 overflow-x-auto flex gap-2">
+            <?php 
+                $kelas_list = [];
+                foreach($data['siswa'] as $s) {
+                    $kelas_nama = $s['nama_kelas'] ?? 'Tanpa Kelas';
+                    if (!in_array($kelas_nama, $kelas_list)) {
+                        $kelas_list[] = $kelas_nama;
+                    }
+                }
+            ?>
+            <?php foreach($kelas_list as $kls): ?>
+                <button @click="currentTab = '<?= $kls ?>'" 
+                        :class="currentTab === '<?= $kls ?>' ? 'bg-white text-emerald-600 shadow-sm font-semibold' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'"
+                        class="px-4 py-2 rounded-lg text-sm transition-all whitespace-nowrap">
+                    <?= $kls ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm whitespace-nowrap">
-                <thead class="bg-slate-50 text-slate-600 font-medium border-b border-slate-200">
+                <thead class="bg-white text-slate-600 font-medium border-b border-slate-200">
                     <tr>
                         <th class="px-6 py-4">NIS</th>
                         <th class="px-6 py-4">Nama Siswa</th>
@@ -19,7 +40,7 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-slate-700">
                     <?php foreach($data['siswa'] as $s): ?>
-                    <tr class="hover:bg-slate-50 transition-colors">
+                    <tr x-show="currentTab === '<?= $s['nama_kelas'] ?? 'Tanpa Kelas' ?>'" class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4"><?= $s['nis']; ?></td>
                         <td class="px-6 py-4 font-medium"><?= $s['nama_lengkap'] ?? 'Siswa (Tanpa Nama)'; ?></td>
                         <td class="px-6 py-4"><?= $s['nama_rombel'] ? $s['nama_kelas'] . ' - ' . $s['nama_rombel'] : '-'; ?></td>

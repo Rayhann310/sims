@@ -3,16 +3,7 @@
 class Kearsipan extends Controller {
     public function __construct()
     {
-        if(!isset($_SESSION['user'])) {
-            header('Location: ' . BASEURL . '/login');
-            exit;
-        }
-
-        // Only Admin/TU can access Kearsipan
-        if($_SESSION['user']['role'] != 'admin') {
-            header('Location: ' . BASEURL . '/dashboard');
-            exit;
-        }
+        requireAccess('kearsipan');
     }
 
     public function index()

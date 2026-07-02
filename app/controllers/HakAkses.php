@@ -3,10 +3,7 @@
 class HakAkses extends Controller {
     public function __construct()
     {
-        if(!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
-            header('Location: ' . BASEURL . '/login');
-            exit;
-        }
+        requireAccess('hak_akses');
     }
 
     public function index()
@@ -43,5 +40,15 @@ class HakAkses extends Controller {
         $result = $this->model('HakAksesModel')->toggleMenu($jabatan_id, $menu_key, $is_active);
         echo json_encode(['status' => $result, 'message' => $result ? 'Berhasil diperbarui' : 'Gagal']);
         exit;
+    }
+
+    public function reset()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $this->model('HakAksesModel')->resetSemua();
+            $_SESSION['flash'] = ['pesan' => 'Semua hak akses berhasil di-reset', 'aksi' => '(semua menu dikembalikan ke default/nonaktif)', 'tipe' => 'success'];
+            header('Location: ' . BASEURL . '/hakakses');
+            exit;
+        }
     }
 }

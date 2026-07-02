@@ -9,8 +9,8 @@
         jenis_kelamin: 'L',
         tanggal_lahir: '',
         alamat: '',
-        nama_wali: '',
-        no_hp_wali: ''
+        tahun_lulus: '',
+        no_hp: ''
     }
 }">
     <!-- Header -->
@@ -19,7 +19,15 @@
             <h2 class="text-xl font-bold text-slate-800">Manajemen Data Alumni</h2>
             <p class="text-sm text-slate-500">Data siswa yang telah diluluskan dari rombongan belajar.</p>
         </div>
-        <div class="flex gap-2 flex-wrap">
+        <div class="flex gap-2 flex-wrap items-center">
+            <form action="<?= BASEURL; ?>/alumni" method="get" class="flex items-center gap-2 mr-2">
+                <select name="tahun" onchange="this.form.submit()" class="px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="">Semua Tahun</option>
+                    <?php foreach($data['tahun_list'] as $t): ?>
+                        <option value="<?= $t['tahun_lulus'] ?>" <?= $data['tahun_aktif'] == $t['tahun_lulus'] ? 'selected' : '' ?>>Lulusan <?= $t['tahun_lulus'] ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </form>
             <button @click="modalTambah = true" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm inline-flex items-center">
                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Tambah
@@ -78,7 +86,7 @@
                         <th class="px-6 py-4 font-semibold">NISN</th>
                         <th class="px-6 py-4 font-semibold">Nama Lengkap</th>
                         <th class="px-6 py-4 font-semibold text-center">L/P</th>
-                        <th class="px-6 py-4 font-semibold">Tgl Lahir</th>
+                        <th class="px-6 py-4 font-semibold">Tahun Lulus</th>
                         <th class="px-6 py-4 font-semibold text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -99,7 +107,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 text-slate-600 text-center"><?= $s['jenis_kelamin'] == 'L' ? 'L' : 'P'; ?></td>
-                        <td class="px-6 py-4 text-slate-600"><?= $s['tanggal_lahir'] ? date('d/m/Y', strtotime($s['tanggal_lahir'])) : '-'; ?></td>
+                        <td class="px-6 py-4 text-slate-600 font-medium"><?= $s['tahun_lulus'] ? $s['tahun_lulus'] : '-'; ?></td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end gap-2">
                                 <button @click="
@@ -109,8 +117,8 @@
                                     form.jenis_kelamin = '<?= $s['jenis_kelamin'] ?>';
                                     form.tanggal_lahir = '<?= $s['tanggal_lahir'] ?>';
                                     form.alamat = '<?= htmlspecialchars($s['alamat']) ?>';
-                                    form.nama_wali = '<?= htmlspecialchars($s['nama_wali']) ?>';
-                                    form.no_hp_wali = '<?= htmlspecialchars($s['no_hp_wali']) ?>';
+                                    form.tahun_lulus = '<?= $s['tahun_lulus'] ?>';
+                                    form.no_hp = '<?= htmlspecialchars($s['no_hp']) ?>';
                                     modalEdit = true;
                                 " class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 flex items-center justify-center transition-colors" title="Ubah Data">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
@@ -179,12 +187,12 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Nama Wali</label>
-                            <input type="text" name="nama_wali" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Tahun Lulus <span class="text-rose-500">*</span></label>
+                            <input type="number" name="tahun_lulus" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">No HP Wali</label>
-                            <input type="text" name="no_hp_wali" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="628xxx">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">No HP Alumni</label>
+                            <input type="text" name="no_hp" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="08xxx">
                         </div>
                     </div>
                     
@@ -238,12 +246,12 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Nama Wali</label>
-                            <input type="text" name="nama_wali" x-model="form.nama_wali" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Tahun Lulus <span class="text-rose-500">*</span></label>
+                            <input type="number" name="tahun_lulus" x-model="form.tahun_lulus" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">No HP Wali</label>
-                            <input type="text" name="no_hp_wali" x-model="form.no_hp_wali" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="628xxx">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">No HP Alumni</label>
+                            <input type="text" name="no_hp" x-model="form.no_hp" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="08xxx">
                         </div>
                     </div>
                     

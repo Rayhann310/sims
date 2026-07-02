@@ -5,8 +5,13 @@ class HakAksesModel {
 
     // Definisi semua menu yang bisa dikustomisasi per jabatan
     public static $MENU_LIST = [
-        // Akademik
-        'jadwal'           => ['label' => 'Jadwal Pelajaran',      'group' => 'Akademik',          'url' => '/jadwal'],
+        // Akademik (Master)
+        'akademik_tahun'   => ['label' => 'Tahun Akademik',         'group' => 'Akademik',          'url' => '/akademik/tahun'],
+        'akademik_kelas'   => ['label' => 'Tingkat Kelas',          'group' => 'Akademik',          'url' => '/akademik/kelas'],
+        'akademik_mapel'   => ['label' => 'Mata Pelajaran',         'group' => 'Akademik',          'url' => '/akademik/mapel'],
+        'jabatan'          => ['label' => 'Jabatan Guru',           'group' => 'Akademik',          'url' => '/jabatan'],
+        // Akademik (Lanjutan)
+        'jadwal'           => ['label' => 'Jadwal Pelajaran',       'group' => 'Akademik',          'url' => '/jadwal'],
         'nilai'            => ['label' => 'Presensi & Nilai',       'group' => 'Akademik',          'url' => '/nilai'],
         'elearning'        => ['label' => 'E-Learning',             'group' => 'Akademik',          'url' => '/elearning'],
         'rombel'           => ['label' => 'Rombel & Siswa',         'group' => 'Akademik',          'url' => '/akademik/rombel'],
@@ -19,7 +24,7 @@ class HakAksesModel {
         // Keuangan
         'keuangan_tarif'   => ['label' => 'Master Tarif',           'group' => 'Keuangan',          'url' => '/keuangan/tarif'],
         'keuangan_tagihan' => ['label' => 'Tagihan & Pembayaran',   'group' => 'Keuangan',          'url' => '/keuangan/tagihan'],
-        'keuangan_riwayat' => ['label' => 'Riwayat Bayar',         'group' => 'Keuangan',          'url' => '/keuangan/riwayat'],
+        'keuangan_riwayat' => ['label' => 'Riwayat Bayar',          'group' => 'Keuangan',          'url' => '/keuangan/riwayat'],
         'keuangan_bukukas' => ['label' => 'Buku Kas & Analisa',     'group' => 'Keuangan',          'url' => '/keuangan/bukuKas'],
         // Komunikasi
         'pengumuman'       => ['label' => 'Pengumuman',             'group' => 'Komunikasi',        'url' => '/komunikasi/pengumuman'],
@@ -30,9 +35,11 @@ class HakAksesModel {
         // SPMB
         'spmb'             => ['label' => 'SPMB/PPDB (Gelombang)',  'group' => 'SPMB / PPDB',       'url' => '/adminspmb'],
         'spmb_peserta'     => ['label' => 'SPMB (Data Peserta)',    'group' => 'SPMB / PPDB',       'url' => '/adminspmb/peserta'],
+        'spmb_biaya'       => ['label' => 'SPMB (Biaya)',           'group' => 'SPMB / PPDB',       'url' => '/adminspmb/biaya'],
         // Kearsipan & Sistem
         'kearsipan'        => ['label' => 'Data Surat (TU)',        'group' => 'Kearsipan & TU',    'url' => '/kearsipan'],
         'pengaturan'       => ['label' => 'Pengaturan Sistem',      'group' => 'Sistem',            'url' => '/pengaturan'],
+        'hak_akses'        => ['label' => 'Hak Akses Menu',         'group' => 'Sistem',            'url' => '/hakakses'],
     ];
 
     public function __construct()
@@ -112,5 +119,12 @@ class HakAksesModel {
         $this->db->bind('menu_key', $menu_key);
         $row = $this->db->single();
         return $row ? (bool)$row['is_active'] : false;
+    }
+
+    public function resetSemua()
+    {
+        $this->db->query("TRUNCATE TABLE hak_akses_menu");
+        $this->db->execute();
+        return true;
     }
 }

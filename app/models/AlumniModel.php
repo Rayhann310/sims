@@ -8,13 +8,27 @@ class AlumniModel {
         $this->db = new Database();
     }
 
-    public function getAllAlumni()
+    public function getAllAlumni($tahun = '')
     {
-        $this->db->query("SELECT siswa.*, users.username, users.nama_lengkap 
-                          FROM siswa 
-                          JOIN users ON siswa.user_id = users.id 
-                          WHERE siswa.status = 'Alumni'
-                          ORDER BY users.nama_lengkap ASC");
+        $query = "SELECT siswa.*, users.username, users.nama_lengkap 
+                  FROM siswa 
+                  JOIN users ON siswa.user_id = users.id 
+                  WHERE siswa.status = 'Alumni'";
+        if (!empty($tahun)) {
+            $query .= " AND siswa.tahun_lulus = :tahun";
+        }
+        $query .= " ORDER BY siswa.tahun_lulus DESC, users.nama_lengkap ASC";
+        
+        $this->db->query($query);
+        if (!empty($tahun)) {
+            $this->db->bind('tahun', $tahun);
+        }
+        return $this->db->resultSet();
+    }
+    
+    public function getTahunLulusList()
+    {
+        $this->db->query("SELECT DISTINCT tahun_lulus FROM siswa WHERE status = 'Alumni' AND tahun_lulus IS NOT NULL ORDER BY tahun_lulus DESC");
         return $this->db->resultSet();
     }
 
@@ -45,15 +59,16 @@ class AlumniModel {
             $this->db->execute();
             $user_id = $this->db->lastInsertId();
 
-            $this->db->query("INSERT INTO siswa (user_id, nisn, jenis_kelamin, tanggal_lahir, alamat, nama_wali, no_hp_wali, status) 
-                              VALUES (:user_id, :nisn, :jk, :tgl, :alamat, :wali, :hp, 'Alumni')");
+            $this->db->query("INSERT INTO siswa (user_id, nisn, jenis_kelamin, tanggal_lahir, alamat, nama_wali, no_hp, status, tahun_lulus) 
+                              VALUES (:user_id, :nisn, :jk, :tgl, :alamat, :wali, :hp, 'Alumni', :tahun)");
             $this->db->bind('user_id', $user_id);
             $this->db->bind('nisn', $data['nisn']);
             $this->db->bind('jk', $data['jenis_kelamin']);
             $this->db->bind('tgl', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
             $this->db->bind('alamat', $data['alamat']);
             $this->db->bind('wali', $data['nama_wali']);
-            $this->db->bind('hp', $data['no_hp_wali']);
+            $this->db->bind('hp', $data['no_hp']);
+            $this->db->bind('tahun', !empty($data['tahun_lulus']) ? $data['tahun_lulus'] : null);
             $this->db->execute();
 
             return ['status' => true];
@@ -80,13 +95,15 @@ class AlumniModel {
                                   tanggal_lahir = :tgl,
                                   alamat = :alamat,
                                   nama_wali = :wali,
-                                  no_hp_wali = :hp
+                                  no_hp = :hp,
+                                  tahun_lulus = :tahun
                                   WHERE id = :id AND status = 'Alumni'");
                 $this->db->bind('jk', $data['jenis_kelamin']);
                 $this->db->bind('tgl', !empty($data['tanggal_lahir']) ? $data['tanggal_lahir'] : null);
                 $this->db->bind('alamat', $data['alamat']);
                 $this->db->bind('wali', $data['nama_wali']);
-                $this->db->bind('hp', $data['no_hp_wali']);
+                $this->db->bind('hp', $data['no_hp']);
+                $this->db->bind('tahun', !empty($data['tahun_lulus']) ? $data['tahun_lulus'] : null);
                 $this->db->bind('id', $data['id']);
                 $this->db->execute();
                 return true;

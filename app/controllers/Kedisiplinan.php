@@ -11,10 +11,7 @@ class Kedisiplinan extends Controller {
 
     public function kategori()
     {
-        if($_SESSION['user']['role'] != 'admin' && $_SESSION['user']['role'] != 'guru') {
-            header('Location: ' . BASEURL . '/dashboard');
-            exit;
-        }
+        requireAccess('ked_kategori');
 
         $data['judul'] = 'Kategori Kedisiplinan';
         $data['kategori'] = $this->model('KedisiplinanModel')->getAllKategori();
@@ -26,6 +23,7 @@ class Kedisiplinan extends Controller {
 
     public function tambahKategori()
     {
+        requireAccess('ked_kategori');
         if($this->model('KedisiplinanModel')->tambahKategori($_POST) > 0) {
             Flasher::setFlash('berhasil', 'ditambahkan', 'success');
         } else {
@@ -37,6 +35,7 @@ class Kedisiplinan extends Controller {
 
     public function hapusKategori($id)
     {
+        requireAccess('ked_kategori');
         if($this->model('KedisiplinanModel')->hapusKategori($id) > 0) {
             Flasher::setFlash('berhasil', 'dihapus', 'success');
         } else {
@@ -48,10 +47,7 @@ class Kedisiplinan extends Controller {
 
     public function rekap()
     {
-        if($_SESSION['user']['role'] != 'admin' && $_SESSION['user']['role'] != 'guru') {
-            header('Location: ' . BASEURL . '/dashboard');
-            exit;
-        }
+        requireAccess('kedisiplinan');
 
         $data['judul'] = 'Rekap Kedisiplinan Siswa';
         $data['siswa'] = $this->model('KedisiplinanModel')->getRekapSiswa();
@@ -67,6 +63,7 @@ class Kedisiplinan extends Controller {
         
         // Cek jika siswa, hanya bisa melihat riwayatnya sendiri
         if($role == 'siswa') {
+            requireAccess('ked_riwayat_siswa');
             $db = new Database();
             $db->query("SELECT id FROM siswa WHERE user_id = :user_id");
             $db->bind('user_id', $_SESSION['user']['id']);
@@ -77,9 +74,8 @@ class Kedisiplinan extends Controller {
                 header('Location: ' . BASEURL . '/dashboard');
                 exit;
             }
-        } else if($role != 'admin' && $role != 'guru') {
-            header('Location: ' . BASEURL . '/dashboard');
-            exit;
+        } else {
+            requireAccess('kedisiplinan');
         }
 
         if(!$siswa_id) {
@@ -112,6 +108,7 @@ class Kedisiplinan extends Controller {
 
     public function tambahCatatan()
     {
+        requireAccess('kedisiplinan');
         if($this->model('KedisiplinanModel')->tambahCatatan($_POST) > 0) {
             Flasher::setFlash('Catatan berhasil', 'ditambahkan', 'success');
         } else {

@@ -4,7 +4,7 @@ class Keuangan extends Controller {
 
     public function __construct()
     {
-        if(!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
+        if(!isset($_SESSION['user'])) {
             header('Location: ' . BASEURL . '/login');
             exit;
         }
@@ -19,6 +19,7 @@ class Keuangan extends Controller {
 
     public function tagihan()
     {
+        requireAccess('keuangan_tagihan');
         $data['judul'] = 'Data Tagihan & Pembayaran';
         $data['tagihan'] = $this->model('KeuanganModel')->getAllTagihan();
         $data['kategori'] = $this->model('KeuanganModel')->getAllKategori();
@@ -30,6 +31,7 @@ class Keuangan extends Controller {
 
     public function tarif()
     {
+        requireAccess('keuangan_tarif');
         $data['judul'] = 'Master Tarif Keuangan';
         $data['kategori'] = $this->model('KeuanganModel')->getAllKategori();
         
@@ -53,6 +55,7 @@ class Keuangan extends Controller {
 
     public function ubahTarif()
     {
+        requireAccess('keuangan_tarif');
         if(isset($_POST['id']) && isset($_POST['nama_kategori'])) {
             if($this->model('KeuanganModel')->ubahKategori($_POST) > 0) {
                 Flasher::setFlash('Tarif berhasil', 'diubah', 'success');
@@ -66,6 +69,7 @@ class Keuangan extends Controller {
 
     public function hapusTarif($id)
     {
+        requireAccess('keuangan_tarif');
         if($this->model('KeuanganModel')->hapusKategori($id) > 0) {
             Flasher::setFlash('Tarif berhasil', 'dihapus', 'success');
         } else {
@@ -77,6 +81,7 @@ class Keuangan extends Controller {
 
     public function riwayat()
     {
+        requireAccess('keuangan_riwayat');
         $data['judul'] = 'Riwayat Pembayaran';
         
         $tahun_list = $this->model('KeuanganModel')->getTahunPembayaran();
@@ -94,6 +99,7 @@ class Keuangan extends Controller {
 
     public function generateTagihan()
     {
+        requireAccess('keuangan_tagihan');
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             $inserted = $this->model('KeuanganModel')->generateTagihanMasal($_POST);
             
@@ -109,6 +115,7 @@ class Keuangan extends Controller {
 
     public function bayar()
     {
+        requireAccess('keuangan_tagihan');
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             if($this->model('KeuanganModel')->prosesPembayaran($_POST) > 0) {
                 $_SESSION['flash'] = ['pesan' => 'Pembayaran', 'aksi' => 'berhasil diproses', 'tipe' => 'success'];
@@ -121,6 +128,7 @@ class Keuangan extends Controller {
     }
     public function kirimWA($tagihan_id)
     {
+        requireAccess('keuangan_tagihan');
         if(isset($tagihan_id)) {
             $this->model('KeuanganModel')->sendFonnteWA($tagihan_id);
             $_SESSION['flash'] = ['pesan' => 'Notifikasi WA', 'aksi' => 'sedang dikirim di latar belakang', 'tipe' => 'success'];
@@ -131,6 +139,7 @@ class Keuangan extends Controller {
 
     public function kirimTagihanWA($tagihan_id)
     {
+        requireAccess('keuangan_tagihan');
         if(isset($tagihan_id)) {
             if($this->model('KeuanganModel')->sendFonnteTagihanWA($tagihan_id)) {
                 $_SESSION['flash'] = ['pesan' => 'Tagihan WA', 'aksi' => 'berhasil dikirim ke orang tua', 'tipe' => 'success'];
@@ -144,6 +153,7 @@ class Keuangan extends Controller {
 
     public function batalBayar($tagihan_id)
     {
+        requireAccess('keuangan_tagihan');
         if(isset($tagihan_id)) {
             if($this->model('KeuanganModel')->batalBayarTagihan($tagihan_id)) {
                 $_SESSION['flash'] = ['pesan' => 'Pembayaran', 'aksi' => 'berhasil dibatalkan dan notifikasi WA telah terkirim', 'tipe' => 'success'];
@@ -161,6 +171,7 @@ class Keuangan extends Controller {
 
     public function bukuKas()
     {
+        requireAccess('keuangan_bukukas');
         $data['judul'] = 'Buku Kas & Analisa Keuangan';
         
         $bulan = isset($_GET['bulan']) ? $_GET['bulan'] : date('m');
@@ -185,6 +196,7 @@ class Keuangan extends Controller {
 
     public function prosesTambahKas()
     {
+        requireAccess('keuangan_bukukas');
         if(isset($_POST['jenis'])) {
             if($this->model('KeuanganModel')->tambahKas($_POST) > 0) {
                 Flasher::setFlash('Data Kas berhasil', 'ditambahkan', 'success');
@@ -198,6 +210,7 @@ class Keuangan extends Controller {
 
     public function hapusKas($id)
     {
+        requireAccess('keuangan_bukukas');
         if($this->model('KeuanganModel')->hapusKas($id) > 0) {
             Flasher::setFlash('Data Kas berhasil', 'dihapus', 'success');
         } else {
@@ -209,6 +222,7 @@ class Keuangan extends Controller {
 
     public function exportExcelKas()
     {
+        requireAccess('keuangan_bukukas');
         $bulan = isset($_GET['bulan']) ? $_GET['bulan'] : '';
         $tahun = isset($_GET['tahun']) ? $_GET['tahun'] : '';
         
