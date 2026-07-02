@@ -229,6 +229,9 @@
                         <button type="button" @click="openEditModalSiswa(<?= $s['id']; ?>)" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
                             <i class="fas fa-edit"></i>
                         </button>
+                        <a href="<?= BASEURL; ?>/siswa/resetSandi/<?= $s['id']; ?>" onclick="return confirm('Reset kata sandi <?= htmlspecialchars($s['nama_lengkap'], ENT_QUOTES) ?> menjadi 123456?')" class="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors" title="Reset Kata Sandi">
+                            <i class="fas fa-key"></i>
+                        </a>
                         <button type="button" @click="$dispatch('open-delete-modal', { url: '<?= BASEURL; ?>/siswa/hapus/<?= $s['id']; ?>' })" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Hapus">
                             <i class="fas fa-trash"></i>
                         </button>

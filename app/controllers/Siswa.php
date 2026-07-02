@@ -90,6 +90,17 @@ class Siswa extends Controller {
         exit;
     }
 
+    public function resetSandi($id)
+    {
+        if($this->model('SiswaModel')->resetSandi($id)) {
+            $_SESSION['flash'] = ['pesan' => 'Kata sandi siswa', 'aksi' => 'berhasil direset menjadi 123456', 'tipe' => 'success'];
+        } else {
+            $_SESSION['flash'] = ['pesan' => 'Kata sandi', 'aksi' => 'gagal direset', 'tipe' => 'danger'];
+        }
+        header('Location: ' . BASEURL . '/siswa');
+        exit;
+    }
+
     public function hapusMasal()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ids']) && is_array($_POST['ids'])) {

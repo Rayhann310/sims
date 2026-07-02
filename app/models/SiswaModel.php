@@ -328,4 +328,18 @@ class SiswaModel {
         }
         return ['sukses' => $sukses, 'gagal' => $gagal];
     }
+
+    public function resetSandi($id)
+    {
+        $siswa = $this->getSiswaById($id);
+        if ($siswa && !empty($siswa['user_id'])) {
+            $password = password_hash('123456', PASSWORD_DEFAULT);
+            $this->db->query("UPDATE users SET password = :password WHERE id = :user_id");
+            $this->db->bind('password', $password);
+            $this->db->bind('user_id', $siswa['user_id']);
+            $this->db->execute();
+            return $this->db->rowCount() > 0;
+        }
+        return false;
+    }
 }
