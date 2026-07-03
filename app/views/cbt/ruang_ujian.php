@@ -42,10 +42,18 @@
                 <i class="fas fa-laptop-code text-3xl"></i>
             </div>
             <h2 class="text-2xl font-bold text-slate-800 mb-2">Siap Mengerjakan Ujian?</h2>
-            <p class="text-slate-600 mb-8">Sistem akan beralih ke Layar Penuh. Jangan menekan tombol ESC atau berpindah aplikasi selama ujian berlangsung karena akan mengunci akun Anda.</p>
-            <button @click="startExam()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-emerald-200">
-                Mulai Ujian Sekarang
-            </button>
+            <p class="text-slate-600 mb-6">Sistem akan beralih ke Layar Penuh. Jangan menekan tombol ESC atau berpindah aplikasi selama ujian berlangsung karena akan mengunci akun Anda.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <input type="text" x-model="startToken" placeholder="Masukkan Token Ujian" class="w-full text-center text-xl tracking-[0.2em] uppercase font-mono font-bold border-2 border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all">
+                </div>
+                <button @click="startExam()" :disabled="isStarting" class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-emerald-200 flex justify-center items-center gap-2">
+                    <i class="fas fa-play" x-show="!isStarting"></i>
+                    <i class="fas fa-spinner fa-spin" x-show="isStarting"></i>
+                    <span x-text="isStarting ? 'Memverifikasi...' : 'Mulai Ujian Sekarang'"></span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -205,7 +213,9 @@
                 isLocked: false,
                 lockReason: '',
                 unlockToken: '',
+                startToken: '',
                 isVerifying: false,
+                isStarting: false,
                 
                 soal: <?= json_encode($data['soal'] ?? []) ?>,
                 currentIndex: 0,
@@ -237,15 +247,44 @@
                 },
                 
                 startExam() {
-                    let elem = document.documentElement;
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen().then(() => {
-                            this.isExamActive = true;
-                            this.startTimer();
-                        }).catch(err => {
-                            alert('Gagal mode fullscreen. Harap gunakan browser Chrome/Firefox terbaru.');
-                        });
-                    }
+                    if(!this.startToken) return alert("Masukkan token ujian terlebih dahulu!");
+                    
+                    this.isStarting = true;
+                    fetch("<?= BASEURL ?>/UjianSiswa/unlockApi", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({
+                            id_peserta: <?= $data['peserta']['id_peserta'] ?? 0 ?>,
+                            id_jadwal: <?= $data['jadwal']['id_jadwal'] ?? 0 ?>,
+                            token: this.startToken
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        this.isStarting = false;
+                        if(data.status) {
+                            let elem = document.documentElement;
+                            if (elem.requestFullscreen) {
+                                elem.requestFullscreen().then(() => {
+                                    this.isExamActive = true;
+                                    this.startTimer();
+                                }).catch(err => {
+                                    alert('Gagal mode fullscreen. Harap gunakan browser Chrome/Firefox terbaru.');
+                                    this.isExamActive = true;
+                                    this.startTimer();
+                                });
+                            } else {
+                                this.isExamActive = true;
+                                this.startTimer();
+                            }
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(e => {
+                        this.isStarting = false;
+                        alert("Terjadi kesalahan koneksi.");
+                    });
                 },
                 
                 startTimer() {
