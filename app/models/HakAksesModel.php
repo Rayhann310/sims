@@ -40,6 +40,7 @@ class HakAksesModel {
         'kearsipan'        => ['label' => 'Data Surat (TU)',        'group' => 'Kearsipan & TU',    'url' => '/kearsipan'],
         // CBT & Ujian
         'cbt_bank_soal'    => ['label' => 'Bank Soal CBT',          'group' => 'CBT & Ujian',       'url' => '/banksoal'],
+        'cbt_setor_soal'   => ['label' => 'Setor Soal Ujian',       'group' => 'CBT & Ujian',       'url' => '/setorsoal'],
         'cbt_jadwal'       => ['label' => 'Jadwal & Pengawas CBT',  'group' => 'CBT & Ujian',       'url' => '/jadwalujian'],
         'cbt_proctor'      => ['label' => 'Dashboard Pengawas CBT', 'group' => 'CBT & Ujian',       'url' => '/proctor'],
         'pengaturan'       => ['label' => 'Pengaturan Sistem',      'group' => 'Sistem',            'url' => '/pengaturan'],
