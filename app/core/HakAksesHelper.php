@@ -52,7 +52,7 @@ function hasMenuAccess($menu_key) {
     
     // Konfigurasi akses default untuk siswa
     if ($role === 'siswa') {
-        $siswaMenus = ['keuangan_tagihan', 'keuangan_riwayat', 'pengumuman', 'pesan', 'ked_riwayat_siswa'];
+        $siswaMenus = ['keuangan_tagihan', 'keuangan_riwayat', 'pengumuman', 'pesan', 'ked_riwayat_siswa', 'cbt_ujian_siswa'];
         return in_array($menu_key, $siswaMenus);
     }
     
