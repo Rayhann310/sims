@@ -139,7 +139,7 @@ class JadwalUjianModel {
     
     public function getJadwalById($id)
     {
-        $this->db->query("SELECT j.*, m.nama_mapel FROM " . $this->table . " j LEFT JOIN mata_pelajaran m ON j.id_mapel = m.id WHERE j.id_jadwal = :id");
+        $this->db->query("SELECT j.*, m.nama_mapel, r.nama_rombel FROM " . $this->table . " j LEFT JOIN mata_pelajaran m ON j.id_mapel = m.id LEFT JOIN rombel r ON j.id_rombel = r.id WHERE j.id_jadwal = :id");
         $this->db->bind('id', $id);
         return $this->db->single();
     }

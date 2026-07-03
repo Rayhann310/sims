@@ -13,8 +13,11 @@
     <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5 mb-6">
         <h3 class="text-lg font-bold text-indigo-900 mb-2">Target Ujian</h3>
         <ul class="text-sm text-indigo-800 space-y-1">
-            <li><strong>Nama Ujian:</strong> <?= htmlspecialchars($data['jadwal']['nama_ujian']); ?></li>
-            <li><strong>Mata Pelajaran:</strong> <?= htmlspecialchars($data['jadwal']['nama_mapel']); ?></li>
+            <li><strong>Nama Ujian:</strong> <?= htmlspecialchars($data['jadwal']['nama_ujian'] ?? ''); ?></li>
+            <li><strong>Mata Pelajaran:</strong> <?= htmlspecialchars($data['jadwal']['nama_mapel'] ?? ''); ?></li>
+            <?php if(!empty($data['jadwal']['nama_rombel'])): ?>
+            <li><strong>Kelas / Rombel:</strong> <?= htmlspecialchars($data['jadwal']['nama_rombel']); ?></li>
+            <?php endif; ?>
             <li><strong>Waktu Pelaksanaan:</strong> <?= date('d/m/Y H:i', strtotime($data['jadwal']['waktu_mulai'])); ?> - <?= date('d/m/Y H:i', strtotime($data['jadwal']['waktu_selesai'])); ?></li>
         </ul>
     </div>
