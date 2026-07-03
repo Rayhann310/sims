@@ -1,11 +1,15 @@
 <?php
 $logoBase64 = '';
 if (!empty($data['pengaturan']['logo_sekolah'])) {
-    $logoPath = $_SERVER['DOCUMENT_ROOT'] . parse_url($data['pengaturan']['logo_sekolah'], PHP_URL_PATH);
-    if (file_exists($logoPath)) {
-        $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-        $imgData = file_get_contents($logoPath);
-        $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($imgData);
+    if (strpos($data['pengaturan']['logo_sekolah'], 'data:image') === 0) {
+        $logoBase64 = $data['pengaturan']['logo_sekolah'];
+    } else {
+        $logoPath = $_SERVER['DOCUMENT_ROOT'] . parse_url($data['pengaturan']['logo_sekolah'], PHP_URL_PATH);
+        if (file_exists($logoPath) && !is_dir($logoPath)) {
+            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $imgData = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($imgData);
+        }
     }
 }
 
@@ -39,27 +43,27 @@ function terbilang($angka) {
     <meta charset="UTF-8">
     <title>Kwitansi Pembayaran</title>
     <style>
-        @page { margin: 15px; }
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; margin: 0; padding: 0; color: #333; }
-        .header { width: 100%; border-bottom: 3px solid #333; padding-bottom: 5px; margin-bottom: 15px; text-align: center; }
+        @page { margin: 10px; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; margin: 0; padding: 0; color: #333; }
+        .header { width: 100%; border-bottom: 2px solid #333; padding-bottom: 5px; margin-bottom: 10px; text-align: center; }
         .header table { width: 100%; }
         .header table td { vertical-align: middle; }
-        .logo { width: 80px; height: auto; }
-        .school-name { font-size: 22px; font-weight: bold; margin: 0; color: #2c3e50; text-transform: uppercase; }
-        .school-address { font-size: 13px; margin: 5px 0 0 0; color: #444; }
-        .title { text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0; text-decoration: underline; letter-spacing: 2px; }
-        .content-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .content-table td { padding: 8px 5px; vertical-align: top; }
-        .label { width: 150px; font-weight: bold; }
-        .colon { width: 20px; text-align: center; font-weight: bold; }
+        .logo { width: 60px; height: auto; }
+        .school-name { font-size: 18px; font-weight: bold; margin: 0; color: #2c3e50; text-transform: uppercase; }
+        .school-address { font-size: 11px; margin: 3px 0 0 0; color: #444; }
+        .title { text-align: center; font-size: 16px; font-weight: bold; margin: 10px 0; text-decoration: underline; letter-spacing: 1px; }
+        .content-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .content-table td { padding: 4px 5px; vertical-align: top; }
+        .label { width: 130px; font-weight: bold; }
+        .colon { width: 15px; text-align: center; font-weight: bold; }
         .value { border-bottom: 1px dotted #ccc; }
-        .amount-box { background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; font-size: 18px; font-weight: bold; text-align: center; margin: 30px 0; border-radius: 5px; }
-        .footer { width: 100%; margin-top: 50px; }
+        .amount-box { background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 10px; font-size: 16px; font-weight: bold; text-align: center; margin: 15px 0; border-radius: 4px; }
+        .footer { width: 100%; margin-top: 20px; }
         .footer-table { width: 100%; }
         .footer-table td { text-align: center; width: 50%; }
-        .signature-area { height: 80px; }
-        .signature-line { border-top: 1px solid #333; width: 200px; margin: 0 auto; display: inline-block; padding-top: 5px; font-weight: bold; }
-        .terbilang-box { background-color: #eef2f5; padding: 10px; border-radius: 4px; font-style: italic; border-left: 4px solid #3b82f6; margin-bottom: 20px; font-size: 13px; line-height: 1.5; }
+        .signature-area { height: 60px; }
+        .signature-line { border-top: 1px solid #333; width: 150px; margin: 0 auto; display: inline-block; padding-top: 5px; font-weight: bold; }
+        .terbilang-box { background-color: #eef2f5; padding: 8px; border-radius: 4px; font-style: italic; border-left: 4px solid #3b82f6; margin-bottom: 15px; font-size: 11px; line-height: 1.4; }
     </style>
 </head>
 <body>
