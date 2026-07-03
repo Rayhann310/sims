@@ -35,7 +35,7 @@
                         <tr class="hover:bg-slate-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500"><?= $i++; ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded">ID Mapel: <?= $row['id_mapel']; ?></span>
+                                <span class="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded"><?= htmlspecialchars($row['nama_mapel'] ?? 'Umum'); ?></span>
                             </td>
                             <td class="px-6 py-4 text-sm text-slate-900 max-w-xs truncate" title="<?= htmlspecialchars($row['pertanyaan']); ?>">
                                 <?= strip_tags($row['pertanyaan']); ?>

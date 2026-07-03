@@ -21,6 +21,7 @@ class BankSoal extends Controller {
     public function tambah()
     {
         $data['judul'] = 'Tambah Soal Baru';
+        $data['mapel'] = $this->model('BankSoalModel')->getAllMapel();
         
         $this->view('templates/admin_header', $data);
         $this->view('bank_soal/form', $data);

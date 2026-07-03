@@ -36,7 +36,29 @@ class BankSoalModel {
 
     public function getAllSoal()
     {
-        $this->db->query("SELECT * FROM " . $this->table . " ORDER BY created_at DESC");
+        $role = $_SESSION['user']['role'] ?? '';
+        $user_id = $_SESSION['user']['id'] ?? 0;
+        
+        $query = "SELECT s.*, m.nama_mapel 
+                  FROM " . $this->table . " s 
+                  LEFT JOIN mata_pelajaran m ON s.id_mapel = m.id ";
+                  
+        if ($role == 'guru') {
+            $query .= " WHERE s.id_guru = :id_guru ";
+            $query .= " ORDER BY s.created_at DESC";
+            $this->db->query($query);
+            $this->db->bind('id_guru', $user_id);
+        } else {
+            $query .= " ORDER BY s.created_at DESC";
+            $this->db->query($query);
+        }
+        
+        return $this->db->resultSet();
+    }
+    
+    public function getAllMapel()
+    {
+        $this->db->query("SELECT * FROM mata_pelajaran ORDER BY nama_mapel ASC");
         return $this->db->resultSet();
     }
 
@@ -55,8 +77,7 @@ class BankSoalModel {
                     (:id_mapel, :id_guru, :tipe_soal, :pertanyaan, :opsi_a, :opsi_b, :opsi_c, :opsi_d, :opsi_e, :kunci_jawaban, :tingkat_kesulitan)";
         
         $this->db->query($query);
-        // Sementara di hardcode untuk id mapel dan guru agar cepat
-        $this->db->bind('id_mapel', 1); 
+        $this->db->bind('id_mapel', $data['id_mapel']); 
         $this->db->bind('id_guru', $_SESSION['user']['id'] ?? 1);
         
         $this->db->bind('tipe_soal', $data['tipe_soal']);

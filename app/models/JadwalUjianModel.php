@@ -27,6 +27,14 @@ class JadwalUjianModel {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )");
             $this->db->execute();
+            
+            // Pivot table untuk relasi Jadwal Ujian dan Soal yang dipilih
+            $this->db->query("CREATE TABLE IF NOT EXISTS cbt_ujian_soal (
+                id_jadwal INT NOT NULL,
+                id_soal INT NOT NULL,
+                PRIMARY KEY (id_jadwal, id_soal)
+            )");
+            $this->db->execute();
         } catch (\Throwable $e) {}
     }
 
@@ -52,7 +60,7 @@ class JadwalUjianModel {
         $this->db->query($query);
         
         $this->db->bind('nama_ujian', $data['nama_ujian']);
-        $this->db->bind('id_mapel', 1); // hardcode sementara 
+        $this->db->bind('id_mapel', $data['id_mapel']); 
         $this->db->bind('waktu_mulai', $data['waktu_mulai']);
         $this->db->bind('waktu_selesai', $data['waktu_selesai']);
         $this->db->bind('durasi_menit', $data['durasi_menit']);
@@ -72,10 +80,72 @@ class JadwalUjianModel {
         return $this->db->rowCount();
     }
 
-    // Mengambil daftar semua guru untuk dropdown pengawas
     public function getAllGuru()
     {
         $this->db->query("SELECT guru.id, users.nama_lengkap FROM guru JOIN users ON guru.user_id = users.id ORDER BY users.nama_lengkap ASC");
         return $this->db->resultSet();
+    }
+    
+    public function getAllMapel()
+    {
+        $this->db->query("SELECT * FROM mata_pelajaran ORDER BY nama_mapel ASC");
+        return $this->db->resultSet();
+    }
+    
+    public function getJadwalById($id)
+    {
+        $this->db->query("SELECT j.*, m.nama_mapel FROM " . $this->table . " j LEFT JOIN mata_pelajaran m ON j.id_mapel = m.id WHERE j.id_jadwal = :id");
+        $this->db->bind('id', $id);
+        return $this->db->single();
+    }
+    
+    public function getSoalByMapel($id_mapel)
+    {
+        $this->db->query("SELECT s.*, (SELECT nama_lengkap FROM users u JOIN guru g ON g.user_id = u.id WHERE g.id = s.id_guru LIMIT 1) as nama_pembuat FROM cbt_bank_soal s WHERE s.id_mapel = :id_mapel ORDER BY s.created_at DESC");
+        $this->db->bind('id_mapel', $id_mapel);
+        return $this->db->resultSet();
+    }
+    
+    public function getSoalTerpilih($id_jadwal)
+    {
+        $this->db->query("SELECT id_soal FROM cbt_ujian_soal WHERE id_jadwal = :id_jadwal");
+        $this->db->bind('id_jadwal', $id_jadwal);
+        $result = $this->db->resultSet();
+        $terpilih = [];
+        foreach($result as $row) {
+            $terpilih[] = $row['id_soal'];
+        }
+        return $terpilih;
+    }
+    
+    public function simpanSoalUjian($id_jadwal, $soal_ids)
+    {
+        try {
+            $this->db->query("START TRANSACTION");
+            $this->db->execute();
+            
+            // Hapus yang lama
+            $this->db->query("DELETE FROM cbt_ujian_soal WHERE id_jadwal = :id_jadwal");
+            $this->db->bind('id_jadwal', $id_jadwal);
+            $this->db->execute();
+            
+            // Insert yang baru
+            if(!empty($soal_ids)) {
+                foreach($soal_ids as $id_soal) {
+                    $this->db->query("INSERT INTO cbt_ujian_soal (id_jadwal, id_soal) VALUES (:id_jadwal, :id_soal)");
+                    $this->db->bind('id_jadwal', $id_jadwal);
+                    $this->db->bind('id_soal', $id_soal);
+                    $this->db->execute();
+                }
+            }
+            
+            $this->db->query("COMMIT");
+            $this->db->execute();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->query("ROLLBACK");
+            $this->db->execute();
+            return false;
+        }
     }
 }

@@ -16,10 +16,21 @@
         </div>
         
         <form action="<?= BASEURL; ?>/JadwalUjian/simpan" method="POST" class="p-6 space-y-6">
-            <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Nama Ujian</label>
-                <input type="text" name="nama_ujian" placeholder="Contoh: Ujian Tengah Semester Ganjil - Matematika" required 
-                       class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Ujian</label>
+                    <input type="text" name="nama_ujian" placeholder="Contoh: Ujian Tengah Semester Ganjil - Matematika" required 
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Mata Pelajaran</label>
+                    <select name="id_mapel" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+                        <option value="">-- Pilih Mata Pelajaran --</option>
+                        <?php foreach($data['mapel'] as $m) : ?>
+                            <option value="<?= $m['id']; ?>"><?= htmlspecialchars($m['nama_mapel']); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

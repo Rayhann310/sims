@@ -36,7 +36,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500"><?= $i++; ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-bold text-slate-900"><?= $row['nama_ujian']; ?></div>
-                                <div class="text-xs text-slate-500 mt-1">ID Mapel: <?= $row['id_mapel']; ?></div>
+                                <div class="text-xs text-slate-500 mt-1">Mapel: <?= $row['id_mapel']; ?> (Bisa di-join nanti)</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-slate-900">Mulai: <span class="font-medium"><?= date('d/m/Y H:i', strtotime($row['waktu_mulai'])); ?></span></div>
@@ -55,7 +55,9 @@
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Selesai</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end gap-2">
+                                <a href="<?= BASEURL; ?>/JadwalUjian/kelolaSoal/<?= $row['id_jadwal']; ?>" 
+                                   class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md transition-colors">Kelola Soal</a>
                                 <a href="<?= BASEURL; ?>/JadwalUjian/hapus/<?= $row['id_jadwal']; ?>" 
                                    class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors"
                                    onclick="return confirm('Yakin ingin menghapus jadwal ini?');">Hapus</a>
