@@ -1,6 +1,6 @@
 <?php
 $db = new PDO('mysql:host=localhost;dbname=db_smanw', 'root', '');
-$tables = ['siswa', 'rombel', 'anggota_rombel', 'kelas'];
+$tables = ['guru', 'users'];
 foreach($tables as $table) {
     echo "TABLE: $table\n";
     $stmt = $db->query("DESCRIBE $table");

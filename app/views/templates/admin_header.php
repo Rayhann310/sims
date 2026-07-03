@@ -392,6 +392,10 @@ $role = $_SESSION['user']['role'] ?? '';
                         <?= substr($_SESSION['user']['nama_lengkap'] ?? 'U', 0, 1); ?>
                     </div>
                 </div>
+                
+                <a href="<?= BASEURL; ?>/profil" class="ml-2 w-8 h-8 flex items-center justify-center text-emerald-100 hover:text-white hover:bg-emerald-700 rounded-md transition-colors" title="Pengaturan Profil">
+                    <i class="fas fa-cog text-lg"></i>
+                </a>
 
                 <a href="<?= BASEURL; ?>/login/logout" class="ml-2 w-8 h-8 flex items-center justify-center text-emerald-100 hover:text-white hover:bg-emerald-700 rounded-md transition-colors" title="Logout">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
