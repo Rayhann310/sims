@@ -76,7 +76,10 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500"><?= $i++; ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-bold text-slate-900"><?= $row['nama_ujian']; ?></div>
-                                <div class="text-xs text-slate-500 mt-1">Mapel Ujian: <?= $row['id_mapel']; ?></div>
+                                <div class="text-xs text-slate-500 mt-1">Mapel Ujian: <?= $row['nama_mapel'] ?? $row['id_mapel']; ?></div>
+                                <?php if($row['nama_rombel']): ?>
+                                    <div class="text-xs font-semibold text-indigo-600 mt-1">Rombel: <?= $row['nama_rombel']; ?></div>
+                                <?php endif; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-slate-900">Mulai: <span class="font-medium"><?= date('d/m/Y H:i', strtotime($row['waktu_mulai'])); ?></span></div>
