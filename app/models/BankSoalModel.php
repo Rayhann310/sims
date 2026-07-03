@@ -7,6 +7,31 @@ class BankSoalModel {
     public function __construct()
     {
         $this->db = new Database();
+        $this->selfHealing();
+    }
+
+    private function selfHealing()
+    {
+        try {
+            // 1. Table Bank Soal
+            $this->db->query("CREATE TABLE IF NOT EXISTS cbt_bank_soal (
+                id_soal INT AUTO_INCREMENT PRIMARY KEY,
+                id_mapel INT NOT NULL,
+                id_guru INT NOT NULL,
+                tipe_soal VARCHAR(20) NOT NULL DEFAULT 'PG',
+                pertanyaan TEXT NOT NULL,
+                file_media VARCHAR(255) NULL,
+                opsi_a TEXT NULL,
+                opsi_b TEXT NULL,
+                opsi_c TEXT NULL,
+                opsi_d TEXT NULL,
+                opsi_e TEXT NULL,
+                kunci_jawaban VARCHAR(255) NOT NULL,
+                tingkat_kesulitan ENUM('Mudah', 'Sedang', 'Sulit') DEFAULT 'Sedang',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )");
+            $this->db->execute();
+        } catch (\Throwable $e) {}
     }
 
     public function getAllSoal()

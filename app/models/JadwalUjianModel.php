@@ -7,6 +7,27 @@ class JadwalUjianModel {
     public function __construct()
     {
         $this->db = new Database();
+        $this->selfHealing();
+    }
+
+    private function selfHealing()
+    {
+        try {
+            $this->db->query("CREATE TABLE IF NOT EXISTS cbt_jadwal (
+                id_jadwal INT AUTO_INCREMENT PRIMARY KEY,
+                nama_ujian VARCHAR(100) NOT NULL,
+                id_mapel INT NOT NULL,
+                waktu_mulai DATETIME NOT NULL,
+                waktu_selesai DATETIME NOT NULL,
+                durasi_menit INT NOT NULL,
+                id_guru_pengawas INT NOT NULL,
+                token_aktif VARCHAR(10) NULL,
+                token_last_update TIMESTAMP NULL,
+                status ENUM('Draft', 'Aktif', 'Selesai') DEFAULT 'Draft',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )");
+            $this->db->execute();
+        } catch (\Throwable $e) {}
     }
 
     public function getAllJadwal()

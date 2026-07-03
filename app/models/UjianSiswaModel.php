@@ -6,6 +6,36 @@ class UjianSiswaModel {
     public function __construct()
     {
         $this->db = new Database();
+        $this->selfHealing();
+    }
+
+    private function selfHealing()
+    {
+        try {
+            $this->db->query("CREATE TABLE IF NOT EXISTS cbt_peserta (
+                id_peserta INT AUTO_INCREMENT PRIMARY KEY,
+                id_jadwal INT NOT NULL,
+                id_siswa INT NOT NULL,
+                waktu_mulai DATETIME NULL,
+                sisa_waktu_detik INT NULL,
+                status_ujian ENUM('0', '1', '2', '3') DEFAULT '0',
+                alasan_terkunci VARCHAR(255) NULL,
+                nilai FLOAT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )");
+            $this->db->execute();
+
+            $this->db->query("CREATE TABLE IF NOT EXISTS cbt_jawaban (
+                id_jawaban INT AUTO_INCREMENT PRIMARY KEY,
+                id_peserta INT NOT NULL,
+                id_soal INT NOT NULL,
+                jawaban_siswa TEXT NULL,
+                ragu_ragu TINYINT(1) DEFAULT 0,
+                skor FLOAT DEFAULT 0,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )");
+            $this->db->execute();
+        } catch (\Throwable $e) {}
     }
 
     public function getJadwalAktif()
