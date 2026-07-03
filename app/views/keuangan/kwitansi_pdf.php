@@ -39,8 +39,9 @@ function terbilang($angka) {
     <meta charset="UTF-8">
     <title>Kwitansi Pembayaran</title>
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; margin: 0; padding: 20px; color: #333; }
-        .header { width: 100%; border-bottom: 3px solid #333; padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+        @page { margin: 15px; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; margin: 0; padding: 0; color: #333; }
+        .header { width: 100%; border-bottom: 3px solid #333; padding-bottom: 5px; margin-bottom: 15px; text-align: center; }
         .header table { width: 100%; }
         .header table td { vertical-align: middle; }
         .logo { width: 80px; height: auto; }
