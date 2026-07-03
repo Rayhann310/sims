@@ -260,7 +260,7 @@ class Keuangan extends Controller {
                 FROM tagihan_spp t 
                 JOIN siswa s ON t.siswa_id = s.id 
                 JOIN users u ON s.user_id = u.id 
-                LEFT JOIN master_tarif_keuangan k ON t.kategori_id = k.id 
+                LEFT JOIN keuangan_kategori k ON t.kategori_id = k.id 
                 WHERE t.id = :id
             ");
             $db->bind('id', $id);
