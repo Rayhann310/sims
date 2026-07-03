@@ -53,7 +53,7 @@ class JadwalUjianModel {
                   LEFT JOIN guru g ON j.id_guru_pengawas = g.id 
                   LEFT JOIN users u ON g.user_id = u.id
                   LEFT JOIN mata_pelajaran m ON j.id_mapel = m.id
-                  LEFT JOIN rombongan_belajar r ON j.id_rombel = r.id
+                  LEFT JOIN rombel r ON j.id_rombel = r.id
                   ORDER BY j.waktu_mulai DESC";
         $this->db->query($query);
         return $this->db->resultSet();
@@ -133,7 +133,7 @@ class JadwalUjianModel {
     
     public function getAllRombel()
     {
-        $this->db->query("SELECT * FROM rombongan_belajar ORDER BY nama_rombel ASC");
+        $this->db->query("SELECT * FROM rombel ORDER BY nama_rombel ASC");
         return $this->db->resultSet();
     }
     
