@@ -110,13 +110,19 @@ document.addEventListener('DOMContentLoaded', function() {
             // Aksi Button
             let aksiBtn = '';
             if(isTerkunci) {
-                aksiBtn = `<a href="${baseUrl}/Proctor/unlockSiswa/${p.id_peserta}/${idJadwal}" 
-                             class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-md transition-colors"
+                aksiBtn += `<a href="${baseUrl}/Proctor/unlockSiswa/${p.id_peserta}/${idJadwal}" 
+                             class="inline-flex items-center px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-md transition-colors mr-1"
                              onclick="return confirm('Yakin ingin membuka akses ujian siswa ini?');">
                              <i class="fas fa-unlock mr-1"></i> Buka Kunci
                           </a>`;
+            } else if (p.status_ujian === '3') {
+                aksiBtn += `<a href="${baseUrl}/Proctor/ulangiUjian/${p.id_peserta}/${idJadwal}" 
+                             class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded-md transition-colors"
+                             onclick="return confirm('PERINGATAN: Nilai siswa ini akan dihapus permanen dan dia harus mengulang dari awal. Yakin?');">
+                             <i class="fas fa-redo-alt mr-1"></i> Ulangi Ujian
+                          </a>`;
             } else {
-                aksiBtn = `<button class="inline-flex items-center px-3 py-1.5 bg-slate-100 text-slate-400 text-xs font-medium rounded-md cursor-not-allowed" disabled>
+                aksiBtn += `<button class="inline-flex items-center px-3 py-1.5 bg-slate-100 text-slate-400 text-xs font-medium rounded-md cursor-not-allowed" disabled>
                               <i class="fas fa-lock mr-1"></i> Buka Kunci
                            </button>`;
             }

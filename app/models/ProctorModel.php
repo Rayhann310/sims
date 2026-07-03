@@ -88,4 +88,19 @@ class ProctorModel {
         $this->db->execute();
         return $this->db->rowCount();
     }
+
+    public function ulangiUjianSiswa($id_peserta)
+    {
+        // Hapus semua jawaban siswa
+        $this->db->query("DELETE FROM cbt_jawaban WHERE id_peserta = :id_peserta");
+        $this->db->bind('id_peserta', $id_peserta);
+        $this->db->execute();
+        
+        // Reset status peserta
+        $this->db->query("UPDATE cbt_peserta SET status_ujian = '0', alasan_terkunci = NULL, nilai = NULL, waktu_mulai = NULL, sisa_waktu_detik = NULL WHERE id_peserta = :id_peserta");
+        $this->db->bind('id_peserta', $id_peserta);
+        $this->db->execute();
+        
+        return $this->db->rowCount();
+    }
 }

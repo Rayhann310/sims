@@ -43,6 +43,17 @@ class Proctor extends Controller {
         exit;
     }
 
+    public function ulangiUjian($id_peserta, $id_jadwal)
+    {
+        if($this->model('ProctorModel')->ulangiUjianSiswa($id_peserta) > 0) {
+            Flasher::setFlash('Ujian Siswa', 'berhasil diulang dan nilai dihapus', 'success');
+        } else {
+            Flasher::setFlash('Ujian Siswa', 'gagal diulang', 'danger');
+        }
+        header('Location: ' . BASEURL . '/Proctor/monitor/' . $id_jadwal);
+        exit;
+    }
+
     public function getMonitorData($id_jadwal)
     {
         // AJAX endpoint
