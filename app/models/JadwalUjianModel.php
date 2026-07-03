@@ -112,11 +112,21 @@ class JadwalUjianModel {
 
     public function hapusDataJadwal($id)
     {
-        $query = "DELETE FROM " . $this->table . " WHERE id_jadwal = :id_jadwal";
-        $this->db->query($query);
+        $this->db->query("DELETE FROM cbt_jadwal WHERE id_jadwal = :id_jadwal");
         $this->db->bind('id_jadwal', $id);
         $this->db->execute();
         return $this->db->rowCount();
+    }
+
+    public function getHasilUjian($id_jadwal)
+    {
+        $this->db->query("SELECT p.*, s.nama_lengkap, s.nisn 
+                          FROM cbt_peserta p 
+                          JOIN siswa s ON p.id_siswa = s.id 
+                          WHERE p.id_jadwal = :id_jadwal 
+                          ORDER BY p.nilai DESC");
+        $this->db->bind('id_jadwal', $id_jadwal);
+        return $this->db->resultSet();
     }
 
     public function getAllGuru()

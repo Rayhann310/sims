@@ -63,6 +63,8 @@
                                    class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md transition-colors">Kelola Soal</a>
                                 <a href="<?= BASEURL; ?>/JadwalUjian/edit/<?= $row['id_jadwal']; ?>" 
                                    class="text-amber-600 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-md transition-colors">Edit</a>
+                                <a href="<?= BASEURL; ?>/JadwalUjian/hasil/<?= $row['id_jadwal']; ?>" 
+                                   class="text-sky-600 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-md transition-colors">Hasil</a>
                                 <a href="<?= BASEURL; ?>/JadwalUjian/hapus/<?= $row['id_jadwal']; ?>" 
                                    class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors"
                                    onclick="return confirm('Yakin ingin menghapus jadwal ini?');">Hapus</a>

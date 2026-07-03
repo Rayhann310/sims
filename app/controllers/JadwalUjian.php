@@ -129,6 +129,24 @@ class JadwalUjian extends Controller {
         }
     }
 
+    public function hasil($id)
+    {
+        $data['judul'] = 'Hasil Ujian Siswa';
+        $data['jadwal'] = $this->model('JadwalUjianModel')->getJadwalById($id);
+        
+        if(!$data['jadwal']) {
+            Flasher::setFlash('Jadwal Ujian tidak', 'ditemukan', 'danger');
+            header('Location: ' . BASEURL . '/JadwalUjian');
+            exit;
+        }
+        
+        $data['hasil'] = $this->model('JadwalUjianModel')->getHasilUjian($id);
+        
+        $this->view('templates/admin_header', $data);
+        $this->view('jadwal_ujian/hasil', $data);
+        $this->view('templates/admin_footer');
+    }
+
     public function hapus($id)
     {
         if($this->model('JadwalUjianModel')->hapusDataJadwal($id) > 0) {
