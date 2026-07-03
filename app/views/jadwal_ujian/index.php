@@ -36,7 +36,10 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500"><?= $i++; ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-bold text-slate-900"><?= $row['nama_ujian']; ?></div>
-                                <div class="text-xs text-slate-500 mt-1">Mapel: <?= $row['id_mapel']; ?> (Bisa di-join nanti)</div>
+                                <div class="text-xs text-slate-500 mt-1">Mapel: <?= $row['nama_mapel'] ?? $row['id_mapel']; ?></div>
+                                <?php if($row['nama_rombel']): ?>
+                                    <div class="text-xs font-semibold text-indigo-600 mt-1">Rombel: <?= $row['nama_rombel']; ?></div>
+                                <?php endif; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-slate-900">Mulai: <span class="font-medium"><?= date('d/m/Y H:i', strtotime($row['waktu_mulai'])); ?></span></div>
@@ -44,7 +47,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-slate-900"><?= $row['durasi_menit']; ?> Menit</div>
-                                <div class="text-xs font-semibold text-indigo-600 mt-1">Pengawas: <?= $row['nama_pengawas'] ?? 'Tidak ada'; ?></div>
+                                <div class="text-xs font-semibold text-slate-600 mt-1">Pengawas: <?= $row['nama_pengawas'] ?? 'Tidak ada'; ?></div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <?php if($row['status'] == 'Aktif'): ?>
@@ -58,6 +61,8 @@
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end gap-2">
                                 <a href="<?= BASEURL; ?>/JadwalUjian/kelolaSoal/<?= $row['id_jadwal']; ?>" 
                                    class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md transition-colors">Kelola Soal</a>
+                                <a href="<?= BASEURL; ?>/JadwalUjian/edit/<?= $row['id_jadwal']; ?>" 
+                                   class="text-amber-600 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-md transition-colors">Edit</a>
                                 <a href="<?= BASEURL; ?>/JadwalUjian/hapus/<?= $row['id_jadwal']; ?>" 
                                    class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors"
                                    onclick="return confirm('Yakin ingin menghapus jadwal ini?');">Hapus</a>

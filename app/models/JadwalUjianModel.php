@@ -21,12 +21,19 @@ class JadwalUjianModel {
                 waktu_selesai DATETIME NOT NULL,
                 durasi_menit INT NOT NULL,
                 id_guru_pengawas INT NOT NULL,
+                id_rombel INT NULL,
                 token_aktif VARCHAR(10) NULL,
                 token_last_update TIMESTAMP NULL,
                 status ENUM('Draft', 'Aktif', 'Selesai') DEFAULT 'Draft',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )");
             $this->db->execute();
+            
+            // Alter table if id_rombel doesn't exist
+            try {
+                $this->db->query("ALTER TABLE cbt_jadwal ADD COLUMN id_rombel INT NULL AFTER id_guru_pengawas");
+                $this->db->execute();
+            } catch (\Throwable $e) {}
             
             // Pivot table untuk relasi Jadwal Ujian dan Soal yang dipilih
             $this->db->query("CREATE TABLE IF NOT EXISTS cbt_ujian_soal (
@@ -41,10 +48,12 @@ class JadwalUjianModel {
     public function getAllJadwal()
     {
         // Join dengan tabel mapel (sementara id_mapel = 1) dan guru pengawas (lewat users)
-        $query = "SELECT j.*, u.nama_lengkap AS nama_pengawas 
+        $query = "SELECT j.*, u.nama_lengkap AS nama_pengawas, m.nama_mapel, r.nama_rombel 
                   FROM " . $this->table . " j 
                   LEFT JOIN guru g ON j.id_guru_pengawas = g.id 
                   LEFT JOIN users u ON g.user_id = u.id
+                  LEFT JOIN mata_pelajaran m ON j.id_mapel = m.id
+                  LEFT JOIN rombongan_belajar r ON j.id_rombel = r.id
                   ORDER BY j.waktu_mulai DESC";
         $this->db->query($query);
         return $this->db->resultSet();
@@ -53,9 +62,9 @@ class JadwalUjianModel {
     public function tambahDataJadwal($data)
     {
         $query = "INSERT INTO " . $this->table . "
-                    (nama_ujian, id_mapel, waktu_mulai, waktu_selesai, durasi_menit, id_guru_pengawas, status)
+                    (nama_ujian, id_mapel, waktu_mulai, waktu_selesai, durasi_menit, id_guru_pengawas, id_rombel, status)
                   VALUES
-                    (:nama_ujian, :id_mapel, :waktu_mulai, :waktu_selesai, :durasi_menit, :id_guru_pengawas, :status)";
+                    (:nama_ujian, :id_mapel, :waktu_mulai, :waktu_selesai, :durasi_menit, :id_guru_pengawas, :id_rombel, :status)";
         
         $this->db->query($query);
         
@@ -65,7 +74,37 @@ class JadwalUjianModel {
         $this->db->bind('waktu_selesai', $data['waktu_selesai']);
         $this->db->bind('durasi_menit', $data['durasi_menit']);
         $this->db->bind('id_guru_pengawas', $data['id_guru_pengawas']);
+        $this->db->bind('id_rombel', $data['id_rombel'] ?: null);
         $this->db->bind('status', $data['status']);
+
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function editDataJadwal($data)
+    {
+        $query = "UPDATE " . $this->table . " SET 
+                    nama_ujian = :nama_ujian,
+                    id_mapel = :id_mapel,
+                    waktu_mulai = :waktu_mulai,
+                    waktu_selesai = :waktu_selesai,
+                    durasi_menit = :durasi_menit,
+                    id_guru_pengawas = :id_guru_pengawas,
+                    id_rombel = :id_rombel,
+                    status = :status
+                  WHERE id_jadwal = :id_jadwal";
+                  
+        $this->db->query($query);
+        
+        $this->db->bind('nama_ujian', $data['nama_ujian']);
+        $this->db->bind('id_mapel', $data['id_mapel']); 
+        $this->db->bind('waktu_mulai', $data['waktu_mulai']);
+        $this->db->bind('waktu_selesai', $data['waktu_selesai']);
+        $this->db->bind('durasi_menit', $data['durasi_menit']);
+        $this->db->bind('id_guru_pengawas', $data['id_guru_pengawas']);
+        $this->db->bind('id_rombel', $data['id_rombel'] ?: null);
+        $this->db->bind('status', $data['status']);
+        $this->db->bind('id_jadwal', $data['id_jadwal']);
 
         $this->db->execute();
         return $this->db->rowCount();
@@ -89,6 +128,12 @@ class JadwalUjianModel {
     public function getAllMapel()
     {
         $this->db->query("SELECT * FROM mata_pelajaran ORDER BY nama_mapel ASC");
+        return $this->db->resultSet();
+    }
+    
+    public function getAllRombel()
+    {
+        $this->db->query("SELECT * FROM rombongan_belajar ORDER BY nama_rombel ASC");
         return $this->db->resultSet();
     }
     
