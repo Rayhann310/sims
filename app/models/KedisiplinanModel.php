@@ -39,7 +39,7 @@ class KedisiplinanModel {
     {
         // Calculate total points: sum of Pelanggaran - sum of Penghargaan
         $this->db->query("
-            SELECT s.id, s.nisn as nis, u.nama_lengkap, k.nama_kelas, r.nama_rombel,
+            SELECT s.id, s.nisn as nis, u.nama_lengkap, active_class.nama_kelas, active_class.nama_rombel,
                    (
                        200 +
                        COALESCE((SELECT SUM(c2.poin_dicatat) FROM catatan_kedisiplinan c2 JOIN kategori_kedisiplinan kat2 ON c2.kategori_id = kat2.id WHERE c2.siswa_id = s.id AND kat2.jenis = 'Penghargaan'), 0)
@@ -48,12 +48,16 @@ class KedisiplinanModel {
                    ) as total_poin
             FROM siswa s
             LEFT JOIN users u ON s.user_id = u.id
-            LEFT JOIN anggota_rombel ar ON s.id = ar.siswa_id
-            LEFT JOIN rombel r ON ar.rombel_id = r.id
-            LEFT JOIN kelas k ON r.kelas_id = k.id
+            LEFT JOIN (
+                SELECT ar2.siswa_id, r2.nama_rombel, k2.nama_kelas
+                FROM anggota_rombel ar2
+                JOIN rombel r2 ON ar2.rombel_id = r2.id
+                JOIN kelas k2 ON r2.kelas_id = k2.id
+                JOIN tahun_akademik ta ON r2.tahun_akademik_id = ta.id
+                WHERE ta.status = 'Aktif'
+            ) active_class ON active_class.siswa_id = s.id
             WHERE s.status = 'Aktif'
-            GROUP BY s.id
-            ORDER BY k.nama_kelas ASC, total_poin DESC, u.nama_lengkap ASC
+            ORDER BY active_class.nama_kelas ASC, total_poin DESC, u.nama_lengkap ASC
         ");
         return $this->db->resultSet();
     }
