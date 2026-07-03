@@ -133,7 +133,7 @@ class JadwalUjianModel {
     
     public function getAllRombel()
     {
-        $this->db->query("SELECT * FROM rombel ORDER BY nama_rombel ASC");
+        $this->db->query("SELECT r.* FROM rombel r JOIN tahun_akademik t ON r.tahun_akademik_id = t.id WHERE t.status = 'Aktif' ORDER BY r.nama_rombel ASC");
         return $this->db->resultSet();
     }
     
