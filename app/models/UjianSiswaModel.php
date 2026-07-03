@@ -62,16 +62,18 @@ class UjianSiswaModel {
         return $row ? $row['id'] : 0;
     }
 
-    public function getJadwalAktif($id_rombel)
+    public function getJadwalAktif($id_rombel, $id_siswa)
     {
-        $query = "SELECT j.*, m.nama_mapel 
+        $query = "SELECT j.*, m.nama_mapel, p.status_ujian, p.nilai 
                   FROM cbt_jadwal j 
                   LEFT JOIN mata_pelajaran m ON j.id_mapel = m.id 
+                  LEFT JOIN cbt_peserta p ON j.id_jadwal = p.id_jadwal AND p.id_siswa = :id_siswa
                   WHERE j.status = 'Aktif' 
                   AND (j.id_rombel IS NULL OR j.id_rombel = 0 OR j.id_rombel = :id_rombel) 
                   ORDER BY j.waktu_mulai ASC";
         $this->db->query($query);
         $this->db->bind('id_rombel', $id_rombel);
+        $this->db->bind('id_siswa', $id_siswa);
         return $this->db->resultSet();
     }
 
@@ -110,5 +112,78 @@ class UjianSiswaModel {
         $this->db->bind('id_peserta', $id_peserta);
         $this->db->execute();
         return $this->db->rowCount();
+    }
+
+    public function ambilSemuaJawaban($id_peserta)
+    {
+        $this->db->query("SELECT id_soal, jawaban_siswa, ragu_ragu FROM cbt_jawaban WHERE id_peserta = :id_peserta");
+        $this->db->bind('id_peserta', $id_peserta);
+        return $this->db->resultSet();
+    }
+
+    public function simpanJawaban($id_peserta, $id_soal, $jawaban, $ragu_ragu)
+    {
+        // Cek apakah sudah ada jawaban untuk soal ini
+        $this->db->query("SELECT id_jawaban FROM cbt_jawaban WHERE id_peserta = :id_peserta AND id_soal = :id_soal");
+        $this->db->bind('id_peserta', $id_peserta);
+        $this->db->bind('id_soal', $id_soal);
+        $ada = $this->db->single();
+        
+        $ragu_val = $ragu_ragu ? 1 : 0;
+
+        if($ada) {
+            $this->db->query("UPDATE cbt_jawaban SET jawaban_siswa = :jawaban, ragu_ragu = :ragu WHERE id_jawaban = :id_jawaban");
+            $this->db->bind('jawaban', $jawaban);
+            $this->db->bind('ragu', $ragu_val);
+            $this->db->bind('id_jawaban', $ada['id_jawaban']);
+            $this->db->execute();
+        } else {
+            $this->db->query("INSERT INTO cbt_jawaban (id_peserta, id_soal, jawaban_siswa, ragu_ragu) VALUES (:id_peserta, :id_soal, :jawaban, :ragu)");
+            $this->db->bind('id_peserta', $id_peserta);
+            $this->db->bind('id_soal', $id_soal);
+            $this->db->bind('jawaban', $jawaban);
+            $this->db->bind('ragu', $ragu_val);
+            $this->db->execute();
+        }
+        return true;
+    }
+
+    public function hitungNilaiAkhir($id_peserta, $id_jadwal)
+    {
+        // Ambil semua soal dari jadwal ini
+        $soal = $this->getSoalUjian($id_jadwal);
+        if(count($soal) == 0) return 0;
+        
+        // Ambil semua jawaban siswa
+        $jawabanSiswa = $this->ambilSemuaJawaban($id_peserta);
+        
+        // Map jawaban siswa ke id_soal
+        $mapJawaban = [];
+        foreach($jawabanSiswa as $j) {
+            $mapJawaban[$j['id_soal']] = $j['jawaban_siswa'];
+        }
+        
+        $benar = 0;
+        $total = count($soal);
+        
+        foreach($soal as $s) {
+            $kunci = strtoupper($s['kunci_jawaban'] ?? '');
+            $jawab = isset($mapJawaban[$s['id_soal']]) ? strtoupper($mapJawaban[$s['id_soal']]) : '';
+            
+            if($jawab !== '' && $jawab === $kunci) {
+                $benar++;
+            }
+        }
+        
+        // Hitung nilai akhir (0-100)
+        $nilai = ($benar / $total) * 100;
+        
+        // Update tabel peserta
+        $this->db->query("UPDATE cbt_peserta SET nilai = :nilai, status_ujian = '3' WHERE id_peserta = :id_peserta");
+        $this->db->bind('nilai', $nilai);
+        $this->db->bind('id_peserta', $id_peserta);
+        $this->db->execute();
+        
+        return $nilai;
     }
 }

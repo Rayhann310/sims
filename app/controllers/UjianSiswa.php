@@ -15,7 +15,8 @@ class UjianSiswa extends Controller {
         $data['judul'] = 'Ujian CBT';
         $model = $this->model('UjianSiswaModel');
         $id_rombel = $model->getSiswaRombelAktif($_SESSION['user']['id']);
-        $data['jadwal'] = $model->getJadwalAktif($id_rombel);
+        $id_siswa = $model->getIdSiswa($_SESSION['user']['id']);
+        $data['jadwal'] = $model->getJadwalAktif($id_rombel, $id_siswa);
         
         $this->view('templates/header', $data); 
         $this->view('cbt/dashboard', $data);
@@ -32,6 +33,13 @@ class UjianSiswa extends Controller {
         $id_siswa = $model->getIdSiswa($_SESSION['user']['id']);
         
         $peserta = $model->getPesertaData($id_jadwal, $id_siswa);
+        
+        if($peserta && $peserta['status_ujian'] == '3') {
+            Flasher::setFlash('Anda sudah', 'menyelesaikan ujian ini', 'warning');
+            header('Location: ' . BASEURL . '/UjianSiswa');
+            exit;
+        }
+
         if(!$peserta) {
             $model->daftarUjian($id_jadwal, $id_siswa);
             $peserta = $model->getPesertaData($id_jadwal, $id_siswa);
@@ -41,6 +49,10 @@ class UjianSiswa extends Controller {
         $data['soal'] = $model->getSoalUjian($id_jadwal);
         $data['peserta'] = $peserta;
         $data['nama_siswa'] = $_SESSION['user']['nama_lengkap'];
+        
+        // Ambil semua jawaban sebelumnya
+        $jawabanLama = $model->ambilSemuaJawaban($peserta['id_peserta']);
+        $data['jawaban_lama'] = $jawabanLama;
         
         $this->view('cbt/ruang_ujian', $data);
     }
@@ -69,7 +81,6 @@ class UjianSiswa extends Controller {
             
             $jadwal = $this->model('JadwalUjianModel')->getJadwalById($id_jadwal);
             if($jadwal && $jadwal['token_aktif'] === strtoupper($token)) {
-                // Update status peserta menjadi mengerjakan (1)
                 $db = new Database();
                 $db->query("UPDATE cbt_peserta SET status_ujian = '1', alasan_terkunci = NULL WHERE id_peserta = :id_peserta");
                 $db->bind('id_peserta', $id_peserta);
@@ -79,6 +90,36 @@ class UjianSiswa extends Controller {
             } else {
                 echo json_encode(['status' => false, 'message' => 'Token tidak valid']);
             }
+            exit;
+        }
+    }
+
+    public function simpanJawabanApi()
+    {
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id_peserta = $_POST['id_peserta'] ?? 0;
+            $id_soal = $_POST['id_soal'] ?? 0;
+            $jawaban = $_POST['jawaban'] ?? '';
+            $ragu_ragu = isset($_POST['ragu_ragu']) && $_POST['ragu_ragu'] == '1' ? true : false;
+            
+            $this->model('UjianSiswaModel')->simpanJawaban($id_peserta, $id_soal, $jawaban, $ragu_ragu);
+            
+            echo json_encode(['status' => true]);
+            exit;
+        }
+    }
+
+    public function selesaiUjianApi()
+    {
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id_peserta = $_POST['id_peserta'] ?? 0;
+            $id_jadwal = $_POST['id_jadwal'] ?? 0;
+            
+            $nilai = $this->model('UjianSiswaModel')->hitungNilaiAkhir($id_peserta, $id_jadwal);
+            
+            echo json_encode(['status' => true, 'nilai' => $nilai]);
             exit;
         }
     }

@@ -143,7 +143,7 @@
                         
                         <label class="flex items-center gap-3 cursor-pointer select-none px-4 py-2 rounded-lg hover:bg-amber-50 border border-transparent hover:border-amber-200 transition-colors">
                             <div class="relative">
-                                <input type="checkbox" class="sr-only peer" x-model="ragu[currentSoal.id_soal]">
+                                <input type="checkbox" class="sr-only peer" x-model="ragu[currentSoal.id_soal]" @change="saveAnswer()">
                                 <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                             </div>
                             <span class="font-medium" :class="ragu[currentSoal.id_soal] ? 'text-amber-600' : 'text-slate-500'">Ragu-ragu</span>
@@ -382,7 +382,24 @@
                 },
                 
                 saveAnswer() {
-                    // Logic to auto-save answer via AJAX can go here
+                    let ans = this.answers[this.currentSoal.id_soal] || '';
+                    let r = this.ragu[this.currentSoal.id_soal] ? '1' : '0';
+                    
+                    fetch("<?= BASEURL ?>/UjianSiswa/simpanJawabanApi", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({
+                            id_peserta: <?= $data['peserta']['id_peserta'] ?? 0 ?>,
+                            id_soal: this.currentSoal.id_soal,
+                            jawaban: ans,
+                            ragu_ragu: r
+                        })
+                    }).catch(e => console.error("Gagal menyimpan jawaban", e));
+                },
+                
+                toggleRagu() {
+                    // This function can be called on change of checkbox
+                    this.saveAnswer();
                 },
                 
                 finishExam() {
@@ -393,12 +410,37 @@
                 
                 autoSubmit() {
                     this.isExamActive = false;
-                    // Logic to submit all answers to server
-                    // Redirect to dashboard
-                    window.location.href = "<?= BASEURL ?>/UjianSiswa";
+                    
+                    fetch("<?= BASEURL ?>/UjianSiswa/selesaiUjianApi", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams({
+                            id_peserta: <?= $data['peserta']['id_peserta'] ?? 0 ?>,
+                            id_jadwal: <?= $data['jadwal']['id_jadwal'] ?? 0 ?>
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        window.location.href = "<?= BASEURL ?>/UjianSiswa";
+                    })
+                    .catch(e => {
+                        alert("Terjadi kesalahan saat menyelesaikan ujian. Harap hubungi pengawas.");
+                        window.location.href = "<?= BASEURL ?>/UjianSiswa";
+                    });
                 }
             }
         }
+
+        // Initialize answers from DB
+        document.addEventListener('alpine:init', () => {
+            let app = document.querySelector('[x-data="examApp()"]')._x_dataStack[0];
+            let jawabanLama = <?= json_encode($data['jawaban_lama'] ?? []) ?>;
+            
+            jawabanLama.forEach(j => {
+                app.answers[j.id_soal] = j.jawaban_siswa;
+                app.ragu[j.id_soal] = (j.ragu_ragu == 1);
+            });
+        });
     </script>
 </body>
 </html>

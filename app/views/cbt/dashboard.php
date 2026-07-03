@@ -71,10 +71,17 @@
                                 </div>
                             </div>
                             
-                            <a href="<?= BASEURL; ?>/UjianSiswa/mulai/<?= $row['id_jadwal']; ?>" class="w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors focus:ring-4 focus:ring-emerald-200">
-                                Buka Ujian
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </a>
+                            <?php if(isset($row['status_ujian']) && $row['status_ujian'] == '3'): ?>
+                                <div class="w-full inline-flex justify-between items-center gap-2 px-4 py-2.5 bg-slate-100 text-slate-500 text-sm font-bold rounded-lg border border-slate-200 cursor-not-allowed">
+                                    <span>Telah Selesai</span>
+                                    <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs">Nilai: <?= number_format((float)$row['nilai'], 1) ?></span>
+                                </div>
+                            <?php else: ?>
+                                <a href="<?= BASEURL; ?>/UjianSiswa/mulai/<?= $row['id_jadwal']; ?>" class="w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors focus:ring-4 focus:ring-emerald-200">
+                                    <?php echo (isset($row['status_ujian']) && $row['status_ujian'] != '0') ? 'Lanjutkan Ujian' : 'Buka Ujian'; ?>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                </a>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
