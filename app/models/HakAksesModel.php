@@ -38,6 +38,10 @@ class HakAksesModel {
         'spmb_biaya'       => ['label' => 'SPMB (Biaya)',           'group' => 'SPMB / PPDB',       'url' => '/adminspmb/biaya'],
         // Kearsipan & Sistem
         'kearsipan'        => ['label' => 'Data Surat (TU)',        'group' => 'Kearsipan & TU',    'url' => '/kearsipan'],
+        // CBT & Ujian
+        'cbt_bank_soal'    => ['label' => 'Bank Soal CBT',          'group' => 'CBT & Ujian',       'url' => '/banksoal'],
+        'cbt_jadwal'       => ['label' => 'Jadwal & Pengawas CBT',  'group' => 'CBT & Ujian',       'url' => '/jadwalujian'],
+        'cbt_proctor'      => ['label' => 'Dashboard Pengawas CBT', 'group' => 'CBT & Ujian',       'url' => '/proctor'],
         'pengaturan'       => ['label' => 'Pengaturan Sistem',      'group' => 'Sistem',            'url' => '/pengaturan'],
         'hak_akses'        => ['label' => 'Hak Akses Menu',         'group' => 'Sistem',            'url' => '/hakakses'],
     ];
