@@ -38,11 +38,51 @@ class UjianSiswaModel {
         } catch (\Throwable $e) {}
     }
 
-    public function getJadwalAktif()
+    public function getSiswaRombelAktif($user_id)
     {
-        // Hanya ambil jadwal yang statusnya 'Aktif'
-        $query = "SELECT * FROM cbt_jadwal WHERE status = 'Aktif' ORDER BY waktu_mulai ASC";
+        $this->db->query("
+            SELECT r.id as id_rombel 
+            FROM siswa s 
+            JOIN anggota_rombel ar ON s.id = ar.siswa_id 
+            JOIN rombel r ON ar.rombel_id = r.id 
+            JOIN tahun_akademik ta ON r.tahun_akademik_id = ta.id 
+            WHERE s.user_id = :user_id AND ta.status = 'Aktif'
+            LIMIT 1
+        ");
+        $this->db->bind('user_id', $user_id);
+        $row = $this->db->single();
+        return $row ? $row['id_rombel'] : 0;
+    }
+
+    public function getIdSiswa($user_id)
+    {
+        $this->db->query("SELECT id FROM siswa WHERE user_id = :user_id");
+        $this->db->bind('user_id', $user_id);
+        $row = $this->db->single();
+        return $row ? $row['id'] : 0;
+    }
+
+    public function getJadwalAktif($id_rombel)
+    {
+        $query = "SELECT j.*, m.nama_mapel 
+                  FROM cbt_jadwal j 
+                  LEFT JOIN mata_pelajaran m ON j.id_mapel = m.id 
+                  WHERE j.status = 'Aktif' 
+                  AND (j.id_rombel IS NULL OR j.id_rombel = 0 OR j.id_rombel = :id_rombel) 
+                  ORDER BY j.waktu_mulai ASC";
         $this->db->query($query);
+        $this->db->bind('id_rombel', $id_rombel);
+        return $this->db->resultSet();
+    }
+
+    public function getSoalUjian($id_jadwal)
+    {
+        $query = "SELECT bs.* 
+                  FROM cbt_ujian_soal us
+                  JOIN cbt_bank_soal bs ON us.id_soal = bs.id_soal
+                  WHERE us.id_jadwal = :id_jadwal";
+        $this->db->query($query);
+        $this->db->bind('id_jadwal', $id_jadwal);
         return $this->db->resultSet();
     }
 
