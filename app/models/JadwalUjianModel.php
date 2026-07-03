@@ -120,9 +120,10 @@ class JadwalUjianModel {
 
     public function getHasilUjian($id_jadwal)
     {
-        $this->db->query("SELECT p.*, s.nama_lengkap, s.nisn 
+        $this->db->query("SELECT p.*, u.nama_lengkap, s.nisn 
                           FROM cbt_peserta p 
                           JOIN siswa s ON p.id_siswa = s.id 
+                          JOIN users u ON s.user_id = u.id
                           WHERE p.id_jadwal = :id_jadwal 
                           ORDER BY p.nilai DESC");
         $this->db->bind('id_jadwal', $id_jadwal);
