@@ -32,10 +32,11 @@ class JadwalUjianModel {
 
     public function getAllJadwal()
     {
-        // Join dengan tabel mapel dan guru pengawas
-        $query = "SELECT j.*, g.nama_lengkap AS nama_pengawas 
+        // Join dengan tabel mapel (sementara id_mapel = 1) dan guru pengawas (lewat users)
+        $query = "SELECT j.*, u.nama_lengkap AS nama_pengawas 
                   FROM " . $this->table . " j 
                   LEFT JOIN guru g ON j.id_guru_pengawas = g.id 
+                  LEFT JOIN users u ON g.user_id = u.id
                   ORDER BY j.waktu_mulai DESC";
         $this->db->query($query);
         return $this->db->resultSet();
@@ -74,7 +75,7 @@ class JadwalUjianModel {
     // Mengambil daftar semua guru untuk dropdown pengawas
     public function getAllGuru()
     {
-        $this->db->query("SELECT id, nama_lengkap FROM guru ORDER BY nama_lengkap ASC");
+        $this->db->query("SELECT guru.id, users.nama_lengkap FROM guru JOIN users ON guru.user_id = users.id ORDER BY users.nama_lengkap ASC");
         return $this->db->resultSet();
     }
 }
