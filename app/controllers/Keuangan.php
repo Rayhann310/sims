@@ -251,46 +251,50 @@ class Keuangan extends Controller {
     }
     public function cetakKwitansi($id)
     {
-        requireAccess('keuangan_tagihan');
-        
-        $db = new Database();
-        $db->query("
-            SELECT t.*, s.nisn, u.nama_lengkap, k.nama_kategori 
-            FROM tagihan_spp t 
-            JOIN siswa s ON t.siswa_id = s.id 
-            JOIN users u ON s.user_id = u.id 
-            LEFT JOIN master_tarif_keuangan k ON t.kategori_id = k.id 
-            WHERE t.id = :id
-        ");
-        $db->bind('id', $id);
-        $tagihan = $db->single();
-        
-        if(!$tagihan) {
-            die("Data tagihan tidak ditemukan.");
-        }
+        try {
+            requireAccess('keuangan_tagihan');
+            
+            $db = new Database();
+            $db->query("
+                SELECT t.*, s.nisn, u.nama_lengkap, k.nama_kategori 
+                FROM tagihan_spp t 
+                JOIN siswa s ON t.siswa_id = s.id 
+                JOIN users u ON s.user_id = u.id 
+                LEFT JOIN master_tarif_keuangan k ON t.kategori_id = k.id 
+                WHERE t.id = :id
+            ");
+            $db->bind('id', $id);
+            $tagihan = $db->single();
+            
+            if(!$tagihan) {
+                die("Data tagihan tidak ditemukan.");
+            }
 
-        $db->query("SELECT * FROM pembayaran_spp WHERE tagihan_id = :id ORDER BY created_at DESC");
-        $db->bind('id', $id);
-        $pembayaran = $db->resultSet();
-        
-        $db->query("SELECT * FROM pengaturan ORDER BY id ASC LIMIT 1");
-        $pengaturan = $db->single();
-        
-        $data['tagihan'] = $tagihan;
-        $data['pembayaran'] = $pembayaran;
-        $data['pengaturan'] = $pengaturan;
-        
-        ob_start();
-        require_once __DIR__ . '/../views/keuangan/kwitansi_pdf.php';
-        $html = ob_get_clean();
-        
-        if (!class_exists('\Dompdf\Dompdf')) {
-            require_once __DIR__ . '/../../vendor/autoload.php';
+            $db->query("SELECT * FROM pembayaran_spp WHERE tagihan_id = :id ORDER BY created_at DESC");
+            $db->bind('id', $id);
+            $pembayaran = $db->resultSet();
+            
+            $db->query("SELECT * FROM pengaturan ORDER BY id ASC LIMIT 1");
+            $pengaturan = $db->single();
+            
+            $data['tagihan'] = $tagihan;
+            $data['pembayaran'] = $pembayaran;
+            $data['pengaturan'] = $pengaturan;
+            
+            ob_start();
+            require_once __DIR__ . '/../views/keuangan/kwitansi_pdf.php';
+            $html = ob_get_clean();
+            
+            if (!class_exists('\Dompdf\Dompdf')) {
+                require_once __DIR__ . '/../../vendor/autoload.php';
+            }
+            $dompdf = new \Dompdf\Dompdf();
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A5', 'landscape');
+            $dompdf->render();
+            $dompdf->stream('Kwitansi_' . $tagihan['nisn'] . '_' . $tagihan['bulan'] . '.pdf', array("Attachment" => false));
+        } catch (\Throwable $e) {
+            die("ERROR: " . $e->getMessage() . " di " . $e->getFile() . " baris " . $e->getLine());
         }
-        $dompdf = new \Dompdf\Dompdf();
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A5', 'landscape');
-        $dompdf->render();
-        $dompdf->stream('Kwitansi_' . $tagihan['nisn'] . '_' . $tagihan['bulan'] . '.pdf', array("Attachment" => false));
     }
 }
