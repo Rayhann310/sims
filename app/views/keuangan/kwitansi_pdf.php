@@ -115,12 +115,12 @@ function terbilang($angka) {
     </table>
 
     <div class="amount-box">
-        Terbilang: Rp <?= number_format($data['tagihan']['total_dibayar'], 0, ',', '.') ?>,-
+        Terbilang: Rp <?= number_format($data['tagihan']['nominal'], 0, ',', '.') ?>,-
     </div>
 
     <div class="terbilang-box">
         <strong>Uang Sejumlah:</strong> <br>
-        <?= ucwords(trim(terbilang($data['tagihan']['total_dibayar']))) ?> Rupiah
+        <?= ucwords(trim(terbilang($data['tagihan']['nominal']))) ?> Rupiah
     </div>
 
     <table class="footer-table">
