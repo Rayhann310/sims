@@ -121,6 +121,9 @@
                                     <i class="fab fa-whatsapp"></i> Resi
                                 </a>
                                 <?php endif; ?>
+                                <a href="<?= BASEURL; ?>/keuangan/cetakKwitansi/<?= $t['id']; ?>" target="_blank" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors inline-flex items-center gap-1" title="Cetak Kwitansi">
+                                    <i class="fas fa-print"></i> Kwitansi
+                                </a>
                                 <a href="<?= BASEURL; ?>/keuangan/batalBayar/<?= $t['id']; ?>" onclick="return confirm('Yakin ingin membatalkan pelunasan ini? Data kas akan dihapus dan notifikasi pembatalan akan dikirim ke WA orang tua.')" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors inline-flex items-center gap-1" title="Batal Bayar">
                                     <i class="fas fa-times-circle"></i> Batal
                                 </a>
