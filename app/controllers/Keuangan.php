@@ -281,10 +281,12 @@ class Keuangan extends Controller {
         $data['pengaturan'] = $pengaturan;
         
         ob_start();
-        require_once '../app/views/keuangan/kwitansi_pdf.php';
+        require_once __DIR__ . '/../views/keuangan/kwitansi_pdf.php';
         $html = ob_get_clean();
         
-        require_once '../vendor/autoload.php';
+        if (!class_exists('\Dompdf\Dompdf')) {
+            require_once __DIR__ . '/../../vendor/autoload.php';
+        }
         $dompdf = new \Dompdf\Dompdf();
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A5', 'landscape');
