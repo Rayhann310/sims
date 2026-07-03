@@ -52,7 +52,7 @@ class ProctorModel {
 
     public function getJadwalDiawasi($id_guru)
     {
-        $this->db->query("SELECT * FROM cbt_jadwal WHERE id_guru_pengawas = :id_guru AND status = 'Aktif' ORDER BY waktu_mulai DESC");
+        $this->db->query("SELECT j.*, m.nama_mapel, r.nama_rombel FROM cbt_jadwal j LEFT JOIN mata_pelajaran m ON j.id_mapel = m.id LEFT JOIN rombel r ON j.id_rombel = r.id WHERE j.id_guru_pengawas = :id_guru AND j.status = 'Aktif' ORDER BY j.waktu_mulai DESC");
         $this->db->bind('id_guru', $id_guru);
         return $this->db->resultSet();
     }
@@ -76,6 +76,15 @@ class ProctorModel {
         // Ubah status_ujian dari 2 (Terkunci) menjadi 1 (Mengerjakan) atau 0
         $this->db->query("UPDATE cbt_peserta SET status_ujian = '1', alasan_terkunci = NULL WHERE id_peserta = :id_peserta");
         $this->db->bind('id_peserta', $id_peserta);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function updateToken($id_jadwal, $token)
+    {
+        $this->db->query("UPDATE cbt_jadwal SET token_aktif = :token, token_last_update = CURRENT_TIMESTAMP WHERE id_jadwal = :id_jadwal");
+        $this->db->bind('token', $token);
+        $this->db->bind('id_jadwal', $id_jadwal);
         $this->db->execute();
         return $this->db->rowCount();
     }
