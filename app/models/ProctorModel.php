@@ -42,6 +42,14 @@ class ProctorModel {
         } catch (\Throwable $e) {}
     }
 
+    public function getGuruIdByUserId($user_id)
+    {
+        $this->db->query("SELECT id FROM guru WHERE user_id = :user_id LIMIT 1");
+        $this->db->bind('user_id', $user_id);
+        $row = $this->db->single();
+        return $row ? $row['id'] : 0;
+    }
+
     public function getJadwalDiawasi($id_guru)
     {
         $this->db->query("SELECT * FROM cbt_jadwal WHERE id_guru_pengawas = :id_guru AND status = 'Aktif' ORDER BY waktu_mulai DESC");

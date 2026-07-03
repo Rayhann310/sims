@@ -10,8 +10,8 @@ class Proctor extends Controller {
     public function index()
     {
         $data['judul'] = 'Dashboard Pengawas Ruangan';
-        // Ambil data guru yang login (asumsi id guru tersimpan di session, untuk demo kita ambil id_guru dari profil user)
-        $id_guru = $_SESSION['user']['id_guru'] ?? 1; // Sesuaikan dengan struktur session asli
+        $user_id = $_SESSION['user']['id'] ?? 0;
+        $id_guru = $this->model('ProctorModel')->getGuruIdByUserId($user_id);
         
         $data['jadwal_diawasi'] = $this->model('ProctorModel')->getJadwalDiawasi($id_guru);
         
