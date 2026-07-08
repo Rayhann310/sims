@@ -202,6 +202,12 @@ $role = $_SESSION['user']['role'] ?? '';
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Presensi & Nilai</span>
                     </a>
                     <?php endif; ?>
+                    <?php if($_SESSION['user']['role'] === 'guru'): ?>
+                    <a href="<?= BASEURL; ?>/ScannerKelas" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/ScannerKelas') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Scanner Absensi Kelas">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Scanner Absensi Kelas</span>
+                    </a>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endif; ?>
@@ -340,9 +346,13 @@ $role = $_SESSION['user']['role'] ?? '';
             <div class="mb-6">
                 <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Sistem</p>
                 <?php if(hasMenuAccess('pengaturan')): ?>
-                <a href="<?= BASEURL; ?>/pengaturan" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'pengaturan') !== false && strpos($_SERVER['REQUEST_URI'], 'fonntelog') === false && strpos($_SERVER['REQUEST_URI'], 'hakAkses') === false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Pengaturan">
+                <a href="<?= BASEURL; ?>/pengaturan" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'pengaturan') !== false && strpos($_SERVER['REQUEST_URI'], 'fonntelog') === false && strpos($_SERVER['REQUEST_URI'], 'hakAkses') === false && strpos($_SERVER['REQUEST_URI'], 'PengaturanAbsensi') === false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Pengaturan">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Pengaturan Utama</span>
+                </a>
+                <a href="<?= BASEURL; ?>/PengaturanAbsensi" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'PengaturanAbsensi') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Pengaturan Absensi">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Pengaturan Absensi</span>
                 </a>
                 <a href="<?= BASEURL; ?>/pengaturan/fonntelog" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], 'fonntelog') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Debug Fonnte">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>

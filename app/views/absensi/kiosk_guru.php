@@ -24,6 +24,10 @@
             </div>
         </div>
         <div class="flex items-center gap-6">
+            <div class="relative w-64">
+                <input type="text" x-model="search" placeholder="Cari nama guru..." class="w-full pl-10 pr-4 py-2 bg-indigo-500/50 border border-indigo-400 rounded-full text-white placeholder-indigo-200 focus:ring-white focus:border-white outline-none">
+                <i class="fas fa-search absolute left-4 top-3 text-indigo-200"></i>
+            </div>
             <div class="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full" :class="isOnline ? 'text-emerald-300' : 'text-red-300'">
                 <i class="fas fa-circle text-[10px]"></i>
                 <span class="text-sm font-medium" x-text="isOnline ? 'Online' : 'Offline'"></span>
@@ -38,56 +42,89 @@
         </div>
     </header>
 
-    <!-- Main Content (Grid Guru) -->
-    <main class="flex-1 overflow-y-auto p-6 bg-slate-50">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between items-end mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800">Daftar Kehadiran</h2>
-                    <p class="text-slate-500">Silakan klik nama Anda untuk mencatat kehadiran hari ini.</p>
+    <!-- Main Content (Dual Pane Grid) -->
+    <main class="flex-1 overflow-hidden flex bg-slate-50">
+        <!-- Left Pane: Belum Hadir -->
+        <div class="w-1/2 h-full flex flex-col border-r border-slate-200">
+            <div class="p-4 bg-white border-b border-slate-200 shrink-0">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center justify-between">
+                    <span><i class="fas fa-clock text-amber-500 mr-2"></i> Belum Hadir</span>
+                    <span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-bold" x-text="belumHadirList.length"></span>
+                </h2>
+                <p class="text-slate-500 text-xs mt-1">Klik pada kartu untuk absen masuk (Satu klik otomatis Hadir).</p>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <template x-for="g in belumHadirList" :key="g.id">
+                        <button @click="openModal(g)" class="bg-white rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-3 border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md hover:border-indigo-300 focus:outline-none border-slate-200">
+                            <div class="relative w-16 h-16 rounded-full overflow-hidden shrink-0 border-2 border-slate-200">
+                                <template x-if="g.foto">
+                                    <img :src="g.foto" class="w-full h-full object-cover">
+                                </template>
+                                <template x-if="!g.foto">
+                                    <div class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-500 font-bold text-xl" x-text="g.nama_lengkap.charAt(0)"></div>
+                                </template>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-slate-800 text-xs line-clamp-2 leading-tight" x-text="g.nama_lengkap"></p>
+                            </div>
+                        </button>
+                    </template>
                 </div>
-                <div class="relative w-64">
-                    <input type="text" x-model="search" placeholder="Cari nama guru..." class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:ring-indigo-500 focus:border-indigo-500 outline-none">
-                    <i class="fas fa-search absolute left-4 top-3 text-slate-400"></i>
+                <div x-show="belumHadirList.length === 0" class="text-center py-12 text-slate-400">
+                    <i class="fas fa-check-circle text-4xl mb-3 text-emerald-300"></i>
+                    <p>Semua guru sudah hadir.</p>
                 </div>
             </div>
+        </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-                <template x-for="g in filteredGuru" :key="g.id">
-                    <button @click="openModal(g)" class="bg-white rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-3 border shadow-sm transition-all hover:-translate-y-1 focus:outline-none" :class="getCardClass(g.id)">
-                        <div class="relative w-16 h-16 rounded-full overflow-hidden shrink-0 border-2" :class="getBorderClass(g.id)">
-                            <template x-if="g.foto">
-                                <img :src="g.foto" class="w-full h-full object-cover">
-                            </template>
-                            <template x-if="!g.foto">
-                                <div class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-500 font-bold text-xl" x-text="g.nama_lengkap.charAt(0)"></div>
-                            </template>
-                            
-                            <!-- Badge Status -->
-                            <template x-if="absensi[g.id]">
-                                <div class="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white" :class="getBadgeClass(g.id)">
-                                    <i class="fas fa-check text-[10px] text-white" x-show="absensi[g.id].status == 'Hadir'"></i>
-                                    <i class="fas fa-medkit text-[10px] text-white" x-show="absensi[g.id].status == 'Sakit'"></i>
-                                    <i class="fas fa-envelope text-[10px] text-white" x-show="absensi[g.id].status == 'Izin'"></i>
-                                </div>
-                            </template>
-                        </div>
-                        <div>
-                            <p class="font-semibold text-slate-800 text-sm line-clamp-2 leading-tight" x-text="g.nama_lengkap"></p>
-                            <p class="text-xs text-slate-400 mt-1" x-text="absensi[g.id] ? 'Sudah Absen' : 'Belum Absen'"></p>
-                        </div>
-                    </button>
-                </template>
+        <!-- Right Pane: Sudah Hadir -->
+        <div class="w-1/2 h-full flex flex-col">
+            <div class="p-4 bg-white border-b border-slate-200 shrink-0">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center justify-between">
+                    <span><i class="fas fa-check-circle text-emerald-500 mr-2"></i> Sudah Hadir / Tercatat</span>
+                    <span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full font-bold" x-text="sudahHadirList.length"></span>
+                </h2>
+                <p class="text-slate-500 text-xs mt-1">Klik pada kartu jika ingin mencatat jam pulang atau info lainnya.</p>
             </div>
-            
-            <div x-show="filteredGuru.length === 0" class="text-center py-12 text-slate-500">
-                <i class="fas fa-search text-4xl mb-3 text-slate-300"></i>
-                <p>Tidak ada guru yang cocok dengan pencarian.</p>
+            <div class="flex-1 overflow-y-auto p-4 bg-emerald-50/30">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <template x-for="g in sudahHadirList" :key="g.id">
+                        <button @click="openModal(g)" class="bg-white rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-3 border shadow-sm transition-all hover:-translate-y-1 focus:outline-none" :class="getCardClass(g.id)">
+                            <div class="relative w-16 h-16 rounded-full overflow-hidden shrink-0 border-2" :class="getBorderClass(g.id)">
+                                <template x-if="g.foto">
+                                    <img :src="g.foto" class="w-full h-full object-cover">
+                                </template>
+                                <template x-if="!g.foto">
+                                    <div class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-500 font-bold text-xl" x-text="g.nama_lengkap.charAt(0)"></div>
+                                </template>
+                                
+                                <!-- Badge Status -->
+                                <template x-if="absensi[g.id]">
+                                    <div class="absolute bottom-0 right-0 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white" :class="getBadgeClass(g.id)">
+                                        <i class="fas fa-check text-[10px] text-white" x-show="absensi[g.id].status == 'Hadir'"></i>
+                                        <i class="fas fa-medkit text-[10px] text-white" x-show="absensi[g.id].status == 'Sakit'"></i>
+                                        <i class="fas fa-envelope text-[10px] text-white" x-show="absensi[g.id].status == 'Izin'"></i>
+                                        <i class="fas fa-briefcase text-[10px] text-white" x-show="absensi[g.id].status == 'Dinas Luar'"></i>
+                                    </div>
+                                </template>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-slate-800 text-xs line-clamp-2 leading-tight" x-text="g.nama_lengkap"></p>
+                                <p class="text-[10px] text-slate-500 mt-1 font-mono bg-white/50 px-1 rounded inline-block" x-text="absensi[g.id].waktu_masuk"></p>
+                            </div>
+                        </button>
+                    </template>
+                </div>
+                <div x-show="sudahHadirList.length === 0" class="text-center py-12 text-slate-400">
+                    <i class="fas fa-user-clock text-4xl mb-3 text-slate-300"></i>
+                    <p>Belum ada guru yang hadir.</p>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- Modal Absen -->
+    <!-- Modal Absen (Hanya untuk yang sudah absen / Pulang) -->
     <div x-show="selectedGuru !== null" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
         <div x-show="selectedGuru !== null" x-transition.opacity class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="closeModal()"></div>
         
@@ -113,31 +150,6 @@
 
                     <!-- Content Modal -->
                     <div class="p-6 bg-slate-50">
-                        <template x-if="!absensi[selectedGuru.id]">
-                            <!-- Belum Absen Masuk -->
-                            <div class="space-y-4">
-                                <p class="text-center text-slate-600 text-sm mb-4">Pilih status kehadiran Anda hari ini:</p>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <button @click="submitAbsen('Hadir')" class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 transition-colors shadow-sm">
-                                        <i class="fas fa-user-check text-2xl"></i>
-                                        <span class="font-semibold">Hadir</span>
-                                    </button>
-                                    <button @click="submitAbsen('Sakit')" class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white border border-amber-200 hover:bg-amber-50 text-amber-700 transition-colors shadow-sm">
-                                        <i class="fas fa-medkit text-2xl"></i>
-                                        <span class="font-semibold">Sakit</span>
-                                    </button>
-                                    <button @click="submitAbsen('Izin')" class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white border border-blue-200 hover:bg-blue-50 text-blue-700 transition-colors shadow-sm">
-                                        <i class="fas fa-envelope text-2xl"></i>
-                                        <span class="font-semibold">Izin</span>
-                                    </button>
-                                    <button @click="submitAbsen('Dinas Luar')" class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-white border border-purple-200 hover:bg-purple-50 text-purple-700 transition-colors shadow-sm">
-                                        <i class="fas fa-briefcase text-2xl"></i>
-                                        <span class="font-semibold text-center text-xs">Dinas Luar</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </template>
-
                         <template x-if="absensi[selectedGuru.id]">
                             <!-- Sudah Absen Masuk -->
                             <div class="text-center">

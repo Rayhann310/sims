@@ -26,6 +26,23 @@ class AbsensiGuruModel {
         $waktu = date('H:i:s');
         $tanggal = date('Y-m-d');
 
+        // Load pengaturan absensi
+        require_once 'app/models/PengaturanAbsensiModel.php';
+        $pam = new PengaturanAbsensiModel();
+        $aturan = $pam->getAturanAbsensiGuru($guru_id);
+        
+        // Calculate terlambat_menit
+        $terlambat_menit = 0;
+        $batas_masuk = strtotime($aturan['batas_jam_masuk']);
+        $waktu_absen = strtotime($waktu);
+        
+        if ($waktu_absen > $batas_masuk) {
+            $diff = round(($waktu_absen - $batas_masuk) / 60);
+            if ($diff > $aturan['toleransi_terlambat']) {
+                $terlambat_menit = $diff - $aturan['toleransi_terlambat']; // Atau diff saja? Tergantung kalau toleransi = boleh telat segitu tanpa dihitung menit telat.
+            }
+        }
+
         // Cek apakah sudah absen masuk hari ini
         $this->db->query("SELECT * FROM absensi_guru WHERE guru_id = :guru_id AND tanggal = :tanggal");
         $this->db->bind('guru_id', $guru_id);
@@ -50,14 +67,20 @@ class AbsensiGuruModel {
             return ['status' => true, 'pesan' => 'Berhasil absen pulang.'];
         } else {
             // Belum absen, lakukan absen masuk
-            $query = "INSERT INTO absensi_guru (guru_id, tanggal, waktu_masuk, status) VALUES (:guru_id, :tanggal, :waktu_masuk, :status)";
+            $query = "INSERT INTO absensi_guru (guru_id, tanggal, waktu_masuk, status, terlambat_menit) VALUES (:guru_id, :tanggal, :waktu_masuk, :status, :terlambat_menit)";
             $this->db->query($query);
             $this->db->bind('guru_id', $guru_id);
             $this->db->bind('tanggal', $tanggal);
             $this->db->bind('waktu_masuk', $waktu);
             $this->db->bind('status', $status);
+            $this->db->bind('terlambat_menit', $terlambat_menit);
             $this->db->execute();
-            return ['status' => true, 'pesan' => 'Berhasil absen masuk.'];
+            
+            $msg = 'Berhasil absen masuk.';
+            if ($terlambat_menit > 0) {
+                $msg .= " (Terlambat $terlambat_menit menit)";
+            }
+            return ['status' => true, 'pesan' => $msg];
         }
     }
 }

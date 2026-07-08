@@ -39,13 +39,31 @@ function kioskData() {
             this.currentDate = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         },
 
-        get filteredGuru() {
-            if (this.search === '') return this.guruList;
-            return this.guruList.filter(g => g.nama_lengkap.toLowerCase().includes(this.search.toLowerCase()));
+        get belumHadirList() {
+            let list = this.guruList.filter(g => !this.absensi[g.id]);
+            if (this.search !== '') {
+                list = list.filter(g => g.nama_lengkap.toLowerCase().includes(this.search.toLowerCase()));
+            }
+            return list;
+        },
+
+        get sudahHadirList() {
+            let list = this.guruList.filter(g => !!this.absensi[g.id]);
+            if (this.search !== '') {
+                list = list.filter(g => g.nama_lengkap.toLowerCase().includes(this.search.toLowerCase()));
+            }
+            return list;
         },
 
         openModal(guru) {
-            this.selectedGuru = guru;
+            // Jika sudah absen, buka modal untuk absen pulang atau info
+            if(this.absensi[guru.id]) {
+                this.selectedGuru = guru;
+            } else {
+                // Jika belum absen, 1-click clock-in sebagai Hadir
+                this.selectedGuru = guru;
+                this.submitAbsen('Hadir');
+            }
         },
 
         closeModal() {
@@ -147,7 +165,7 @@ function kioskData() {
                     // Berhasil sync, kosongkan antrian
                     this.pendingSync = [];
                     this.savePendingSync();
-                    // this.showToast('Data berhasil disinkronkan ke server.');
+                    // Optional: show Toast for syncing
                 }
             } catch (error) {
                 console.error('Sync failed, will retry later', error);

@@ -850,6 +850,7 @@ return array (
   `waktu_masuk` TIME NOT NULL,
   `waktu_pulang` TIME NULL DEFAULT NULL,
   `status` ENUM(\'Hadir\',\'Sakit\',\'Izin\',\'Dinas Luar\',\'Alpa\') NOT NULL DEFAULT \'Hadir\',
+  `terlambat_menit` INT(11) DEFAULT 0,
   `sync_status` BOOLEAN DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
     'columns' => 
@@ -860,6 +861,7 @@ return array (
       'waktu_masuk' => 'TIME NOT NULL',
       'waktu_pulang' => 'TIME NULL DEFAULT NULL',
       'status' => 'ENUM(\'Hadir\',\'Sakit\',\'Izin\',\'Dinas Luar\',\'Alpa\') NOT NULL DEFAULT \'Hadir\'',
+      'terlambat_menit' => 'INT(11) DEFAULT 0',
       'sync_status' => 'BOOLEAN DEFAULT 1',
     ),
   ),
@@ -878,6 +880,75 @@ return array (
       'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
       'siswa_id' => 'INT(11) NOT NULL',
       'tanggal' => 'DATE NOT NULL',
+      'waktu_scan' => 'TIME NOT NULL',
+      'status' => 'ENUM(\'Hadir\',\'Sakit\',\'Izin\',\'Alpa\') NOT NULL DEFAULT \'Hadir\'',
+      'sync_status' => 'BOOLEAN DEFAULT 1',
+    ),
+  ),
+  'pengaturan_absensi' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `pengaturan_absensi` (
+  `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+  `mode_siswa` ENUM(\'Normal\', \'Per Jam Pelajaran\') NOT NULL DEFAULT \'Normal\',
+  `batas_jam_masuk_guru` TIME NOT NULL DEFAULT \'07:00:00\',
+  `batas_jam_keluar_guru` TIME NOT NULL DEFAULT \'15:00:00\',
+  `toleransi_terlambat_guru` INT(11) NOT NULL DEFAULT 15,
+  `min_jam_pelajaran_siswa` INT(11) NOT NULL DEFAULT 4,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
+      'mode_siswa' => 'ENUM(\'Normal\', \'Per Jam Pelajaran\') NOT NULL DEFAULT \'Normal\'',
+      'batas_jam_masuk_guru' => 'TIME NOT NULL DEFAULT \'07:00:00\'',
+      'batas_jam_keluar_guru' => 'TIME NOT NULL DEFAULT \'15:00:00\'',
+      'toleransi_terlambat_guru' => 'INT(11) NOT NULL DEFAULT 15',
+      'min_jam_pelajaran_siswa' => 'INT(11) NOT NULL DEFAULT 4',
+      'updated_at' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    ),
+  ),
+  'pengaturan_absensi_guru' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `pengaturan_absensi_guru` (
+  `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+  `guru_id` INT(11) NOT NULL,
+  `batas_jam_masuk` TIME NULL DEFAULT NULL,
+  `batas_jam_keluar` TIME NULL DEFAULT NULL,
+  `toleransi_terlambat` INT(11) NULL DEFAULT NULL,
+  UNIQUE KEY `guru_id` (`guru_id`),
+  CONSTRAINT `pengaturan_absensi_guru_ibfk_1` FOREIGN KEY (`guru_id`) REFERENCES `guru` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
+      'guru_id' => 'INT(11) NOT NULL',
+      'batas_jam_masuk' => 'TIME NULL DEFAULT NULL',
+      'batas_jam_keluar' => 'TIME NULL DEFAULT NULL',
+      'toleransi_terlambat' => 'INT(11) NULL DEFAULT NULL',
+    ),
+  ),
+  'absensi_siswa_detail' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `absensi_siswa_detail` (
+  `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+  `siswa_id` INT(11) NOT NULL,
+  `tanggal` DATE NOT NULL,
+  `jam_ke` INT(11) NOT NULL,
+  `guru_id` INT(11) NOT NULL,
+  `waktu_scan` TIME NOT NULL,
+  `status` ENUM(\'Hadir\',\'Sakit\',\'Izin\',\'Alpa\') NOT NULL DEFAULT \'Hadir\',
+  `sync_status` BOOLEAN DEFAULT 1,
+  UNIQUE KEY `siswa_tanggal_jam` (`siswa_id`, `tanggal`, `jam_ke`),
+  CONSTRAINT `absensi_siswa_detail_ibfk_1` FOREIGN KEY (`siswa_id`) REFERENCES `siswa` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `absensi_siswa_detail_ibfk_2` FOREIGN KEY (`guru_id`) REFERENCES `guru` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
+      'siswa_id' => 'INT(11) NOT NULL',
+      'tanggal' => 'DATE NOT NULL',
+      'jam_ke' => 'INT(11) NOT NULL',
+      'guru_id' => 'INT(11) NOT NULL',
       'waktu_scan' => 'TIME NOT NULL',
       'status' => 'ENUM(\'Hadir\',\'Sakit\',\'Izin\',\'Alpa\') NOT NULL DEFAULT \'Hadir\'',
       'sync_status' => 'BOOLEAN DEFAULT 1',
