@@ -19,7 +19,18 @@ class Dashboard extends Controller {
             $db->query("SELECT qr_token FROM siswa WHERE user_id = :user_id");
             $db->bind('user_id', $_SESSION['user']['id']);
             $siswa = $db->single();
-            $data['qr_token'] = $siswa ? $siswa['qr_token'] : null;
+            
+            // Auto generate (self-healing)
+            if ($siswa && empty($siswa['qr_token'])) {
+                $token = 'STUDENT_' . $_SESSION['user']['id'] . '_' . uniqid();
+                $db->query("UPDATE siswa SET qr_token = :token WHERE user_id = :user_id");
+                $db->bind('token', $token);
+                $db->bind('user_id', $_SESSION['user']['id']);
+                $db->execute();
+                $data['qr_token'] = $token;
+            } else {
+                $data['qr_token'] = $siswa ? $siswa['qr_token'] : null;
+            }
         }
 
         

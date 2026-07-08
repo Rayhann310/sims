@@ -46,7 +46,23 @@ class SiswaModel {
             $this->db->bind($key, $val);
         }
 
-        return $this->db->resultSet();
+        $result = $this->db->resultSet();
+        
+        // Auto-generate qr_token if it's missing (Self-healing for online databases)
+        foreach($result as &$row) {
+            if(empty($row['qr_token'])) {
+                $token = 'STUDENT_' . $row['id'] . '_' . uniqid();
+                // We need a separate DB connection or just standard query to avoid messing up the main one,
+                // but since resultSet() has already fetched everything, we can do it safely.
+                $this->db->query("UPDATE siswa SET qr_token = :token WHERE id = :id");
+                $this->db->bind('token', $token);
+                $this->db->bind('id', $row['id']);
+                $this->db->execute();
+                $row['qr_token'] = $token;
+            }
+        }
+
+        return $result;
     }
 
     public function getFilterOptions()
