@@ -14,6 +14,14 @@ class Dashboard extends Controller {
 
         // Ambil data realtime dari database
         $db = new Database();
+
+        if($_SESSION['user']['role'] == 'siswa') {
+            $db->query("SELECT qr_token FROM siswa WHERE user_id = :user_id");
+            $db->bind('user_id', $_SESSION['user']['id']);
+            $siswa = $db->single();
+            $data['qr_token'] = $siswa ? $siswa['qr_token'] : null;
+        }
+
         
         // Tahun ajaran aktif
         $db->query("SELECT id, nama_tahun, semester FROM tahun_akademik WHERE status = 'Aktif' LIMIT 1");

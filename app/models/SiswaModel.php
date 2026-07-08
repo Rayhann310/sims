@@ -154,7 +154,8 @@ class SiswaModel {
             $userId = $this->db->single()['last_id'];
 
             // 2. Tambah siswa
-            $querySiswa = "INSERT INTO siswa (user_id, nisn, jenis_kelamin, tanggal_lahir, alamat, nama_wali, no_hp_wali) VALUES (:user_id, :nisn, :jenis_kelamin, :tanggal_lahir, :alamat, :nama_wali, :no_hp_wali)";
+            $qr_token = 'STUDENT_' . time() . '_' . uniqid();
+            $querySiswa = "INSERT INTO siswa (user_id, nisn, jenis_kelamin, tanggal_lahir, alamat, nama_wali, no_hp_wali, qr_token) VALUES (:user_id, :nisn, :jenis_kelamin, :tanggal_lahir, :alamat, :nama_wali, :no_hp_wali, :qr_token)";
             $this->db->query($querySiswa);
             $this->db->bind('user_id', $userId);
             $this->db->bind('nisn', htmlspecialchars($data['nisn']));
@@ -163,6 +164,7 @@ class SiswaModel {
             $this->db->bind('alamat', htmlspecialchars($data['alamat']));
             $this->db->bind('nama_wali', htmlspecialchars($data['nama_wali']));
             $this->db->bind('no_hp_wali', htmlspecialchars($data['no_hp_wali'] ?? ''));
+            $this->db->bind('qr_token', $qr_token);
             $this->db->execute();
 
             $this->db->query("COMMIT");
@@ -306,7 +308,8 @@ class SiswaModel {
                 $userId = $this->db->single()['last_id'];
 
                 // 2. Tambah siswa
-                $querySiswa = "INSERT INTO siswa (user_id, nisn, jenis_kelamin, tanggal_lahir, alamat, nama_wali, no_hp_wali) VALUES (:user_id, :nisn, :jenis_kelamin, :tanggal_lahir, :alamat, :nama_wali, :no_hp_wali)";
+                $qr_token = 'STUDENT_' . time() . '_' . uniqid();
+                $querySiswa = "INSERT INTO siswa (user_id, nisn, jenis_kelamin, tanggal_lahir, alamat, nama_wali, no_hp_wali, qr_token) VALUES (:user_id, :nisn, :jenis_kelamin, :tanggal_lahir, :alamat, :nama_wali, :no_hp_wali, :qr_token)";
                 $this->db->query($querySiswa);
                 $this->db->bind('user_id', $userId);
                 $this->db->bind('nisn', $username);
@@ -315,6 +318,7 @@ class SiswaModel {
                 $this->db->bind('alamat', $data['alamat'] ?? '');
                 $this->db->bind('nama_wali', $data['nama_wali'] ?? '');
                 $this->db->bind('no_hp_wali', $data['no_hp_wali'] ?? '');
+                $this->db->bind('qr_token', $qr_token);
                 $this->db->execute();
 
                 $this->db->query("COMMIT");

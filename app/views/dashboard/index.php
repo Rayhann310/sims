@@ -57,6 +57,30 @@
         </div>
     </div>
 
+    <?php if($_SESSION['user']['role'] == 'siswa' && !empty($data['qr_token'])): ?>
+    <!-- Student QR Code Section -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-8 rounded-2xl shadow-lg border border-purple-200 flex flex-col md:flex-row items-center justify-between gap-8 mt-8 text-white relative overflow-hidden">
+        <div class="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-black/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="relative z-10 max-w-lg">
+            <h3 class="text-3xl font-extrabold mb-2 flex items-center gap-3">
+                <i class="fas fa-qrcode"></i> Kartu Presensi Digital
+            </h3>
+            <p class="text-purple-100 text-lg mb-6">Tunjukkan QR Code ini pada mesin pemindai (scanner) untuk mencatat kehadiran Anda hari ini.</p>
+            <div class="flex flex-wrap gap-4">
+                <a href="https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=<?= $data['qr_token'] ?>" download="QRCode_Saya.png" target="_blank" class="px-5 py-2.5 bg-white text-purple-700 font-bold rounded-xl shadow hover:bg-slate-50 transition-colors inline-flex items-center gap-2">
+                    <i class="fas fa-download"></i> Unduh QR
+                </a>
+            </div>
+        </div>
+        
+        <div class="relative z-10 shrink-0 bg-white p-4 rounded-2xl shadow-2xl">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=<?= $data['qr_token'] ?>" alt="QR Code Absensi" class="w-48 h-48 rounded-lg">
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         <!-- Gender Chart -->
