@@ -57,6 +57,37 @@
         </div>
     </div>
 
+    <?php if(in_array($_SESSION['user']['role'], ['admin', 'guru'])): ?>
+    <!-- Quick Actions untuk Absensi -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <!-- Kiosk Guru -->
+        <?php if($_SESSION['user']['role'] == 'admin'): ?>
+        <a href="<?= BASEURL; ?>/kioskabsensi" class="bg-gradient-to-r from-indigo-500 to-indigo-600 p-6 rounded-2xl shadow-sm text-white flex items-center justify-between hover:shadow-lg transition-all group overflow-hidden relative">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all"></div>
+            <div>
+                <h3 class="text-xl font-bold mb-1 flex items-center gap-2">
+                    <i class="fas fa-desktop"></i> Kiosk Absensi Guru
+                </h3>
+                <p class="text-indigo-100 text-sm">Buka mode layar penuh untuk presensi guru.</p>
+            </div>
+            <i class="fas fa-chevron-right text-xl opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+        </a>
+        <?php endif; ?>
+
+        <!-- Scanner Siswa -->
+        <a href="<?= BASEURL; ?>/scannerabsensi" class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 rounded-2xl shadow-sm text-white flex items-center justify-between hover:shadow-lg transition-all group overflow-hidden relative">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all"></div>
+            <div>
+                <h3 class="text-xl font-bold mb-1 flex items-center gap-2">
+                    <i class="fas fa-qrcode"></i> Scanner Presensi Siswa
+                </h3>
+                <p class="text-blue-100 text-sm">Buka kamera untuk scan QR Code absensi siswa.</p>
+            </div>
+            <i class="fas fa-chevron-right text-xl opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+        </a>
+    </div>
+    <?php endif; ?>
+
     <?php if($_SESSION['user']['role'] == 'siswa' && !empty($data['qr_token'])): ?>
     <!-- Student QR Code Section -->
     <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-8 rounded-2xl shadow-lg border border-purple-200 flex flex-col md:flex-row items-center justify-between gap-8 mt-8 text-white relative overflow-hidden">
