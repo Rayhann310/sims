@@ -3,7 +3,7 @@
      @open-edit-modal.window="editModalOpen = true"
      @open-detail-modal.window="detailModalOpen = true; currentSiswa = $event.detail;"
      @open-ultah-modal.window="ultahModalOpen = true"
-     @open-qr-modal.window="qrModalOpen = true"
+     @open-qr-modal.window="qrModalOpen = true; qrToken = $event.detail.token; qrName = $event.detail.nama"
      @open-delete-modal.window="deleteModalOpen = true; deleteUrl = $event.detail.url">
     
     <!-- Stats Grid 5 Cards -->
@@ -676,9 +676,7 @@ function openQrModal(token, nama) {
         alert('QR Token belum tergenerate untuk siswa ini.');
         return;
     }
-    document.querySelector('[x-data]').__x.$data.qrToken = token;
-    document.querySelector('[x-data]').__x.$data.qrName = nama;
-    window.dispatchEvent(new CustomEvent('open-qr-modal'));
+    window.dispatchEvent(new CustomEvent('open-qr-modal', { detail: { token: token, nama: nama } }));
 }
 
 function openEditModalSiswa(id) {
