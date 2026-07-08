@@ -840,4 +840,46 @@ return array (
       'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
     ),
   ),
+  'absensi_guru' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `absensi_guru` (
+  `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+  `guru_id` INT(11) NOT NULL,
+  `tanggal` DATE NOT NULL,
+  `waktu_masuk` TIME NOT NULL,
+  `waktu_pulang` TIME NULL DEFAULT NULL,
+  `status` ENUM(\'Hadir\',\'Sakit\',\'Izin\',\'Dinas Luar\',\'Alpa\') NOT NULL DEFAULT \'Hadir\',
+  `sync_status` BOOLEAN DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
+      'guru_id' => 'INT(11) NOT NULL',
+      'tanggal' => 'DATE NOT NULL',
+      'waktu_masuk' => 'TIME NOT NULL',
+      'waktu_pulang' => 'TIME NULL DEFAULT NULL',
+      'status' => 'ENUM(\'Hadir\',\'Sakit\',\'Izin\',\'Dinas Luar\',\'Alpa\') NOT NULL DEFAULT \'Hadir\'',
+      'sync_status' => 'BOOLEAN DEFAULT 1',
+    ),
+  ),
+  'absensi_siswa' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `absensi_siswa` (
+  `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+  `siswa_id` INT(11) NOT NULL,
+  `tanggal` DATE NOT NULL,
+  `waktu_scan` TIME NOT NULL,
+  `status` ENUM(\'Hadir\',\'Sakit\',\'Izin\',\'Alpa\') NOT NULL DEFAULT \'Hadir\',
+  `sync_status` BOOLEAN DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
+      'siswa_id' => 'INT(11) NOT NULL',
+      'tanggal' => 'DATE NOT NULL',
+      'waktu_scan' => 'TIME NOT NULL',
+      'status' => 'ENUM(\'Hadir\',\'Sakit\',\'Izin\',\'Alpa\') NOT NULL DEFAULT \'Hadir\'',
+      'sync_status' => 'BOOLEAN DEFAULT 1',
+    ),
+  ),
 );

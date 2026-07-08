@@ -6,6 +6,10 @@ class AbsensiGuruModel {
     public function __construct()
     {
         $this->db = new Database();
+        
+        // Ensure tables exist via self-healing
+        require_once 'app/models/UserModel.php';
+        new UserModel();
     }
 
     public function getAbsensiHariIni()

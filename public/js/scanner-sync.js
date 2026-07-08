@@ -5,6 +5,7 @@ function scannerData() {
         html5Qrcode: null,
         pendingSync: [],
         flashSuccess: false,
+        cameraError: false,
         lastScannedName: '',
         lastScannedToken: '',
         cooldown: false, // Prevents spamming the same QR
@@ -55,9 +56,10 @@ function scannerData() {
                     }
                 ).then(() => {
                     this.isScanning = true;
+                    this.cameraError = false;
                 }).catch(err => {
                     console.error("Failed to start scanner", err);
-                    alert("Tidak dapat mengakses kamera. Pastikan izin kamera diberikan.");
+                    this.cameraError = true;
                 });
             }
         },

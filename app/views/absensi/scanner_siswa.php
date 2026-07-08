@@ -45,10 +45,22 @@
                     <p x-text="lastScannedName"></p>
                 </div>
 
+                <!-- Camera Error UI -->
+                <div x-show="cameraError" class="absolute inset-0 z-30 bg-white flex flex-col items-center justify-center p-6 text-center" style="display: none;">
+                    <div class="w-16 h-16 rounded-full bg-red-100 text-red-500 flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-video-slash text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-lg mb-2">Akses Kamera Ditolak</h3>
+                    <p class="text-slate-500 text-sm mb-6">Pastikan Anda telah memberikan izin akses kamera pada browser Anda. (Harus menggunakan HTTPS atau localhost).</p>
+                    <button @click="toggleCamera()" class="px-5 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-colors">
+                        Coba Lagi
+                    </button>
+                </div>
+
                 <h2 class="text-2xl font-bold text-slate-800 mb-2">Scan QR Code</h2>
                 <p class="text-slate-500 text-sm mb-6">Posisikan QR Code siswa di dalam kotak pemindai.</p>
                 
-                <div class="rounded-2xl overflow-hidden border-4 border-slate-100 shadow-inner bg-black aspect-square relative" id="reader">
+                <div class="rounded-2xl overflow-hidden border-4 border-slate-100 shadow-inner bg-black aspect-square relative w-full mx-auto" id="reader">
                     <!-- HTML5 QR Code injects here -->
                 </div>
 
