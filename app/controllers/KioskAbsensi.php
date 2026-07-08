@@ -3,8 +3,8 @@
 class KioskAbsensi extends Controller {
     public function __construct()
     {
-        // Pastikan hanya admin yang bisa buka kiosk ini
-        if(!isset($_SESSION['user']) || $_SESSION['user']['role'] != 'admin') {
+        // Pastikan hanya admin dan guru yang bisa buka kiosk ini
+        if(!isset($_SESSION['user']) || !in_array($_SESSION['user']['role'], ['admin', 'guru'])) {
             header('Location: ' . BASEURL . '/login');
             exit;
         }

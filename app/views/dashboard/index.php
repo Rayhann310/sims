@@ -61,8 +61,8 @@
     <!-- Quick Actions untuk Absensi -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
         <!-- Kiosk Guru -->
-        <?php if($_SESSION['user']['role'] == 'admin'): ?>
-        <a href="<?= BASEURL; ?>/kioskabsensi" class="bg-gradient-to-r from-indigo-500 to-indigo-600 p-6 rounded-2xl shadow-sm text-white flex items-center justify-between hover:shadow-lg transition-all group overflow-hidden relative">
+        <?php if(in_array($_SESSION['user']['role'], ['admin', 'guru'])): ?>
+        <a href="<?= BASEURL; ?>/KioskAbsensi" class="bg-gradient-to-r from-indigo-500 to-indigo-600 p-6 rounded-2xl shadow-sm text-white flex items-center justify-between hover:shadow-lg transition-all group overflow-hidden relative">
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all"></div>
             <div>
                 <h3 class="text-xl font-bold mb-1 flex items-center gap-2">
@@ -75,7 +75,7 @@
         <?php endif; ?>
 
         <!-- Scanner Siswa -->
-        <a href="<?= BASEURL; ?>/scannerabsensi" class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 rounded-2xl shadow-sm text-white flex items-center justify-between hover:shadow-lg transition-all group overflow-hidden relative">
+        <a href="<?= BASEURL; ?>/ScannerAbsensi" class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 rounded-2xl shadow-sm text-white flex items-center justify-between hover:shadow-lg transition-all group overflow-hidden relative">
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all"></div>
             <div>
                 <h3 class="text-xl font-bold mb-1 flex items-center gap-2">
