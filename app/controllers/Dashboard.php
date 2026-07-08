@@ -1,6 +1,13 @@
 <?php
 
 class Dashboard extends Controller {
+    public function __construct()
+    {
+        // Ensure database schema is up to date via self-healing
+        require_once 'app/models/UserModel.php';
+        new UserModel();
+    }
+
     public function index()
     {
         // Pengecekan sesi, hanya yang sudah login yang bisa akses

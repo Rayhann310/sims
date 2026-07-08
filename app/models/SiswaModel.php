@@ -6,6 +6,10 @@ class SiswaModel {
     public function __construct()
     {
         $this->db = new Database();
+        
+        // Ensure database schema is up to date via self-healing
+        require_once 'app/models/UserModel.php';
+        new UserModel();
     }
 
     public function getAllSiswa($filters = [])

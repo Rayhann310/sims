@@ -186,7 +186,7 @@
         const GURU_LIST = <?= json_encode($data['guru']); ?>;
         const INITIAL_ABSENSI = <?= json_encode($data['absensi']); ?>;
     </script>
-    <script src="<?= BASEURL; ?>/js/kiosk-sync.js"></script>
+    <script src="<?= BASEURL; ?>/public/js/kiosk-sync.js"></script>
 
 </body>
 </html>

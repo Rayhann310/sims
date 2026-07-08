@@ -86,7 +86,7 @@
     <script>
         const BASEURL = '<?= BASEURL; ?>';
     </script>
-    <script src="<?= BASEURL; ?>/js/scanner-sync.js"></script>
+    <script src="<?= BASEURL; ?>/public/js/scanner-sync.js"></script>
 
 </body>
 </html>

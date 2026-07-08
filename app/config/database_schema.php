@@ -633,6 +633,7 @@ return array (
       'status' => 'enum(\'Aktif\',\'Alumni\',\'Keluar\') DEFAULT \'Aktif\'',
       'tahun_lulus' => 'int(4) DEFAULT NULL',
       'foto' => 'LONGTEXT DEFAULT NULL',
+      'qr_token' => 'VARCHAR(255) NULL DEFAULT NULL',
     ),
   ),
   'tagihan_spp' => 
