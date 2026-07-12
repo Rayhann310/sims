@@ -12,6 +12,8 @@ class Jadwal extends Controller {
             header('Location: ' . BASEURL . '/login');
             exit;
         }
+        // Pastikan self-healing berjalan
+        $this->model('UserModel');
     }
 
     public function index()
