@@ -280,6 +280,14 @@ class Jadwal extends Controller {
         header('Location: ' . BASEURL . '/jadwal/pengaturan');
         exit;
     }
+
+    public function hapusAlokasi($id)
+    {
+        $this->model('JadwalModel')->hapusAlokasi($id);
+        $_SESSION['flash'] = ['pesan' => 'Alokasi Mapel', 'aksi' => 'dihapus', 'tipe' => 'success'];
+        header('Location: ' . BASEURL . '/jadwal/pengaturan');
+        exit;
+    }
     // --- AUTO GENERATE JADWAL ---
     public function autoGenerate()
     {

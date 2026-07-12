@@ -201,9 +201,14 @@ class JadwalModel {
         return $this->db->resultSet();
     }
 
-    public function tambahIstirahat($data)
+    public function simpanIstirahat($data)
     {
-        $this->db->query("INSERT INTO jadwal_istirahat (nama_istirahat, setelah_jp_ke, durasi_menit, hari_khusus) VALUES (:nama_istirahat, :setelah_jp_ke, :durasi_menit, :hari_khusus)");
+        if (!empty($data['id'])) {
+            $this->db->query("UPDATE jadwal_istirahat SET nama_istirahat = :nama_istirahat, setelah_jp_ke = :setelah_jp_ke, durasi_menit = :durasi_menit, hari_khusus = :hari_khusus WHERE id = :id");
+            $this->db->bind('id', $data['id']);
+        } else {
+            $this->db->query("INSERT INTO jadwal_istirahat (nama_istirahat, setelah_jp_ke, durasi_menit, hari_khusus) VALUES (:nama_istirahat, :setelah_jp_ke, :durasi_menit, :hari_khusus)");
+        }
         $this->db->bind('nama_istirahat', $data['nama_istirahat']);
         $this->db->bind('setelah_jp_ke', $data['setelah_jp_ke']);
         $this->db->bind('durasi_menit', $data['durasi_menit']);
@@ -229,11 +234,24 @@ class JadwalModel {
 
     public function simpanAlokasi($data)
     {
-        $this->db->query("INSERT INTO alokasi_mapel (mapel_id, tingkat, jurusan, jumlah_jp) VALUES (:mapel_id, :tingkat, :jurusan, :jumlah_jp) ON DUPLICATE KEY UPDATE jumlah_jp = :jumlah_jp");
+        if (!empty($data['id'])) {
+            $this->db->query("UPDATE alokasi_mapel SET mapel_id = :mapel_id, tingkat = :tingkat, jurusan = :jurusan, jumlah_jp = :jumlah_jp WHERE id = :id");
+            $this->db->bind('id', $data['id']);
+        } else {
+            $this->db->query("INSERT INTO alokasi_mapel (mapel_id, tingkat, jurusan, jumlah_jp) VALUES (:mapel_id, :tingkat, :jurusan, :jumlah_jp) ON DUPLICATE KEY UPDATE jumlah_jp = :jumlah_jp");
+        }
         $this->db->bind('mapel_id', $data['mapel_id']);
         $this->db->bind('tingkat', $data['tingkat']);
         $this->db->bind('jurusan', $data['jurusan']);
         $this->db->bind('jumlah_jp', $data['jumlah_jp']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function hapusAlokasi($id)
+    {
+        $this->db->query("DELETE FROM alokasi_mapel WHERE id = :id");
+        $this->db->bind('id', $id);
         $this->db->execute();
         return $this->db->rowCount();
     }
