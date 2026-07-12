@@ -14,12 +14,30 @@ class ScannerKelas extends Controller {
     {
         $data['judul'] = 'Scanner & Absensi Kelas';
 
-        // Load kelas/rombel yang diajar oleh guru ini (misal ambil semua rombel aktif)
-        // Sebenarnya idealnya ambil dari jadwal, tapi untuk kesederhanaan kita ambil semua rombel aktif
-        $this->model('SiswaModel'); // To initialize DB
+        // Load jadwal pelajaran untuk guru yang sedang login untuk hari ini
         $db = new Database();
-        $db->query("SELECT r.*, k.tingkat as grade, k.jurusan, k.nama_kelas FROM rombel r JOIN kelas k ON r.kelas_id = k.id ORDER BY k.tingkat ASC, k.jurusan ASC, k.nama_kelas ASC");
-        $data['rombel'] = $db->resultSet();
+        
+        $db->query("SELECT id FROM guru WHERE user_id = :user_id");
+        $db->bind('user_id', $_SESSION['user']['id']);
+        $guru = $db->single();
+        $guru_id = $guru ? $guru['id'] : 0;
+
+        $hari_indo = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        $hari_ini = $hari_indo[date('w')];
+
+        $db->query("
+            SELECT jp.*, m.nama_mapel, r.nama_rombel, k.tingkat, k.jurusan, k.nama_kelas 
+            FROM jadwal_pelajaran jp
+            JOIN mata_pelajaran m ON jp.mapel_id = m.id
+            JOIN rombel r ON jp.rombel_id = r.id
+            JOIN kelas k ON r.kelas_id = k.id
+            WHERE jp.guru_id = :guru_id AND jp.hari = :hari
+            ORDER BY jp.jam_mulai ASC
+        ");
+        $db->bind('guru_id', $guru_id);
+        $db->bind('hari', $hari_ini);
+        $data['jadwal'] = $db->resultSet();
+
 
         $this->view('templates/admin_header', $data);
         $this->view('absensi/scanner_kelas', $data);
@@ -61,7 +79,7 @@ class ScannerKelas extends Controller {
                     $payload = [
                         'siswa_id' => $siswa['id'],
                         'guru_id' => $guru_id,
-                        'jam_ke' => $post['jam_ke'],
+                        'jam_ke' => $post['jadwal_id'],
                         'status' => 'Hadir'
                     ];
                     $res = $this->model('AbsensiSiswaModel')->absenKelas($payload);
@@ -74,7 +92,7 @@ class ScannerKelas extends Controller {
                 $payload = [
                     'siswa_id' => $post['siswa_id'],
                     'guru_id' => $guru_id,
-                    'jam_ke' => $post['jam_ke'],
+                    'jam_ke' => $post['jadwal_id'],
                     'status' => $post['status']
                 ];
                 $res = $this->model('AbsensiSiswaModel')->absenKelas($payload);

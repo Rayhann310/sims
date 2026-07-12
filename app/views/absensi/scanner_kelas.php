@@ -7,29 +7,38 @@
     </div>
 
     <!-- Parameter Filter -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
         <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Jam Pelajaran Ke-</label>
-            <select x-model="jamKe" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
-                <option value="">-- Pilih Jam Pelajaran --</option>
-                <template x-for="i in 10">
-                    <option :value="i" x-text="`Jam Ke-${i}`"></option>
-                </template>
-            </select>
-        </div>
-        <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Kelas / Rombel</label>
-            <select x-model="rombelId" @change="loadSiswa()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
-                <option value="">-- Pilih Kelas --</option>
-                <?php foreach($data['rombel'] as $r): ?>
-                <option value="<?= $r['id'] ?>"><?= $r['grade'] . ' ' . $r['jurusan'] . ' ' . $r['nama_kelas'] ?></option>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Jadwal Mengajar (Hari Ini)</label>
+            <select x-model="jadwalId" @change="handleJadwalChange()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
+                <option value="">-- Pilih Jadwal --</option>
+                <?php 
+                $currentTime = date('H:i:s');
+                foreach($data['jadwal'] as $j): 
+                    $mulai = $j['jam_mulai'];
+                    $selesai = $j['jam_selesai'];
+                    
+                    if ($currentTime < $mulai) {
+                        $status = 'Belum Aktif';
+                        $disabled = 'disabled';
+                    } else if ($currentTime > $selesai) {
+                        $status = 'Terlewat';
+                        $disabled = '';
+                    } else {
+                        $status = 'Sedang Aktif';
+                        $disabled = '';
+                    }
+                ?>
+                <option value="<?= $j['id'] ?>" <?= $disabled ?>>
+                    <?= substr($mulai, 0, 5) ?> - <?= substr($selesai, 0, 5) ?> | <?= $j['nama_mapel'] ?> (<?= $j['nama_rombel'] ?>) - [<?= $status ?>]
+                </option>
                 <?php endforeach; ?>
             </select>
         </div>
     </div>
 
     <!-- Main Content Tabs -->
-    <div x-show="jamKe && rombelId" style="display: none;">
+    <div x-show="jadwalId" style="display: none;">
         <!-- Tabs -->
         <div class="flex gap-4 border-b border-slate-200 mb-4">
             <button @click="activeTab = 'manual'" :class="activeTab == 'manual' ? 'border-b-2 border-indigo-600 text-indigo-600 font-bold' : 'text-slate-500 hover:text-slate-700'" class="px-4 py-3 text-sm transition-colors">
@@ -85,9 +94,9 @@
     </div>
 
     <!-- Alert belum pilih filter -->
-    <div x-show="!jamKe || !rombelId" class="text-center py-12 bg-white rounded-2xl border border-slate-200 border-dashed text-slate-400">
+    <div x-show="!jadwalId" class="text-center py-12 bg-white rounded-2xl border border-slate-200 border-dashed text-slate-400">
         <i class="fas fa-hand-pointer text-4xl mb-3"></i>
-        <p>Silakan pilih Jam Pelajaran dan Kelas untuk mulai.</p>
+        <p>Silakan pilih Jadwal Mengajar untuk mulai.</p>
     </div>
 
 </div>
@@ -97,13 +106,22 @@
 
 <script>
 function scannerKelasData() {
+    const jadwalData = <?= json_encode($data['jadwal']) ?>;
     return {
-        jamKe: '',
+        jadwalId: '',
         rombelId: '',
         activeTab: 'manual',
         siswaList: [],
         isLoading: false,
         html5QrcodeScanner: null,
+
+        handleJadwalChange() {
+            let j = jadwalData.find(x => x.id == this.jadwalId);
+            if(j) {
+                this.rombelId = j.rombel_id;
+                this.loadSiswa();
+            }
+        },
 
         async loadSiswa() {
             if (!this.rombelId) return;
@@ -137,7 +155,7 @@ function scannerKelasData() {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         siswa_id: siswa_id,
-                        jam_ke: this.jamKe,
+                        jadwal_id: this.jadwalId,
                         status: status
                     })
                 });
@@ -180,7 +198,7 @@ function scannerKelasData() {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         qr_token: decodedText,
-                        jam_ke: this.jamKe
+                        jadwal_id: this.jadwalId
                     })
                 });
                 const result = await res.json();
