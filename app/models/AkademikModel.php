@@ -110,8 +110,9 @@ class AkademikModel {
 
     public function tambahKelas($data)
     {
-        $this->db->query("INSERT INTO kelas (nama_kelas, jurusan) VALUES (:nama_kelas, :jurusan)");
+        $this->db->query("INSERT INTO kelas (nama_kelas, tingkat, jurusan) VALUES (:nama_kelas, :tingkat, :jurusan)");
         $this->db->bind('nama_kelas', $data['nama_kelas']);
+        $this->db->bind('tingkat', isset($data['tingkat']) ? $data['tingkat'] : '10');
         $this->db->bind('jurusan', $data['jurusan']);
         $this->db->execute();
         return $this->db->rowCount();
@@ -127,8 +128,9 @@ class AkademikModel {
 
     public function editKelas($data)
     {
-        $this->db->query("UPDATE kelas SET nama_kelas = :nama_kelas, jurusan = :jurusan WHERE id = :id");
+        $this->db->query("UPDATE kelas SET nama_kelas = :nama_kelas, tingkat = :tingkat, jurusan = :jurusan WHERE id = :id");
         $this->db->bind('nama_kelas', $data['nama_kelas']);
+        $this->db->bind('tingkat', isset($data['tingkat']) ? $data['tingkat'] : '10');
         $this->db->bind('jurusan', $data['jurusan']);
         $this->db->bind('id', $data['id']);
         $this->db->execute();
