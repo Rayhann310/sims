@@ -91,8 +91,9 @@
 
         <!-- Tab Scan QR -->
         <div x-show="activeTab == 'scan'" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col items-center">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 text-center">Arahkan QR Code Siswa ke Kamera</h3>
-            <div id="reader" class="w-full max-w-sm rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-100 mb-4"></div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2 text-center">Arahkan QR Code Siswa ke Kamera</h3>
+            <p class="text-sm text-slate-500 mb-4 text-center">Pastikan Anda memberikan izin akses kamera pada browser Anda (Allow Camera Permission) saat diminta.</p>
+            <div id="reader" class="w-full max-w-sm sm:max-w-md md:max-w-lg rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-100 mb-4" style="min-height: 250px;"></div>
             
             <div class="w-full max-w-md space-y-2 mt-4 max-h-48 overflow-y-auto" id="scan-results">
                 <!-- Log hasil scan akan muncul di sini -->
@@ -188,7 +189,17 @@ function scannerKelasData() {
 
             this.html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader",
-                { fps: 10, qrbox: {width: 250, height: 250} },
+                { 
+                    fps: 10, 
+                    qrbox: function(viewfinderWidth, viewfinderHeight) {
+                        var minEdgePercentage = 0.7; // 70% of the smallest edge
+                        var minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+                        var qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
+                        return { width: qrboxSize, height: qrboxSize };
+                    },
+                    aspectRatio: 1.0,
+                    supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+                },
                 /* verbose= */ false
             );
 
