@@ -954,4 +954,64 @@ return array (
       'sync_status' => 'BOOLEAN DEFAULT 1',
     ),
   ),
+  'pengaturan_jadwal' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `pengaturan_jadwal` (
+  `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+  `jam_mulai` TIME NOT NULL DEFAULT \'07:00:00\',
+  `durasi_per_jp` INT(11) NOT NULL DEFAULT 45,
+  `max_jp_per_hari` INT(11) NOT NULL DEFAULT 10,
+  `hari_aktif` VARCHAR(100) NOT NULL DEFAULT \'Senin,Selasa,Rabu,Kamis,Jumat\',
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
+      'jam_mulai' => 'TIME NOT NULL DEFAULT \'07:00:00\'',
+      'durasi_per_jp' => 'INT(11) NOT NULL DEFAULT 45',
+      'max_jp_per_hari' => 'INT(11) NOT NULL DEFAULT 10',
+      'hari_aktif' => 'VARCHAR(100) NOT NULL DEFAULT \'Senin,Selasa,Rabu,Kamis,Jumat\'',
+      'updated_at' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    ),
+  ),
+  'jadwal_istirahat' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `jadwal_istirahat` (
+  `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+  `nama_istirahat` VARCHAR(50) NOT NULL,
+  `setelah_jp_ke` INT(11) NOT NULL,
+  `durasi_menit` INT(11) NOT NULL DEFAULT 30,
+  `hari_khusus` VARCHAR(50) DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
+      'nama_istirahat' => 'VARCHAR(50) NOT NULL',
+      'setelah_jp_ke' => 'INT(11) NOT NULL',
+      'durasi_menit' => 'INT(11) NOT NULL DEFAULT 30',
+      'hari_khusus' => 'VARCHAR(50) DEFAULT NULL',
+      'created_at' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    ),
+  ),
+  'alokasi_mapel' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `alokasi_mapel` (
+  `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
+  `mapel_id` INT(11) NOT NULL,
+  `tingkat` ENUM(\'10\',\'11\',\'12\') NOT NULL,
+  `jurusan` ENUM(\'MIPA\',\'IPS\',\'BAHASA\',\'UMUM\') NOT NULL,
+  `jumlah_jp` INT(11) NOT NULL DEFAULT 2,
+  UNIQUE KEY `mapel_tingkat_jurusan` (`mapel_id`, `tingkat`, `jurusan`),
+  CONSTRAINT `alokasi_mapel_ibfk_1` FOREIGN KEY (`mapel_id`) REFERENCES `mata_pelajaran` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
+      'mapel_id' => 'INT(11) NOT NULL',
+      'tingkat' => 'ENUM(\'10\',\'11\',\'12\') NOT NULL',
+      'jurusan' => 'ENUM(\'MIPA\',\'IPS\',\'BAHASA\',\'UMUM\') NOT NULL',
+      'jumlah_jp' => 'INT(11) NOT NULL DEFAULT 2',
+    ),
+  ),
 );

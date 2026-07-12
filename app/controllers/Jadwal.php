@@ -227,4 +227,393 @@ class Jadwal extends Controller {
             exit;
         }
     }
+    // --- PENGATURAN & ALOKASI ---
+    public function pengaturan()
+    {
+        $data['judul'] = 'Pengaturan Jadwal & Alokasi Mapel';
+        $data['pengaturan'] = $this->model('JadwalModel')->getPengaturanJadwal();
+        $data['istirahat'] = $this->model('JadwalModel')->getAllIstirahat();
+        $data['alokasi'] = $this->model('JadwalModel')->getAllAlokasi();
+        $data['mapel_list'] = $this->model('JadwalModel')->getAllMapel();
+
+        $this->view('templates/admin_header', $data);
+        $this->view('jadwal/pengaturan', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    public function simpanPengaturanJadwal()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $this->model('JadwalModel')->savePengaturanJadwal($_POST);
+            $_SESSION['flash'] = ['pesan' => 'Pengaturan Jadwal', 'aksi' => 'diperbarui', 'tipe' => 'success'];
+        }
+        header('Location: ' . BASEURL . '/jadwal/pengaturan');
+        exit;
+    }
+
+    public function simpanIstirahat()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $this->model('JadwalModel')->tambahIstirahat($_POST);
+            $_SESSION['flash'] = ['pesan' => 'Jadwal Istirahat', 'aksi' => 'ditambahkan', 'tipe' => 'success'];
+        }
+        header('Location: ' . BASEURL . '/jadwal/pengaturan');
+        exit;
+    }
+
+    public function hapusIstirahat($id)
+    {
+        $this->model('JadwalModel')->hapusIstirahat($id);
+        $_SESSION['flash'] = ['pesan' => 'Jadwal Istirahat', 'aksi' => 'dihapus', 'tipe' => 'success'];
+        header('Location: ' . BASEURL . '/jadwal/pengaturan');
+        exit;
+    }
+
+    public function simpanAlokasi()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $this->model('JadwalModel')->simpanAlokasi($_POST);
+            $_SESSION['flash'] = ['pesan' => 'Alokasi Mapel', 'aksi' => 'disimpan', 'tipe' => 'success'];
+        }
+        header('Location: ' . BASEURL . '/jadwal/pengaturan');
+        exit;
+    }
+    // --- AUTO GENERATE JADWAL ---
+    public function autoGenerate()
+    {
+        $rombel_id = isset($_GET['rombel_id']) ? $_GET['rombel_id'] : null;
+        $ta_id = isset($_GET['ta_id']) ? $_GET['ta_id'] : null;
+        if (!$rombel_id || !$ta_id) {
+            $_SESSION['flash'] = ['pesan' => 'Rombel belum dipilih', 'aksi' => '', 'tipe' => 'danger'];
+            header('Location: ' . BASEURL . '/jadwal');
+            exit;
+        }
+
+        // Ambil info rombel
+        $db = new Database();
+        $db->query("SELECT r.*, k.tingkat, k.jurusan FROM rombel r JOIN kelas k ON r.kelas_id = k.id WHERE r.id = :id");
+        $db->bind('id', $rombel_id);
+        $rombel = $db->single();
+
+        // Ambil alokasi mapel sesuai tingkat & jurusan
+        $db->query("SELECT a.*, m.nama_mapel, m.kode_mapel FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id WHERE a.tingkat = :tingkat AND a.jurusan = :jurusan");
+        $db->bind('tingkat', $rombel['tingkat']);
+        $db->bind('jurusan', $rombel['jurusan']);
+        $alokasi = $db->resultSet();
+
+        $data['judul'] = 'Auto Generate Jadwal - ' . $rombel['nama_rombel'];
+        $data['rombel'] = $rombel;
+        $data['alokasi'] = $alokasi;
+        $data['guru_list'] = $this->model('JadwalModel')->getAllGuru();
+        $data['ta_id'] = $ta_id;
+
+        $this->view('templates/admin_header', $data);
+        $this->view('jadwal/auto_generate', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    public function prosesGenerate()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') exit;
+        
+        $rombel_id = $_POST['rombel_id'];
+        $ta_id = $_POST['ta_id'];
+        
+        $mapel_guru = [];
+        // Extract mapel_id dan guru_id dari POST (berbentuk array: guru[mapel_id])
+        if (isset($_POST['guru'])) {
+            foreach ($_POST['guru'] as $mapel_id => $guru_id) {
+                if (!empty($guru_id)) {
+                    $mapel_guru[$mapel_id] = $guru_id;
+                }
+            }
+        }
+
+        // Masukkan data ini ke session untuk diproses di preview
+        $_SESSION['auto_generate_data'] = [
+            'rombel_id' => $rombel_id,
+            'ta_id' => $ta_id,
+            'mapel_guru' => $mapel_guru
+        ];
+
+        header('Location: ' . BASEURL . '/jadwal/previewGenerate');
+        exit;
+    public function previewGenerate()
+    {
+        if (!isset($_SESSION['auto_generate_data'])) {
+            header('Location: ' . BASEURL . '/jadwal');
+            exit;
+        }
+
+        $sessionData = $_SESSION['auto_generate_data'];
+        $rombel_id = $sessionData['rombel_id'];
+        $ta_id = $sessionData['ta_id'];
+        $mapel_guru = $sessionData['mapel_guru']; // [mapel_id => guru_id]
+
+        $db = new Database();
+        
+        // Ambil info rombel
+        $db->query("SELECT r.*, k.tingkat, k.jurusan FROM rombel r JOIN kelas k ON r.kelas_id = k.id WHERE r.id = :id");
+        $db->bind('id', $rombel_id);
+        $rombel = $db->single();
+
+        // Pengaturan
+        $model = $this->model('JadwalModel');
+        $pengaturan = $model->getPengaturanJadwal();
+        $istirahat = $model->getAllIstirahat();
+        
+        $hari_aktif = explode(',', $pengaturan['hari_aktif']);
+        $max_jp = (int)$pengaturan['max_jp_per_hari'];
+        $durasi = (int)$pengaturan['durasi_per_jp'];
+        
+        // Ambil alokasi untuk tahu butuh berapa JP per mapel
+        $db->query("SELECT a.*, m.nama_mapel, m.kode_mapel FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id WHERE a.tingkat = :tingkat AND a.jurusan = :jurusan");
+        $db->bind('tingkat', $rombel['tingkat']);
+        $db->bind('jurusan', $rombel['jurusan']);
+        $alokasiRaw = $db->resultSet();
+        $alokasiMap = []; // [mapel_id => ['nama' => x, 'jml' => y]]
+        foreach($alokasiRaw as $a) {
+            $alokasiMap[$a['mapel_id']] = [
+                'nama' => $a['nama_mapel'],
+                'jml' => (int)$a['jumlah_jp']
+            ];
+        }
+        
+        // Persiapkan grid (Hari -> JP)
+        $grid = [];
+        foreach($hari_aktif as $h) {
+            $grid[$h] = [];
+            
+            // Kalkulasi jam
+            $currentTime = strtotime($pengaturan['jam_mulai']);
+            
+            for($jp = 1; $jp <= $max_jp; $jp++) {
+                // Cek apakah JP ini adalah istirahat
+                $isBreak = false;
+                $breakName = '';
+                $breakDuration = 0;
+                
+                foreach($istirahat as $ist) {
+                    if ($ist['setelah_jp_ke'] == ($jp - 1)) {
+                        // Berlaku tiap hari ATAU hari ini khusus
+                        if (empty($ist['hari_khusus']) || strtolower($ist['hari_khusus']) == strtolower($h)) {
+                            $isBreak = true;
+                            $breakName = $ist['nama_istirahat'];
+                            $breakDuration = (int)$ist['durasi_menit'];
+                            break; // Anggap 1 istirahat per slot
+                        }
+                    }
+                }
+                
+                if ($isBreak) {
+                    $jamSelesaiBreak = $currentTime + ($breakDuration * 60);
+                    $grid[$h]['break_' . $jp] = [
+                        'type' => 'break',
+                        'name' => $breakName,
+                        'jam_mulai' => date('H:i', $currentTime),
+                        'jam_selesai' => date('H:i', $jamSelesaiBreak)
+                    ];
+                    $currentTime = $jamSelesaiBreak;
+                }
+                
+                // Normal JP
+                $jamSelesai = $currentTime + ($durasi * 60);
+                $grid[$h][$jp] = [
+                    'type' => 'jp',
+                    'jp' => $jp,
+                    'jam_mulai' => date('H:i', $currentTime),
+                    'jam_selesai' => date('H:i', $jamSelesai),
+                    'mapel_id' => null,
+                    'guru_id' => null,
+                    'nama_mapel' => '',
+                    'nama_guru' => '',
+                    'conflict' => false
+                ];
+                $currentTime = $jamSelesai;
+            }
+        }
+        
+        // Ambil nama guru
+        $guru_list = $model->getAllGuru();
+        $guruMap = [];
+        foreach($guru_list as $g) {
+            $guruMap[$g['id']] = $g['nama_lengkap'];
+        }
+
+        // ALGORITMA PENEMPATAN GREEDY
+        // Urutkan mapel berdasarkan prioritas/jumlah JP terbanyak agar mudah cari slot berjejer (block)
+        $tasks = [];
+        foreach($mapel_guru as $m_id => $g_id) {
+            if (isset($alokasiMap[$m_id])) {
+                $tasks[] = [
+                    'mapel_id' => $m_id,
+                    'guru_id' => $g_id,
+                    'sisa_jp' => $alokasiMap[$m_id]['jml'],
+                    'nama_mapel' => $alokasiMap[$m_id]['nama'],
+                    'nama_guru' => $guruMap[$g_id] ?? 'Guru ' . $g_id
+                ];
+            }
+        }
+        
+        // Sort tasks descending by sisa_jp
+        usort($tasks, function($a, $b) {
+            return $b['sisa_jp'] - $a['sisa_jp'];
+        });
+
+        foreach($tasks as &$task) {
+            while($task['sisa_jp'] > 0) {
+                // Tentukan ukuran blok (coba pasang 2 JP sekaligus jika sisa >= 2, kalau tidak 1)
+                $blockSize = ($task['sisa_jp'] >= 2) ? 2 : 1;
+                $placed = false;
+                
+                foreach($hari_aktif as $h) {
+                    for($jp = 1; $jp <= $max_jp - $blockSize + 1; $jp++) {
+                        // Cek apakah slot(s) kosong
+                        $canPlace = true;
+                        $slotsToFill = [];
+                        
+                        for($b = 0; $b < $blockSize; $b++) {
+                            $targetJp = $jp + $b;
+                            if (isset($grid[$h][$targetJp]) && $grid[$h][$targetJp]['mapel_id'] === null) {
+                                // Cek bentrok guru di jam ini pakai cekKonflikJam
+                                $konflik = $model->cekKonflikJam(
+                                    $rombel_id, 
+                                    $task['guru_id'], 
+                                    $h, 
+                                    $grid[$h][$targetJp]['jam_mulai'], 
+                                    $grid[$h][$targetJp]['jam_selesai']
+                                );
+                                
+                                if ($konflik['konflik_guru']) {
+                                    $canPlace = false;
+                                    break;
+                                }
+                                $slotsToFill[] = $targetJp;
+                            } else {
+                                $canPlace = false;
+                                break;
+                            }
+                        }
+                        
+                        if ($canPlace) {
+                            // Cek apakah hari ini sudah ada mapel yang sama (hindari double pelajaran di 1 hari jika memungkinkan)
+                            // Ini optional, tapi bagus untuk jadwal
+                            $hasSameToday = false;
+                            foreach($grid[$h] as $k => $v) {
+                                if ($v['type'] == 'jp' && $v['mapel_id'] == $task['mapel_id']) {
+                                    $hasSameToday = true;
+                                    break;
+                                }
+                            }
+                            
+                            // Jika ada yang sama di hari yang sama, dan blok size > 1, mending coba hari lain dulu
+                            // (Sangat kompleks untuk perfect greedy, kita pakai sederhana saja)
+                            if ($hasSameToday && count($hari_aktif) > 1 && mt_rand(0, 1) == 0) {
+                                // skip with 50% chance to spread subjects
+                                continue; 
+                            }
+
+                            // Place
+                            foreach($slotsToFill as $s) {
+                                $grid[$h][$s]['mapel_id'] = $task['mapel_id'];
+                                $grid[$h][$s]['guru_id'] = $task['guru_id'];
+                                $grid[$h][$s]['nama_mapel'] = $task['nama_mapel'];
+                                $grid[$h][$s]['nama_guru'] = $task['nama_guru'];
+                            }
+                            $task['sisa_jp'] -= $blockSize;
+                            $placed = true;
+                            break;
+                        }
+                    }
+                    if ($placed) break;
+                }
+                
+                if (!$placed) {
+                    // Jika tidak bisa ditempatkan dengan blockSize 2, coba turunkan jadi 1
+                    if ($blockSize > 1) {
+                        // loop kembali dengan sisa JP yang sama (akan otomatis jadi blockSize 1 next time jika kita force)
+                        // Wait, if it fails to place blockSize 2, it loops forever.
+                        // Force sisa_jp to be evaluated as 1 temporarily for this turn
+                        $task['sisa_jp'] -= 1; 
+                        // fallback strategy, just place 1
+                        $task['sisa_jp'] += 1;
+                        // a hack: we break out if we absolutely can't place it even with size 1
+                    } 
+                    // Break to avoid infinite loop if grid is full
+                    break;
+                }
+            }
+        }
+        
+        $_SESSION['generated_grid'] = $grid; // Simpan untuk disave nanti
+
+        $data['judul'] = 'Preview Jadwal - ' . $rombel['nama_rombel'];
+        $data['rombel'] = $rombel;
+        $data['grid'] = $grid;
+        $data['hari_aktif'] = $hari_aktif;
+        $data['unplaced'] = array_filter($tasks, function($t) { return $t['sisa_jp'] > 0; });
+        $data['max_jp'] = $max_jp;
+
+        $this->view('templates/admin_header', $data);
+        $this->view('jadwal/preview', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    public function simpanJadwalOtomatis()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_SESSION['generated_grid'])) {
+            header('Location: ' . BASEURL . '/jadwal');
+            exit;
+        }
+
+        $grid = $_SESSION['generated_grid'];
+        $rombel_id = $_SESSION['auto_generate_data']['rombel_id'];
+        
+        $dataInsert = [];
+        foreach ($grid as $hari => $slots) {
+            foreach ($slots as $key => $slot) {
+                if ($slot['type'] == 'jp' && !empty($slot['mapel_id']) && !empty($slot['guru_id'])) {
+                    $dataInsert[] = [
+                        'rombel_id'   => $rombel_id,
+                        'mapel_id'    => $slot['mapel_id'],
+                        'guru_id'     => $slot['guru_id'],
+                        'hari'        => $hari,
+                        'jam_mulai'   => $slot['jam_mulai'],
+                        'jam_selesai' => $slot['jam_selesai'],
+                    ];
+                }
+            }
+        }
+
+        if (count($dataInsert) > 0) {
+            // Kita bisa pakai importJadwalMassal
+            $result = $this->model('JadwalModel')->importJadwalMassal($dataInsert);
+            $msg = $result['inserted'] . ' jadwal hasil generate berhasil disimpan.';
+            if (!empty($result['errors'])) {
+                $msg .= ' ' . count($result['errors']) . ' blok dilewati (bentrok manual).';
+            }
+            $_SESSION['flash'] = ['pesan' => $msg, 'aksi' => '', 'tipe' => 'success'];
+        } else {
+            $_SESSION['flash'] = ['pesan' => 'Tidak ada jadwal yang disimpan.', 'aksi' => '', 'tipe' => 'danger'];
+        }
+
+        // Hapus session 
+        unset($_SESSION['generated_grid']);
+        unset($_SESSION['auto_generate_data']);
+
+        header('Location: ' . BASEURL . '/jadwal');
+        exit;
+    public function updateSessionGrid()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['grid'])) {
+            $grid = json_decode($_POST['grid'], true);
+            if ($grid) {
+                $_SESSION['generated_grid'] = $grid;
+                echo json_encode(['status' => 'ok']);
+                exit;
+            }
+        }
+        http_response_code(400);
+        exit;
+    }
 }

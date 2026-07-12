@@ -6,13 +6,17 @@
         </div>
         <?php if ($_SESSION['user']['role'] == 'admin') : ?>
         <div class="flex space-x-2">
+            <a href="<?= BASEURL; ?>/jadwal/pengaturan" class="inline-flex items-center px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                <i class="fas fa-cog mr-2"></i> Pengaturan
+            </a>
+            <button @click="window.location.href='<?= BASEURL; ?>/jadwal/autoGenerate?rombel_id='+rombel_id+'&ta_id='+ta_id" :disabled="!rombel_id" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                <i class="fas fa-magic mr-2"></i> Auto Generate
+            </button>
             <button @click="openModal()" :disabled="!rombel_id" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                Import Jadwal
+                <i class="fas fa-file-excel mr-2"></i> Import Excel
             </button>
             <button @click="openTambahModal()" :disabled="!rombel_id" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
-                <i class="fas fa-plus mr-2"></i>
-                Tambah Jadwal
+                <i class="fas fa-plus mr-2"></i> Tambah Manual
             </button>
         </div>
         <?php endif; ?>
@@ -31,8 +35,12 @@
                 <label class="block text-sm font-medium text-slate-700 mb-1">Tahun Akademik</label>
                 <select x-model="ta_id" @change="fetchRombel()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
                     <option value="">-- Pilih Tahun Akademik --</option>
-                    <?php foreach($data['tahun_akademik'] as $ta): ?>
-                        <option value="<?= $ta['id'] ?>"><?= $ta['nama_tahun'] ?> - <?= $ta['semester'] ?></option>
+                    <?php 
+                    $active_ta_id = '';
+                    foreach($data['tahun_akademik'] as $ta): 
+                        if ($ta['status'] == 'Aktif') $active_ta_id = $ta['id'];
+                    ?>
+                        <option value="<?= $ta['id'] ?>"><?= $ta['nama_tahun'] ?> - <?= $ta['semester'] ?> <?= $ta['status'] == 'Aktif' ? '(Aktif)' : '' ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -216,7 +224,7 @@
 <script>
 document.addEventListener('alpine:init', () => {
     Alpine.data('jadwalData', () => ({
-        ta_id: '',
+        ta_id: '<?= isset($active_ta_id) ? $active_ta_id : "" ?>',
         rombel_id: '',
         rombels: [],
         jadwal: [],
@@ -230,6 +238,12 @@ document.addEventListener('alpine:init', () => {
             hari: '',
             jam_mulai: '',
             jam_selesai: ''
+        },
+
+        init() {
+            if(this.ta_id) {
+                this.fetchRombel();
+            }
         },
 
         async fetchRombel() {

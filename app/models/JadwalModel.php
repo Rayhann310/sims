@@ -159,4 +159,82 @@ class JadwalModel {
         $this->db->query("SELECT * FROM mata_pelajaran ORDER BY nama_mapel ASC");
         return $this->db->resultSet();
     }
+
+    // --- PENGATURAN JADWAL ---
+    public function getPengaturanJadwal()
+    {
+        $this->db->query("SELECT * FROM pengaturan_jadwal LIMIT 1");
+        $result = $this->db->single();
+        if (!$result) {
+            // Default settings if empty
+            return [
+                'jam_mulai' => '07:00:00',
+                'durasi_per_jp' => 45,
+                'max_jp_per_hari' => 10,
+                'hari_aktif' => 'Senin,Selasa,Rabu,Kamis,Jumat'
+            ];
+        }
+        return $result;
+    }
+
+    public function savePengaturanJadwal($data)
+    {
+        $this->db->query("SELECT id FROM pengaturan_jadwal LIMIT 1");
+        $exists = $this->db->single();
+        if ($exists) {
+            $this->db->query("UPDATE pengaturan_jadwal SET jam_mulai = :jam_mulai, durasi_per_jp = :durasi_per_jp, max_jp_per_hari = :max_jp_per_hari, hari_aktif = :hari_aktif WHERE id = :id");
+            $this->db->bind('id', $exists['id']);
+        } else {
+            $this->db->query("INSERT INTO pengaturan_jadwal (jam_mulai, durasi_per_jp, max_jp_per_hari, hari_aktif) VALUES (:jam_mulai, :durasi_per_jp, :max_jp_per_hari, :hari_aktif)");
+        }
+        $this->db->bind('jam_mulai', $data['jam_mulai']);
+        $this->db->bind('durasi_per_jp', $data['durasi_per_jp']);
+        $this->db->bind('max_jp_per_hari', $data['max_jp_per_hari']);
+        $this->db->bind('hari_aktif', $data['hari_aktif']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function getAllIstirahat()
+    {
+        $this->db->query("SELECT * FROM jadwal_istirahat ORDER BY setelah_jp_ke ASC");
+        return $this->db->resultSet();
+    }
+
+    public function tambahIstirahat($data)
+    {
+        $this->db->query("INSERT INTO jadwal_istirahat (nama_istirahat, setelah_jp_ke, durasi_menit, hari_khusus) VALUES (:nama_istirahat, :setelah_jp_ke, :durasi_menit, :hari_khusus)");
+        $this->db->bind('nama_istirahat', $data['nama_istirahat']);
+        $this->db->bind('setelah_jp_ke', $data['setelah_jp_ke']);
+        $this->db->bind('durasi_menit', $data['durasi_menit']);
+        $this->db->bind('hari_khusus', !empty($data['hari_khusus']) ? $data['hari_khusus'] : null);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function hapusIstirahat($id)
+    {
+        $this->db->query("DELETE FROM jadwal_istirahat WHERE id = :id");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    // --- ALOKASI MAPEL ---
+    public function getAllAlokasi()
+    {
+        $this->db->query("SELECT a.*, m.nama_mapel FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id ORDER BY a.tingkat, a.jurusan, m.nama_mapel");
+        return $this->db->resultSet();
+    }
+
+    public function simpanAlokasi($data)
+    {
+        $this->db->query("INSERT INTO alokasi_mapel (mapel_id, tingkat, jurusan, jumlah_jp) VALUES (:mapel_id, :tingkat, :jurusan, :jumlah_jp) ON DUPLICATE KEY UPDATE jumlah_jp = :jumlah_jp");
+        $this->db->bind('mapel_id', $data['mapel_id']);
+        $this->db->bind('tingkat', $data['tingkat']);
+        $this->db->bind('jurusan', $data['jurusan']);
+        $this->db->bind('jumlah_jp', $data['jumlah_jp']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
 }
