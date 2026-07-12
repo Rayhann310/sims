@@ -203,9 +203,9 @@ $role = $_SESSION['user']['role'] ?? '';
                     </a>
                     <?php endif; ?>
                     <?php if($_SESSION['user']['role'] === 'guru'): ?>
-                    <a href="<?= BASEURL; ?>/ScannerKelas" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/ScannerKelas') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Scanner Absensi Kelas">
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Scanner Absensi Kelas</span>
+                    <a href="<?= BASEURL; ?>/ScannerKelas" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/ScannerKelas') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Absensi Kelas">
+                        <i class="fas fa-qrcode w-5 h-5 text-center transition-colors group-hover:text-white <?= (strpos($_SERVER['REQUEST_URI'], '/ScannerKelas') !== false) ? 'text-white' : 'text-emerald-300' ?>"></i>
+                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Absensi Kelas</span>
                     </a>
                     <?php endif; ?>
                 </div>

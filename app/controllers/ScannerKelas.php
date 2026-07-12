@@ -12,7 +12,7 @@ class ScannerKelas extends Controller {
 
     public function index()
     {
-        $data['judul'] = 'Scanner & Absensi Kelas';
+        $data['judul'] = 'Absensi Kelas';
 
         // Load jadwal pelajaran untuk guru yang sedang login untuk hari ini
         $db = new Database();
