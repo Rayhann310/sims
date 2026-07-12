@@ -1012,18 +1012,17 @@ return array (
     'create_sql' => 'CREATE TABLE IF NOT EXISTS `alokasi_mapel` (
   `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
   `mapel_id` INT(11) NOT NULL,
-  `tingkat` ENUM(\'10\',\'11\',\'12\') NOT NULL,
-  `jurusan` VARCHAR(50) NOT NULL,
+  `kelas_id` INT(11) NOT NULL,
   `jumlah_jp` INT(11) NOT NULL DEFAULT 2,
-  UNIQUE KEY `mapel_tingkat_jurusan` (`mapel_id`, `tingkat`, `jurusan`),
-  CONSTRAINT `alokasi_mapel_ibfk_1` FOREIGN KEY (`mapel_id`) REFERENCES `mata_pelajaran` (`id`) ON DELETE CASCADE
+  UNIQUE KEY `mapel_kelas` (`mapel_id`, `kelas_id`),
+  CONSTRAINT `alokasi_mapel_ibfk_1` FOREIGN KEY (`mapel_id`) REFERENCES `mata_pelajaran` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `alokasi_mapel_ibfk_2` FOREIGN KEY (`kelas_id`) REFERENCES `kelas` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
     'columns' => 
     array (
       'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
       'mapel_id' => 'INT(11) NOT NULL',
-      'tingkat' => 'ENUM(\'10\',\'11\',\'12\') NOT NULL',
-      'jurusan' => 'VARCHAR(50) NOT NULL',
+      'kelas_id' => 'INT(11) NOT NULL',
       'jumlah_jp' => 'INT(11) NOT NULL DEFAULT 2',
     ),
   ),

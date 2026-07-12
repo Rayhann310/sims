@@ -228,21 +228,20 @@ class JadwalModel {
     // --- ALOKASI MAPEL ---
     public function getAllAlokasi()
     {
-        $this->db->query("SELECT a.*, m.nama_mapel FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id ORDER BY a.tingkat, a.jurusan, m.nama_mapel");
+        $this->db->query("SELECT a.*, m.nama_mapel, k.nama_kelas, k.tingkat, k.jurusan FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id JOIN kelas k ON a.kelas_id = k.id ORDER BY k.tingkat, k.jurusan, k.nama_kelas, m.nama_mapel");
         return $this->db->resultSet();
     }
 
     public function simpanAlokasi($data)
     {
         if (!empty($data['id'])) {
-            $this->db->query("UPDATE alokasi_mapel SET mapel_id = :mapel_id, tingkat = :tingkat, jurusan = :jurusan, jumlah_jp = :jumlah_jp WHERE id = :id");
+            $this->db->query("UPDATE alokasi_mapel SET mapel_id = :mapel_id, kelas_id = :kelas_id, jumlah_jp = :jumlah_jp WHERE id = :id");
             $this->db->bind('id', $data['id']);
         } else {
-            $this->db->query("INSERT INTO alokasi_mapel (mapel_id, tingkat, jurusan, jumlah_jp) VALUES (:mapel_id, :tingkat, :jurusan, :jumlah_jp) ON DUPLICATE KEY UPDATE jumlah_jp = :jumlah_jp");
+            $this->db->query("INSERT INTO alokasi_mapel (mapel_id, kelas_id, jumlah_jp) VALUES (:mapel_id, :kelas_id, :jumlah_jp) ON DUPLICATE KEY UPDATE jumlah_jp = :jumlah_jp");
         }
         $this->db->bind('mapel_id', $data['mapel_id']);
-        $this->db->bind('tingkat', $data['tingkat']);
-        $this->db->bind('jurusan', $data['jurusan']);
+        $this->db->bind('kelas_id', $data['kelas_id']);
         $this->db->bind('jumlah_jp', $data['jumlah_jp']);
         $this->db->execute();
         return $this->db->rowCount();

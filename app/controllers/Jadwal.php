@@ -238,10 +238,10 @@ class Jadwal extends Controller {
         $data['alokasi'] = $this->model('JadwalModel')->getAllAlokasi();
         $data['mapel_list'] = $this->model('JadwalModel')->getAllMapel();
         
-        // Fetch master_jurusan from AkademikModel
+        // Fetch kelas dari AkademikModel
         require_once 'app/models/AkademikModel.php';
         $akademikModel = new AkademikModel();
-        $data['master_jurusan'] = $akademikModel->getAllJurusan();
+        $data['daftar_kelas'] = $akademikModel->getAllKelas();
 
         $this->view('templates/admin_header', $data);
         $this->view('jadwal/pengaturan', $data);
@@ -310,26 +310,10 @@ class Jadwal extends Controller {
         $db->bind('id', $rombel_id);
         $rombel = $db->single();
 
-        $jurusan = $rombel['jurusan'];
-        if (empty($jurusan)) {
-            if (stripos($rombel['nama_kelas'], 'ipa') !== false || stripos($rombel['nama_rombel'], 'ipa') !== false) $jurusan = 'MIPA';
-            elseif (stripos($rombel['nama_kelas'], 'ips') !== false || stripos($rombel['nama_rombel'], 'ips') !== false) $jurusan = 'IPS';
-            elseif (stripos($rombel['nama_kelas'], 'bahasa') !== false) $jurusan = 'BAHASA';
-            else $jurusan = 'UMUM';
-        }
-
-        // Ambil alokasi mapel sesuai tingkat & jurusan
-        $db->query("SELECT a.*, m.nama_mapel, m.kode_mapel FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id WHERE a.tingkat = :tingkat AND a.jurusan = :jurusan");
-        $db->bind('tingkat', $rombel['tingkat']);
-        $db->bind('jurusan', $jurusan);
+        // Ambil alokasi mapel sesuai kelas
+        $db->query("SELECT a.*, m.nama_mapel, m.kode_mapel FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id WHERE a.kelas_id = :kelas_id");
+        $db->bind('kelas_id', $rombel['kelas_id']);
         $alokasi = $db->resultSet();
-        
-        // Jika masih kosong, coba ambil semua mapel di tingkat tersebut (fallback darurat)
-        if (empty($alokasi)) {
-            $db->query("SELECT a.*, m.nama_mapel, m.kode_mapel FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id WHERE a.tingkat = :tingkat GROUP BY a.mapel_id");
-            $db->bind('tingkat', $rombel['tingkat']);
-            $alokasi = $db->resultSet();
-        }
 
         $data['judul'] = 'Auto Generate Jadwal - ' . $rombel['nama_rombel'];
         $data['rombel'] = $rombel;
@@ -399,9 +383,8 @@ class Jadwal extends Controller {
         $durasi = (int)$pengaturan['durasi_per_jp'];
         
         // Ambil alokasi untuk tahu butuh berapa JP per mapel
-        $db->query("SELECT a.*, m.nama_mapel, m.kode_mapel FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id WHERE a.tingkat = :tingkat AND a.jurusan = :jurusan");
-        $db->bind('tingkat', $rombel['tingkat']);
-        $db->bind('jurusan', $rombel['jurusan']);
+        $db->query("SELECT a.*, m.nama_mapel, m.kode_mapel FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id WHERE a.kelas_id = :kelas_id");
+        $db->bind('kelas_id', $rombel['kelas_id']);
         $alokasiRaw = $db->resultSet();
         $alokasiMap = []; // [mapel_id => ['nama' => x, 'jml' => y]]
         foreach($alokasiRaw as $a) {

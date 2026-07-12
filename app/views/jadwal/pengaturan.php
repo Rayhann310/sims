@@ -89,20 +89,12 @@
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="w-24">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tingkat</label>
-                        <select name="tingkat" id="tingkat" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
-                            <option value="10">10</option>
-                            <option value="11">11</option>
-                            <option value="12">12</option>
-                        </select>
-                    </div>
-                    <div class="w-32">
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Jurusan</label>
-                        <select name="jurusan" id="jurusan" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
-                            <option value="">-- Semua / Umum --</option>
-                            <?php foreach($data['master_jurusan'] as $j): ?>
-                                <option value="<?= $j['nama_jurusan'] ?>"><?= $j['nama_jurusan'] ?></option>
+                    <div class="w-48">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Pilih Kelas</label>
+                        <select name="kelas_id" id="kelas_id" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
+                            <option value="">-- Pilih Kelas --</option>
+                            <?php foreach($data['daftar_kelas'] as $k): ?>
+                                <option value="<?= $k['id'] ?>"><?= $k['nama_kelas'] ?> (<?= $k['tingkat'] ?> <?= $k['jurusan'] ?>)</option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -121,8 +113,7 @@
                         <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 uppercase text-xs">
                             <tr>
                                 <th class="py-3 px-4 rounded-tl-lg">Mata Pelajaran</th>
-                                <th class="py-3 px-4">Tingkat</th>
-                                <th class="py-3 px-4">Jurusan</th>
+                                <th class="py-3 px-4">Kelas</th>
                                 <th class="py-3 px-4 text-center">Jml JP / Minggu</th>
                                 <th class="py-3 px-4 rounded-tr-lg text-right">Aksi</th>
                             </tr>
@@ -131,8 +122,7 @@
                             <?php foreach($data['alokasi'] as $a): ?>
                                 <tr class="hover:bg-slate-50/50 transition-colors">
                                     <td class="py-3 px-4 font-medium text-slate-800"><?= $a['nama_mapel'] ?></td>
-                                    <td class="py-3 px-4"><span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-md font-bold text-xs"><?= $a['tingkat'] ?></span></td>
-                                    <td class="py-3 px-4"><span class="px-2 py-1 bg-blue-50 text-blue-600 rounded-md font-bold text-xs"><?= $a['jurusan'] ?></span></td>
+                                    <td class="py-3 px-4"><span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-md font-bold text-xs"><?= $a['nama_kelas'] ?> (<?= $a['tingkat'] ?> <?= $a['jurusan'] ?>)</span></td>
                                     <td class="py-3 px-4 text-center"><span class="font-bold text-emerald-600"><?= $a['jumlah_jp'] ?> JP</span></td>
                                     <td class="py-3 px-4 text-right">
                                         <button type="button" onclick="editAlokasi(<?= htmlspecialchars(json_encode($a)) ?>)" class="text-blue-500 hover:text-blue-700 mx-1 p-1"><i class="fas fa-edit"></i></button>
@@ -169,8 +159,7 @@
     function editAlokasi(data) {
         document.getElementById('alokasi_id').value = data.id;
         document.getElementById('mapel_id').value = data.mapel_id;
-        document.getElementById('tingkat').value = data.tingkat;
-        document.getElementById('jurusan').value = data.jurusan;
+        document.getElementById('kelas_id').value = data.kelas_id;
         document.getElementById('jumlah_jp').value = data.jumlah_jp;
         document.getElementById('form-alokasi').scrollIntoView({behavior: 'smooth'});
     }

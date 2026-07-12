@@ -85,6 +85,29 @@ class UserModel {
                     $this->db->execute();
                 }
             }
+
+            // SELF-HEALING: Refactor alokasi_mapel to use kelas_id instead of tingkat/jurusan
+            try {
+                // Check if kelas_id already exists
+                $this->db->query("SHOW COLUMNS FROM alokasi_mapel LIKE 'kelas_id'");
+                $this->db->execute();
+                if ($this->db->rowCount() == 0) {
+                    // Empty table first because the structure is changing fundamentally
+                    $this->db->query("TRUNCATE TABLE alokasi_mapel");
+                    $this->db->execute();
+
+                    $this->db->query("ALTER TABLE alokasi_mapel DROP INDEX mapel_tingkat_jurusan, DROP COLUMN tingkat, DROP COLUMN jurusan, ADD COLUMN kelas_id INT(11) NOT NULL AFTER mapel_id");
+                    $this->db->execute();
+
+                    $this->db->query("ALTER TABLE alokasi_mapel ADD UNIQUE KEY mapel_kelas (mapel_id, kelas_id)");
+                    $this->db->execute();
+
+                    $this->db->query("ALTER TABLE alokasi_mapel ADD CONSTRAINT alokasi_mapel_ibfk_2 FOREIGN KEY (kelas_id) REFERENCES kelas (id) ON DELETE CASCADE");
+                    $this->db->execute();
+                }
+            } catch (Exception $e) {
+                // Ignore errors if columns are already dropped or if it runs multiple times
+            }
         } catch (Exception $e) {
             error_log("Self-healing encountered a critical error: " . $e->getMessage());
         }
