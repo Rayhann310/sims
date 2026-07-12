@@ -9,28 +9,35 @@
     <!-- Parameter Filter -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
         <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Jadwal Mengajar (Hari Ini)</label>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Jadwal Mengajar (Seluruh Hari)</label>
             <select x-model="jadwalId" @change="handleJadwalChange()" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
                 <option value="">-- Pilih Jadwal --</option>
                 <?php 
                 $currentTime = date('H:i:s');
-                foreach($data['jadwal'] as $j): 
+                $currentDay = $data['hari_ini'];
+                foreach($data['jadwal_semua'] as $j): 
                     $mulai = $j['jam_mulai'];
                     $selesai = $j['jam_selesai'];
+                    $hari = $j['hari'];
                     
-                    if ($currentTime < $mulai) {
-                        $status = 'Belum Aktif';
-                        $disabled = 'disabled';
-                    } else if ($currentTime > $selesai) {
-                        $status = 'Terlewat';
+                    if ($hari !== $currentDay) {
+                        $status = 'Beda Hari';
                         $disabled = '';
                     } else {
-                        $status = 'Sedang Aktif';
-                        $disabled = '';
+                        if ($currentTime < $mulai) {
+                            $status = 'Belum Aktif';
+                            $disabled = 'disabled';
+                        } else if ($currentTime > $selesai) {
+                            $status = 'Terlewat';
+                            $disabled = '';
+                        } else {
+                            $status = 'Sedang Aktif';
+                            $disabled = '';
+                        }
                     }
                 ?>
                 <option value="<?= $j['id'] ?>" <?= $disabled ?>>
-                    <?= substr($mulai, 0, 5) ?> - <?= substr($selesai, 0, 5) ?> | <?= $j['nama_mapel'] ?> (<?= $j['nama_rombel'] ?>) - [<?= $status ?>]
+                    [<?= $hari ?>] <?= substr($mulai, 0, 5) ?> - <?= substr($selesai, 0, 5) ?> | <?= $j['nama_mapel'] ?> (<?= $j['nama_rombel'] ?>) - <?= $status ?>
                 </option>
                 <?php endforeach; ?>
             </select>
@@ -106,7 +113,7 @@
 
 <script>
 function scannerKelasData() {
-    const jadwalData = <?= json_encode($data['jadwal']) ?>;
+    const jadwalData = <?= json_encode($data['jadwal_semua']) ?>;
     return {
         jadwalId: '',
         rombelId: '',

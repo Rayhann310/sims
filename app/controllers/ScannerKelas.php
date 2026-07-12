@@ -31,13 +31,22 @@ class ScannerKelas extends Controller {
             JOIN mata_pelajaran m ON jp.mapel_id = m.id
             JOIN rombel r ON jp.rombel_id = r.id
             JOIN kelas k ON r.kelas_id = k.id
-            WHERE jp.guru_id = :guru_id AND jp.hari = :hari
-            ORDER BY jp.jam_mulai ASC
+            WHERE jp.guru_id = :guru_id
+            ORDER BY 
+                CASE jp.hari 
+                    WHEN 'Senin' THEN 1
+                    WHEN 'Selasa' THEN 2
+                    WHEN 'Rabu' THEN 3
+                    WHEN 'Kamis' THEN 4
+                    WHEN 'Jumat' THEN 5
+                    WHEN 'Sabtu' THEN 6
+                    WHEN 'Minggu' THEN 7
+                END,
+                jp.jam_mulai ASC
         ");
         $db->bind('guru_id', $guru_id);
-        $db->bind('hari', $hari_ini);
-        $data['jadwal'] = $db->resultSet();
-
+        $data['jadwal_semua'] = $db->resultSet();
+        $data['hari_ini'] = $hari_ini;
 
         $this->view('templates/admin_header', $data);
         $this->view('absensi/scanner_kelas', $data);
