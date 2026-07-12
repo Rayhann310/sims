@@ -338,6 +338,8 @@ class Jadwal extends Controller {
 
         header('Location: ' . BASEURL . '/jadwal/previewGenerate');
         exit;
+    }
+
     public function previewGenerate()
     {
         if (!isset($_SESSION['auto_generate_data'])) {
@@ -603,6 +605,8 @@ class Jadwal extends Controller {
 
         header('Location: ' . BASEURL . '/jadwal');
         exit;
+    }
+
     public function updateSessionGrid()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['grid'])) {
