@@ -237,6 +237,11 @@ class Jadwal extends Controller {
         $data['istirahat'] = $this->model('JadwalModel')->getAllIstirahat();
         $data['alokasi'] = $this->model('JadwalModel')->getAllAlokasi();
         $data['mapel_list'] = $this->model('JadwalModel')->getAllMapel();
+        
+        // Fetch master_jurusan from AkademikModel
+        require_once 'app/models/AkademikModel.php';
+        $akademikModel = new AkademikModel();
+        $data['master_jurusan'] = $akademikModel->getAllJurusan();
 
         $this->view('templates/admin_header', $data);
         $this->view('jadwal/pengaturan', $data);

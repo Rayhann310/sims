@@ -361,13 +361,26 @@ return array (
       'status' => 'varchar(50) DEFAULT NULL',
     ),
   ),
+  'master_jurusan' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `master_jurusan` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nama_jurusan` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'int(11) NOT NULL auto_increment',
+      'nama_jurusan' => 'varchar(50) NOT NULL',
+    ),
+  ),
   'kelas' => 
   array (
     'create_sql' => 'CREATE TABLE IF NOT EXISTS `kelas` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nama_kelas` varchar(50) NOT NULL,
   `tingkat` enum(\'10\',\'11\',\'12\') NOT NULL,
-  `jurusan` enum(\'MIPA\',\'IPS\',\'BAHASA\',\'UMUM\') NOT NULL,
+  `jurusan` varchar(50) NOT NULL,
   `wali_kelas_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `wali_kelas_id` (`wali_kelas_id`),
@@ -378,7 +391,7 @@ return array (
       'id' => 'int(11) NOT NULL auto_increment',
       'nama_kelas' => 'varchar(50) NOT NULL',
       'tingkat' => 'enum(\'10\',\'11\',\'12\') NOT NULL',
-      'jurusan' => 'enum(\'MIPA\',\'IPS\',\'BAHASA\',\'UMUM\') NOT NULL',
+      'jurusan' => 'varchar(50) NOT NULL',
       'wali_kelas_id' => 'int(11) DEFAULT NULL',
     ),
   ),
@@ -1000,7 +1013,7 @@ return array (
   `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
   `mapel_id` INT(11) NOT NULL,
   `tingkat` ENUM(\'10\',\'11\',\'12\') NOT NULL,
-  `jurusan` ENUM(\'MIPA\',\'IPS\',\'BAHASA\',\'UMUM\') NOT NULL,
+  `jurusan` VARCHAR(50) NOT NULL,
   `jumlah_jp` INT(11) NOT NULL DEFAULT 2,
   UNIQUE KEY `mapel_tingkat_jurusan` (`mapel_id`, `tingkat`, `jurusan`),
   CONSTRAINT `alokasi_mapel_ibfk_1` FOREIGN KEY (`mapel_id`) REFERENCES `mata_pelajaran` (`id`) ON DELETE CASCADE
@@ -1010,7 +1023,7 @@ return array (
       'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
       'mapel_id' => 'INT(11) NOT NULL',
       'tingkat' => 'ENUM(\'10\',\'11\',\'12\') NOT NULL',
-      'jurusan' => 'ENUM(\'MIPA\',\'IPS\',\'BAHASA\',\'UMUM\') NOT NULL',
+      'jurusan' => 'VARCHAR(50) NOT NULL',
       'jumlah_jp' => 'INT(11) NOT NULL DEFAULT 2',
     ),
   ),

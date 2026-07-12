@@ -124,4 +124,48 @@ class AkademikModel {
         $this->db->execute();
         return $this->db->rowCount();
     }
+
+    public function editKelas($data)
+    {
+        $this->db->query("UPDATE kelas SET nama_kelas = :nama_kelas, jurusan = :jurusan WHERE id = :id");
+        $this->db->bind('nama_kelas', $data['nama_kelas']);
+        $this->db->bind('jurusan', $data['jurusan']);
+        $this->db->bind('id', $data['id']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    // ==========================================
+    // MASTER JURUSAN
+    // ==========================================
+    public function getAllJurusan()
+    {
+        $this->db->query("SELECT * FROM master_jurusan ORDER BY nama_jurusan ASC");
+        return $this->db->resultSet();
+    }
+
+    public function tambahJurusan($data)
+    {
+        $this->db->query("INSERT INTO master_jurusan (nama_jurusan) VALUES (:nama_jurusan)");
+        $this->db->bind('nama_jurusan', $data['nama_jurusan']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function editJurusan($data)
+    {
+        $this->db->query("UPDATE master_jurusan SET nama_jurusan = :nama_jurusan WHERE id = :id");
+        $this->db->bind('nama_jurusan', $data['nama_jurusan']);
+        $this->db->bind('id', $data['id']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function hapusJurusan($id)
+    {
+        $this->db->query("DELETE FROM master_jurusan WHERE id = :id");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
 }

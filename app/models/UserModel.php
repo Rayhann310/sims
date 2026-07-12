@@ -67,6 +67,24 @@ class UserModel {
                 $this->db->bind('password', $password);
                 $this->db->execute();
             }
+            // SELF-HEALING: Ubah tipe data enum jurusan menjadi varchar di tabel kelas dan alokasi_mapel
+            $this->db->query("ALTER TABLE kelas MODIFY jurusan VARCHAR(50) NOT NULL");
+            $this->db->execute();
+            $this->db->query("ALTER TABLE alokasi_mapel MODIFY jurusan VARCHAR(50) NOT NULL");
+            $this->db->execute();
+
+            // SELF-HEALING: Populate master_jurusan jika masih kosong
+            $this->db->query("SELECT COUNT(*) as count FROM master_jurusan");
+            $this->db->execute();
+            $countJurusan = $this->db->single()['count'];
+            if ($countJurusan == 0) {
+                $defaultJurusan = ['MIPA', 'IPS', 'BAHASA', 'UMUM'];
+                foreach ($defaultJurusan as $j) {
+                    $this->db->query("INSERT INTO master_jurusan (nama_jurusan) VALUES (:nama)");
+                    $this->db->bind('nama', $j);
+                    $this->db->execute();
+                }
+            }
         } catch (Exception $e) {
             error_log("Self-healing encountered a critical error: " . $e->getMessage());
         }

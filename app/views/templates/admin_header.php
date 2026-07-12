@@ -160,6 +160,7 @@ $role = $_SESSION['user']['role'] ?? '';
                             <?php endif; ?>
                             <?php if(hasMenuAccess('akademik_kelas')): ?>
                             <a href="<?= BASEURL; ?>/akademik/kelas" class="block py-2 text-sm text-slate-500 hover:text-blue-600 transition-colors">Tingkat Kelas</a>
+                            <a href="<?= BASEURL; ?>/akademik/jurusan" class="block py-2 text-sm text-slate-500 hover:text-blue-600 transition-colors">Master Jurusan</a>
                             <?php endif; ?>
                             <?php if(hasMenuAccess('akademik_mapel')): ?>
                             <a href="<?= BASEURL; ?>/akademik/mapel" class="block py-2 text-sm text-slate-500 hover:text-blue-600 transition-colors">Mata Pelajaran</a>

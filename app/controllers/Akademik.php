@@ -370,6 +370,7 @@ class Akademik extends Controller {
         requireAccess('akademik_kelas');
         $data['judul'] = 'Manajemen Master Kelas';
         $data['kelas'] = $this->model('AkademikModel')->getAllKelas();
+        $data['master_jurusan'] = $this->model('AkademikModel')->getAllJurusan();
 
         $this->view('templates/admin_header', $data);
         $this->view('akademik/kelas', $data);
@@ -398,6 +399,74 @@ class Akademik extends Controller {
             $_SESSION['flash'] = ['pesan' => 'gagal', 'aksi' => 'dihapus', 'tipe' => 'danger'];
         }
         header('Location: ' . BASEURL . '/akademik/kelas');
+        exit;
+    }
+
+    public function editKelas()
+    {
+        requireAccess('akademik_kelas');
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if($this->model('AkademikModel')->editKelas($_POST) > 0) {
+                $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'diubah', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'gagal / tidak ada perubahan', 'aksi' => 'diubah', 'tipe' => 'warning'];
+            }
+            header('Location: ' . BASEURL . '/akademik/kelas');
+            exit;
+        }
+    }
+
+    // ==========================================
+    // JURUSAN
+    // ==========================================
+    public function jurusan()
+    {
+        requireAccess('akademik_kelas'); // Group access with kelas
+        $data['judul'] = 'Master Jurusan';
+        $data['jurusan'] = $this->model('AkademikModel')->getAllJurusan();
+
+        $this->view('templates/admin_header', $data);
+        $this->view('akademik/jurusan', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    public function tambahJurusan()
+    {
+        requireAccess('akademik_kelas');
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if($this->model('AkademikModel')->tambahJurusan($_POST) > 0) {
+                $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'ditambahkan', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'gagal', 'aksi' => 'ditambahkan', 'tipe' => 'danger'];
+            }
+            header('Location: ' . BASEURL . '/akademik/jurusan');
+            exit;
+        }
+    }
+
+    public function editJurusan()
+    {
+        requireAccess('akademik_kelas');
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if($this->model('AkademikModel')->editJurusan($_POST) > 0) {
+                $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'diubah', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'gagal / tidak ada perubahan', 'aksi' => 'diubah', 'tipe' => 'warning'];
+            }
+            header('Location: ' . BASEURL . '/akademik/jurusan');
+            exit;
+        }
+    }
+
+    public function hapusJurusan($id)
+    {
+        requireAccess('akademik_kelas');
+        if($this->model('AkademikModel')->hapusJurusan($id) > 0) {
+            $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'dihapus', 'tipe' => 'success'];
+        } else {
+            $_SESSION['flash'] = ['pesan' => 'gagal', 'aksi' => 'dihapus', 'tipe' => 'danger'];
+        }
+        header('Location: ' . BASEURL . '/akademik/jurusan');
         exit;
     }
 }

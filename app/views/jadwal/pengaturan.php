@@ -100,10 +100,10 @@
                     <div class="w-32">
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Jurusan</label>
                         <select name="jurusan" id="jurusan" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
-                            <option value="MIPA">MIPA</option>
-                            <option value="IPS">IPS</option>
-                            <option value="BAHASA">BAHASA</option>
-                            <option value="UMUM">UMUM</option>
+                            <option value="">-- Semua / Umum --</option>
+                            <?php foreach($data['master_jurusan'] as $j): ?>
+                                <option value="<?= $j['nama_jurusan'] ?>"><?= $j['nama_jurusan'] ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="w-24">
