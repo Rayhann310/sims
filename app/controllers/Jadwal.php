@@ -100,6 +100,58 @@ class Jadwal extends Controller {
         exit;
     }
 
+    // Edit jadwal manual
+    public function edit()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $model  = $this->model('JadwalModel');
+            $result = $model->editJadwal($_POST);
+            if ($result !== false) {
+                $_SESSION['flash'] = ['pesan' => 'Jadwal berhasil', 'aksi' => 'diperbarui', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'Gagal memperbarui jadwal (Konflik / Bentrok)', 'aksi' => '', 'tipe' => 'danger'];
+            }
+        }
+        header('Location: ' . BASEURL . '/jadwal');
+        exit;
+    }
+
+    // AJAX: Pindah Jadwal (Drag & Drop)
+    public function apiPindahJadwal()
+    {
+        header('Content-Type: application/json');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { echo json_encode(['success' => false, 'pesan' => 'Invalid method']); exit; }
+
+        $id = $_POST['id'] ?? 0;
+        $hari = $_POST['hari'] ?? '';
+        $jam_mulai = $_POST['jam_mulai'] ?? '';
+        $jam_selesai = $_POST['jam_selesai'] ?? '';
+
+        $model = $this->model('JadwalModel');
+        $result = $model->pindahJadwal($id, $hari, $jam_mulai, $jam_selesai);
+        
+        if ($result) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'pesan' => 'Jadwal bentrok atau gagal dipindah']);
+        }
+        exit;
+    }
+
+    // AJAX: Toggle Lock
+    public function apiToggleLock()
+    {
+        header('Content-Type: application/json');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') { echo json_encode(['success' => false, 'pesan' => 'Invalid method']); exit; }
+
+        $id = $_POST['id'] ?? 0;
+        $model = $this->model('JadwalModel');
+        $model->toggleLock($id);
+        
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
     // Download template Excel
     public function template()
     {
@@ -393,6 +445,18 @@ class Jadwal extends Controller {
                 'jml' => (int)$a['jumlah_jp']
             ];
         }
+
+        // Ambil jadwal yang terkunci (is_locked = 1)
+        $db->query("SELECT jp.*, m.nama_mapel, u.nama_lengkap as nama_guru FROM jadwal_pelajaran jp JOIN mata_pelajaran m ON jp.mapel_id = m.id JOIN guru g ON jp.guru_id = g.id JOIN users u ON g.user_id = u.id WHERE jp.rombel_id = :rombel_id AND jp.is_locked = 1");
+        $db->bind('rombel_id', $rombel_id);
+        $lockedSchedules = $db->resultSet();
+        
+        // Kurangi kebutuhan JP berdasarkan jadwal yang terkunci
+        foreach ($lockedSchedules as $ls) {
+            if (isset($alokasiMap[$ls['mapel_id']])) {
+                $alokasiMap[$ls['mapel_id']]['jml'] -= 1; // Tiap blok = 1 JP
+            }
+        }
         
         // Persiapkan grid (Hari -> JP)
         $grid = [];
@@ -442,9 +506,28 @@ class Jadwal extends Controller {
                     'guru_id' => null,
                     'nama_mapel' => '',
                     'nama_guru' => '',
-                    'conflict' => false
+                    'conflict' => false,
+                    'is_locked' => false // flag to track locked status
                 ];
                 $currentTime = $jamSelesai;
+            }
+        }
+        
+        // Masukkan jadwal terkunci ke dalam grid
+        foreach ($lockedSchedules as $ls) {
+            $hari = $ls['hari'];
+            $jam_mulai = date('H:i', strtotime($ls['jam_mulai']));
+            if (isset($grid[$hari])) {
+                foreach ($grid[$hari] as $k => &$slot) {
+                    if ($slot['type'] == 'jp' && $slot['jam_mulai'] == $jam_mulai) {
+                        $slot['mapel_id'] = $ls['mapel_id'];
+                        $slot['guru_id'] = $ls['guru_id'];
+                        $slot['nama_mapel'] = $ls['nama_mapel'];
+                        $slot['nama_guru'] = $ls['nama_guru'];
+                        $slot['is_locked'] = true;
+                        break;
+                    }
+                }
             }
         }
         
@@ -588,6 +671,10 @@ class Jadwal extends Controller {
         foreach ($grid as $hari => $slots) {
             foreach ($slots as $key => $slot) {
                 if ($slot['type'] == 'jp' && !empty($slot['mapel_id']) && !empty($slot['guru_id'])) {
+                    // Skip if it was already a locked schedule to prevent duplicate inserts
+                    if (isset($slot['is_locked']) && $slot['is_locked'] === true) {
+                        continue;
+                    }
                     $dataInsert[] = [
                         'rombel_id'   => $rombel_id,
                         'mapel_id'    => $slot['mapel_id'],
@@ -601,6 +688,12 @@ class Jadwal extends Controller {
         }
 
         if (count($dataInsert) > 0) {
+            // Delete old UNLOCKED schedules first
+            $db = new Database();
+            $db->query("DELETE FROM jadwal_pelajaran WHERE rombel_id = :rombel_id AND is_locked = 0");
+            $db->bind('rombel_id', $rombel_id);
+            $db->execute();
+
             // Kita bisa pakai importJadwalMassal
             $result = $this->model('JadwalModel')->importJadwalMassal($dataInsert);
             $msg = $result['inserted'] . ' jadwal hasil generate berhasil disimpan.';

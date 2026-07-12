@@ -58,10 +58,20 @@
 
     <!-- Table Card -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50">
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
             <h3 class="text-base font-semibold text-slate-800">Daftar Jadwal <span x-show="rombel_id" class="text-blue-600">(Pilih rombel untuk melihat)</span></h3>
+            <div class="flex items-center space-x-2" x-show="rombel_id" style="display: none;">
+                <button @click="viewMode = 'list'" :class="viewMode === 'list' ? 'bg-blue-100 text-blue-700' : 'bg-white text-slate-600 hover:bg-slate-50'" class="px-3 py-1 text-sm font-medium border border-slate-300 rounded-md transition-colors">
+                    <i class="fas fa-list mr-1"></i> List
+                </button>
+                <button @click="viewMode = 'grid'" :class="viewMode === 'grid' ? 'bg-blue-100 text-blue-700' : 'bg-white text-slate-600 hover:bg-slate-50'" class="px-3 py-1 text-sm font-medium border border-slate-300 rounded-md transition-colors">
+                    <i class="fas fa-th mr-1"></i> Grid
+                </button>
+            </div>
         </div>
-        <div class="overflow-x-auto">
+        
+        <!-- List View -->
+        <div class="overflow-x-auto" x-show="viewMode === 'list'">
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
@@ -87,7 +97,11 @@
                                 <span x-text="j.nama_guru" :class="j.nama_guru === '<?= addslashes($_SESSION['user']['nama_lengkap']) ?>' ? 'font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md border border-blue-200' : ''"></span>
                             </td>
                             <?php if ($_SESSION['user']['role'] == 'admin') : ?>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                <button @click="toggleLock(j.id)" class="text-slate-500 hover:text-slate-700" :title="j.is_locked == 1 ? 'Buka Kunci' : 'Kunci'">
+                                    <i class="fas" :class="j.is_locked == 1 ? 'fa-lock text-red-500' : 'fa-unlock'"></i>
+                                </button>
+                                <button @click="openEditModal(j)" class="text-blue-600 hover:text-blue-900"><i class="fas fa-edit"></i></button>
                                 <a :href="'<?= BASEURL; ?>/jadwal/hapus/' + j.id" onclick="return confirm('Yakin ingin menghapus jadwal ini?');" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></a>
                             </td>
                             <?php endif; ?>
@@ -106,6 +120,41 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Grid View (Drag & Drop) -->
+        <div x-show="viewMode === 'grid' && rombel_id" style="display: none;" class="p-6 overflow-x-auto">
+            <div class="min-w-max">
+                <template x-for="hari in ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']" :key="hari">
+                    <div class="mb-6">
+                        <h4 class="text-md font-bold text-slate-800 mb-3 border-b pb-2" x-text="hari"></h4>
+                        <div class="flex flex-wrap gap-3 p-3 bg-slate-50 rounded-lg min-h-[100px]"
+                             @dragover.prevent
+                             @drop="onDrop($event, hari)">
+                            
+                            <template x-for="j in getJadwalByHari(hari)" :key="j.id">
+                                <div class="bg-white border border-slate-200 rounded-lg p-3 shadow-sm w-48 relative cursor-grab active:cursor-grabbing hover:border-blue-300 transition-colors"
+                                     draggable="true"
+                                     @dragstart="onDragStart($event, j)"
+                                     :class="j.is_locked == 1 ? 'border-l-4 border-l-red-500' : 'border-l-4 border-l-blue-500'">
+                                    
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded" x-text="j.jam_mulai + ' - ' + j.jam_selesai"></div>
+                                        <i x-show="j.is_locked == 1" class="fas fa-lock text-red-500 text-xs"></i>
+                                    </div>
+                                    <div class="font-bold text-sm text-slate-900 leading-tight mb-1" x-text="j.nama_mapel"></div>
+                                    <div class="text-xs text-slate-500" x-text="j.nama_guru"></div>
+                                    
+                                </div>
+                            </template>
+                            
+                            <div x-show="getJadwalByHari(hari).length === 0" class="text-sm text-slate-400 italic flex items-center justify-center w-full">
+                                Tidak ada pelajaran
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
     </div>
 
     <!-- Modal Tambah Manual -->
@@ -115,14 +164,15 @@
 
             <div x-show="tambahModalOpen" x-transition class="relative inline-block w-full max-w-lg p-6 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl sm:my-8">
                 <div class="flex items-center justify-between mb-5">
-                    <h3 class="text-lg font-bold text-slate-900">Tambah Jadwal Pelajaran</h3>
+                    <h3 class="text-lg font-bold text-slate-900" x-text="isEdit ? 'Edit Jadwal Pelajaran' : 'Tambah Jadwal Pelajaran'"></h3>
                     <button @click="tambahModalOpen = false" class="text-slate-400 hover:text-slate-500 transition-colors">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
                 
-                <form action="<?= BASEURL; ?>/jadwal/tambah" method="post" @submit="cekKonflik($event)">
+                <form :action="isEdit ? '<?= BASEURL; ?>/jadwal/edit' : '<?= BASEURL; ?>/jadwal/tambah'" method="post" @submit="cekKonflik($event)">
                     <input type="hidden" name="rombel_id" :value="rombel_id">
+                    <input type="hidden" name="id" x-model="formData.id">
                     
                     <div class="space-y-4">
                         <div x-show="errorMessage" class="bg-red-50 text-red-700 p-3 rounded-lg border border-red-200 text-sm mb-4" x-text="errorMessage" style="display: none;"></div>
@@ -224,15 +274,18 @@
 <script>
 document.addEventListener('alpine:init', () => {
     Alpine.data('jadwalData', () => ({
+        viewMode: 'list',
         ta_id: '<?= isset($active_ta_id) ? $active_ta_id : "" ?>',
         rombel_id: '',
         rombels: [],
         jadwal: [],
         modalOpen: false,
         tambahModalOpen: false,
+        isEdit: false,
         isSubmitting: false,
         errorMessage: '',
         formData: {
+            id: '',
             mapel_id: '',
             guru_id: '',
             hari: '',
@@ -284,11 +337,99 @@ document.addEventListener('alpine:init', () => {
 
         openTambahModal() {
             if(this.rombel_id) {
+                this.isEdit = false;
                 this.tambahModalOpen = true;
                 this.errorMessage = '';
-                this.formData = { mapel_id: '', guru_id: '', hari: '', jam_mulai: '', jam_selesai: '' };
+                this.formData = { id: '', mapel_id: '', guru_id: '', hari: '', jam_mulai: '', jam_selesai: '' };
             } else {
                 alert('Silakan pilih Tahun Akademik dan Rombel terlebih dahulu.');
+            }
+        },
+
+        openEditModal(j) {
+            this.isEdit = true;
+            this.tambahModalOpen = true;
+            this.errorMessage = '';
+            this.formData = {
+                id: j.id,
+                mapel_id: j.mapel_id,
+                guru_id: j.guru_id,
+                hari: j.hari,
+                jam_mulai: j.jam_mulai.substring(0, 5),
+                jam_selesai: j.jam_selesai.substring(0, 5)
+            };
+        },
+
+        getJadwalByHari(hari) {
+            return this.jadwal.filter(j => j.hari === hari);
+        },
+
+        onDragStart(e, j) {
+            if(j.is_locked == 1) {
+                e.preventDefault();
+                alert('Jadwal ini terkunci dan tidak bisa dipindahkan.');
+                return false;
+            }
+            e.dataTransfer.setData('text/plain', JSON.stringify(j));
+            e.dataTransfer.effectAllowed = 'move';
+        },
+
+        async onDrop(e, hariBaru) {
+            const data = e.dataTransfer.getData('text/plain');
+            if(!data) return;
+            
+            const j = JSON.parse(data);
+            if(j.hari === hariBaru) return; // Same day, maybe dragging within day (need specific time slot to drop, but here we just append to the day? We don't have visual slots in grid mode currently, we just drop in day. Wait, dragging requires changing hari and jam! Oh, if we just drop on day, we don't know the time.)
+            
+            // For now, if we drop on a day, we might prompt for time, OR we can't really do drag drop without time slots!
+            // Actually, if we just want a simple drag drop to another day, we can keep the same jam_mulai and jam_selesai, just change the hari.
+            const hariLama = j.hari;
+            j.hari = hariBaru;
+
+            try {
+                const fd = new FormData();
+                fd.append('id', j.id);
+                fd.append('hari', hariBaru);
+                fd.append('jam_mulai', j.jam_mulai);
+                fd.append('jam_selesai', j.jam_selesai);
+
+                const res = await fetch(`<?= BASEURL; ?>/jadwal/apiPindahJadwal`, {
+                    method: 'POST',
+                    body: fd
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    // Update local state
+                    const index = this.jadwal.findIndex(item => item.id == j.id);
+                    if (index !== -1) {
+                        this.jadwal[index].hari = hariBaru;
+                    }
+                } else {
+                    alert(result.pesan || 'Gagal memindah jadwal (Bentrok)');
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan saat memindah jadwal');
+            }
+        },
+
+        async toggleLock(id) {
+            try {
+                const fd = new FormData();
+                fd.append('id', id);
+                const res = await fetch(`<?= BASEURL; ?>/jadwal/apiToggleLock`, {
+                    method: 'POST',
+                    body: fd
+                });
+                const result = await res.json();
+                if (result.success) {
+                    const index = this.jadwal.findIndex(item => item.id == id);
+                    if (index !== -1) {
+                        this.jadwal[index].is_locked = this.jadwal[index].is_locked == 1 ? 0 : 1;
+                    }
+                }
+            } catch (err) {
+                console.error(err);
             }
         },
 

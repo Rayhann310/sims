@@ -90,8 +90,8 @@ class UserModel {
             try {
                 // Check if kelas_id already exists
                 $this->db->query("SHOW COLUMNS FROM alokasi_mapel LIKE 'kelas_id'");
-                $this->db->execute();
-                if ($this->db->rowCount() == 0) {
+                $res = $this->db->resultSet();
+                if (count($res) == 0) {
                     // Empty table first because the structure is changing fundamentally
                     $this->db->query("TRUNCATE TABLE alokasi_mapel");
                     $this->db->execute();
@@ -107,6 +107,17 @@ class UserModel {
                 }
             } catch (Exception $e) {
                 // Ignore errors if columns are already dropped or if it runs multiple times
+            }
+            try {
+                // Check if is_locked already exists in jadwal_pelajaran
+                $this->db->query("SHOW COLUMNS FROM jadwal_pelajaran LIKE 'is_locked'");
+                $res2 = $this->db->resultSet();
+                if (count($res2) == 0) {
+                    $this->db->query("ALTER TABLE jadwal_pelajaran ADD COLUMN is_locked TINYINT(1) DEFAULT 0 AFTER jam_selesai");
+                    $this->db->execute();
+                }
+            } catch (Exception $e) {
+                // Ignore errors
             }
         } catch (Exception $e) {
             error_log("Self-healing encountered a critical error: " . $e->getMessage());

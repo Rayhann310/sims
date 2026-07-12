@@ -24,7 +24,8 @@ class JadwalModel {
                    u.nama_lengkap as nama_guru,
                    r.nama_rombel,
                    k.nama_kelas,
-                   t.nama_tahun, t.semester
+                   t.nama_tahun, t.semester,
+                   jp.is_locked
             FROM jadwal_pelajaran jp
             JOIN mata_pelajaran m ON jp.mapel_id = m.id
             JOIN guru g ON jp.guru_id = g.id
@@ -119,7 +120,66 @@ class JadwalModel {
 
     public function hapusJadwal($id)
     {
+        // Don't delete if locked? We can check this in controller or here. Let's do it in controller.
         $this->db->query("DELETE FROM jadwal_pelajaran WHERE id = :id");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function editJadwal($data)
+    {
+        $konflik = $this->cekKonflikJam(
+            $data['rombel_id'], $data['guru_id'],
+            $data['hari'], $data['jam_mulai'], $data['jam_selesai'],
+            $data['id']
+        );
+
+        if ($konflik['konflik_rombel'] || $konflik['konflik_guru']) {
+            return false;
+        }
+
+        $this->db->query("UPDATE jadwal_pelajaran SET mapel_id = :mapel_id, guru_id = :guru_id, hari = :hari, jam_mulai = :jam_mulai, jam_selesai = :jam_selesai WHERE id = :id");
+        $this->db->bind('mapel_id', $data['mapel_id']);
+        $this->db->bind('guru_id', $data['guru_id']);
+        $this->db->bind('hari', $data['hari']);
+        $this->db->bind('jam_mulai', $data['jam_mulai']);
+        $this->db->bind('jam_selesai', $data['jam_selesai']);
+        $this->db->bind('id', $data['id']);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function pindahJadwal($id, $hari, $jam_mulai, $jam_selesai)
+    {
+        // Get rombel_id & guru_id first
+        $this->db->query("SELECT rombel_id, guru_id FROM jadwal_pelajaran WHERE id = :id");
+        $this->db->bind('id', $id);
+        $jadwal = $this->db->single();
+        if(!$jadwal) return false;
+
+        $konflik = $this->cekKonflikJam(
+            $jadwal['rombel_id'], $jadwal['guru_id'],
+            $hari, $jam_mulai, $jam_selesai,
+            $id
+        );
+
+        if ($konflik['konflik_rombel'] || $konflik['konflik_guru']) {
+            return false;
+        }
+
+        $this->db->query("UPDATE jadwal_pelajaran SET hari = :hari, jam_mulai = :jam_mulai, jam_selesai = :jam_selesai WHERE id = :id");
+        $this->db->bind('hari', $hari);
+        $this->db->bind('jam_mulai', $jam_mulai);
+        $this->db->bind('jam_selesai', $jam_selesai);
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return true;
+    }
+
+    public function toggleLock($id)
+    {
+        $this->db->query("UPDATE jadwal_pelajaran SET is_locked = NOT is_locked WHERE id = :id");
         $this->db->bind('id', $id);
         $this->db->execute();
         return $this->db->rowCount();
