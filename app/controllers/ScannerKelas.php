@@ -18,7 +18,7 @@ class ScannerKelas extends Controller {
         // Sebenarnya idealnya ambil dari jadwal, tapi untuk kesederhanaan kita ambil semua rombel aktif
         $this->model('SiswaModel'); // To initialize DB
         $db = new Database();
-        $db->query("SELECT * FROM rombel ORDER BY nama_kelas ASC, jurusan ASC, grade ASC");
+        $db->query("SELECT r.*, k.tingkat as grade, k.jurusan, k.nama_kelas FROM rombel r JOIN kelas k ON r.kelas_id = k.id ORDER BY k.tingkat ASC, k.jurusan ASC, k.nama_kelas ASC");
         $data['rombel'] = $db->resultSet();
 
         $this->view('templates/admin_header', $data);
