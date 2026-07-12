@@ -297,11 +297,26 @@ class Jadwal extends Controller {
         $db->bind('id', $rombel_id);
         $rombel = $db->single();
 
+        $jurusan = $rombel['jurusan'];
+        if (empty($jurusan)) {
+            if (stripos($rombel['nama_kelas'], 'ipa') !== false || stripos($rombel['nama_rombel'], 'ipa') !== false) $jurusan = 'MIPA';
+            elseif (stripos($rombel['nama_kelas'], 'ips') !== false || stripos($rombel['nama_rombel'], 'ips') !== false) $jurusan = 'IPS';
+            elseif (stripos($rombel['nama_kelas'], 'bahasa') !== false) $jurusan = 'BAHASA';
+            else $jurusan = 'UMUM';
+        }
+
         // Ambil alokasi mapel sesuai tingkat & jurusan
         $db->query("SELECT a.*, m.nama_mapel, m.kode_mapel FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id WHERE a.tingkat = :tingkat AND a.jurusan = :jurusan");
         $db->bind('tingkat', $rombel['tingkat']);
-        $db->bind('jurusan', $rombel['jurusan']);
+        $db->bind('jurusan', $jurusan);
         $alokasi = $db->resultSet();
+        
+        // Jika masih kosong, coba ambil semua mapel di tingkat tersebut (fallback darurat)
+        if (empty($alokasi)) {
+            $db->query("SELECT a.*, m.nama_mapel, m.kode_mapel FROM alokasi_mapel a JOIN mata_pelajaran m ON a.mapel_id = m.id WHERE a.tingkat = :tingkat GROUP BY a.mapel_id");
+            $db->bind('tingkat', $rombel['tingkat']);
+            $alokasi = $db->resultSet();
+        }
 
         $data['judul'] = 'Auto Generate Jadwal - ' . $rombel['nama_rombel'];
         $data['rombel'] = $rombel;
