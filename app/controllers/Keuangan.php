@@ -297,4 +297,219 @@ class Keuangan extends Controller {
             die("ERROR: " . $e->getMessage() . " di " . $e->getFile() . " baris " . $e->getLine());
         }
     }
+
+    // ==========================================
+    // TUNGGAKAN
+    // ==========================================
+
+    public function tunggakan()
+    {
+        requireAccess('keuangan_tagihan'); // Use the same access right as Tagihan
+        $data['judul'] = 'Manajemen Tunggakan';
+        
+        $db = new Database();
+        // Ambil semua siswa termasuk alumni untuk input tunggakan
+        $db->query("SELECT id, nisn, status, user_id FROM siswa ORDER BY status ASC, id DESC");
+        $siswaRaw = $db->resultSet();
+        
+        // Populate names
+        $siswa = [];
+        foreach($siswaRaw as $s) {
+            $db->query("SELECT nama_lengkap FROM users WHERE id = :id");
+            $db->bind('id', $s['user_id']);
+            $u = $db->single();
+            $s['nama_lengkap'] = $u ? $u['nama_lengkap'] : 'Tanpa Nama';
+            $siswa[] = $s;
+        }
+        $data['siswa'] = $siswa;
+        $data['kategori'] = $this->model('KeuanganModel')->getAllKategori();
+        
+        $this->view('templates/admin_header', $data);
+        $this->view('keuangan/tunggakan', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    public function prosesTunggakan()
+    {
+        requireAccess('keuangan_tagihan');
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $inserted = $this->model('KeuanganModel')->tambahTunggakan($_POST);
+            
+            if($inserted > 0) {
+                $_SESSION['flash'] = ['pesan' => "$inserted bulan tunggakan", 'aksi' => 'berhasil ditambahkan', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'Gagal', 'aksi' => 'menambahkan tunggakan (mungkin tagihan sudah ada)', 'tipe' => 'danger'];
+            }
+            header('Location: ' . BASEURL . '/keuangan/tunggakan');
+            exit;
+        }
+    }
+
+    public function downloadTemplateTunggakan()
+    {
+        requireAccess('keuangan_tagihan');
+        require_once __DIR__ . '/../../vendor/autoload.php';
+        
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        
+        // Sheet 1: Template Input
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template Tunggakan');
+        
+        $headers = ['Siswa ID', 'Kategori ID', 'Bulan', 'Tahun', 'Nominal', 'Tanggal Jatuh Tempo (1-31)'];
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+            $col++;
+        }
+        
+        // Buat Sheet 2: Referensi Siswa
+        $sheetSiswa = $spreadsheet->createSheet();
+        $sheetSiswa->setTitle('Referensi Siswa');
+        $sheetSiswa->setCellValue('A1', 'Siswa ID');
+        $sheetSiswa->setCellValue('B1', 'NISN');
+        $sheetSiswa->setCellValue('C1', 'Nama Siswa');
+        $sheetSiswa->setCellValue('D1', 'Status');
+        
+        $db = new Database();
+        $db->query("SELECT s.id, s.nisn, s.status, u.nama_lengkap FROM siswa s JOIN users u ON s.user_id = u.id ORDER BY s.status ASC, u.nama_lengkap ASC");
+        $siswaList = $db->resultSet();
+        $row = 2;
+        foreach ($siswaList as $s) {
+            $sheetSiswa->setCellValue('A' . $row, $s['id']);
+            $sheetSiswa->setCellValue('B' . $row, $s['nisn']);
+            $sheetSiswa->setCellValue('C' . $row, $s['nama_lengkap']);
+            $sheetSiswa->setCellValue('D' . $row, $s['status']);
+            $row++;
+        }
+        
+        // Buat Sheet 3: Referensi Kategori
+        $sheetKategori = $spreadsheet->createSheet();
+        $sheetKategori->setTitle('Referensi Kategori');
+        $sheetKategori->setCellValue('A1', 'Kategori ID (Kosongkan jika SPP Biasa)');
+        $sheetKategori->setCellValue('B1', 'Nama Kategori');
+        
+        $kategoriList = $this->model('KeuanganModel')->getAllKategori();
+        $row = 2;
+        foreach ($kategoriList as $k) {
+            $sheetKategori->setCellValue('A' . $row, $k['id']);
+            $sheetKategori->setCellValue('B' . $row, $k['nama_kategori']);
+            $row++;
+        }
+        
+        $spreadsheet->setActiveSheetIndex(0);
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="Template_Import_Tunggakan.xlsx"');
+        header('Cache-Control: max-age=0');
+        
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function previewImportTunggakan()
+    {
+        requireAccess('keuangan_tagihan');
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file_excel'])) {
+            $data['judul'] = 'Preview Import Tunggakan';
+            
+            require_once __DIR__ . '/../../vendor/autoload.php';
+            $file = $_FILES['file_excel']['tmp_name'];
+            
+            $preview_data = [];
+            try {
+                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+                $sheet = $spreadsheet->getSheetByName('Template Tunggakan');
+                if (!$sheet) $sheet = $spreadsheet->getActiveSheet();
+                
+                $highestRow = $sheet->getHighestDataRow();
+                for ($row = 2; $row <= $highestRow; $row++) {
+                    $siswa_id = $sheet->getCell('A' . $row)->getValue();
+                    if(empty($siswa_id)) continue;
+                    
+                    $kategori_id = $sheet->getCell('B' . $row)->getValue();
+                    $bulan = $sheet->getCell('C' . $row)->getValue();
+                    $tahun = $sheet->getCell('D' . $row)->getValue();
+                    $nominal = $sheet->getCell('E' . $row)->getValue();
+                    $tgl_jt = $sheet->getCell('F' . $row)->getValue();
+                    
+                    if(empty($bulan) || empty($tahun) || empty($nominal)) continue;
+                    
+                    $tgl = empty($tgl_jt) ? 10 : (int)$tgl_jt;
+                    $bulanNum = array_search(ucfirst(strtolower($bulan)), ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']) + 1;
+                    if($bulanNum === false) $bulanNum = 1;
+                    $jatuh_tempo = sprintf("%04d-%02d-%02d", $tahun, $bulanNum, $tgl);
+                    
+                    $preview_data[] = [
+                        'siswa_id' => $siswa_id,
+                        'kategori_id' => empty($kategori_id) ? null : $kategori_id,
+                        'bulan' => ucfirst(strtolower($bulan)),
+                        'tahun' => $tahun,
+                        'nominal' => $nominal,
+                        'jatuh_tempo' => $jatuh_tempo
+                    ];
+                }
+            } catch(Exception $e) {
+                Flasher::setFlash('Error membaca file Excel', 'pastikan format benar', 'danger');
+                header('Location: ' . BASEURL . '/keuangan/tunggakan');
+                exit;
+            }
+            
+            $data['preview_data'] = $preview_data;
+            
+            $this->view('templates/admin_header', $data);
+            $this->view('keuangan/tunggakan_preview', $data);
+            $this->view('templates/admin_footer');
+        } else {
+            header('Location: ' . BASEURL . '/keuangan/tunggakan');
+            exit;
+        }
+    }
+
+    public function prosesImportTunggakan()
+    {
+        requireAccess('keuangan_tagihan');
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['import_data'])) {
+            $data = json_decode(base64_decode($_POST['import_data']), true);
+            if(!is_array($data) || empty($data)) {
+                Flasher::setFlash('Data kosong', 'gagal import', 'danger');
+                header('Location: ' . BASEURL . '/keuangan/tunggakan');
+                exit;
+            }
+            
+            $inserted = 0;
+            $db = new Database();
+            foreach($data as $row) {
+                // Check exist
+                if (!empty($row['kategori_id'])) {
+                    $db->query("SELECT id FROM tagihan_spp WHERE siswa_id = :siswa_id AND bulan = :bulan AND tahun = :tahun AND kategori_id = :kategori_id");
+                    $db->bind('kategori_id', $row['kategori_id']);
+                } else {
+                    $db->query("SELECT id FROM tagihan_spp WHERE siswa_id = :siswa_id AND bulan = :bulan AND tahun = :tahun AND kategori_id IS NULL");
+                }
+                $db->bind('siswa_id', $row['siswa_id']);
+                $db->bind('bulan', $row['bulan']);
+                $db->bind('tahun', $row['tahun']);
+                $db->single();
+                
+                if($db->rowCount() == 0) {
+                    $db->query("INSERT INTO tagihan_spp (siswa_id, kategori_id, bulan, tahun, nominal, jatuh_tempo) VALUES (:siswa_id, :kategori_id, :bulan, :tahun, :nominal, :jatuh_tempo)");
+                    $db->bind('siswa_id', $row['siswa_id']);
+                    $db->bind('kategori_id', $row['kategori_id']);
+                    $db->bind('bulan', $row['bulan']);
+                    $db->bind('tahun', $row['tahun']);
+                    $db->bind('nominal', $row['nominal']);
+                    $db->bind('jatuh_tempo', $row['jatuh_tempo']);
+                    $db->execute();
+                    $inserted++;
+                }
+            }
+            
+            Flasher::setFlash("$inserted tagihan/tunggakan", 'berhasil diimpor', 'success');
+            header('Location: ' . BASEURL . '/keuangan/tunggakan');
+            exit;
+        }
+    }
 }

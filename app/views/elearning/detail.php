@@ -186,7 +186,7 @@
             <template x-if="absensiDate">
                 <div>
                     <div class="overflow-x-auto border border-slate-200 rounded-xl mb-4">
-                        <table class="min-w-full divide-y divide-slate-200">
+                        <table class="min-w-full divide-y divide-slate-200 no-datatable">
                             <thead class="bg-slate-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">NIS</th>
@@ -197,7 +197,7 @@
                             <tbody class="bg-white divide-y divide-slate-200">
                                 <template x-for="siswa in daftarAbsensi" :key="siswa.siswa_id">
                                     <tr class="hover:bg-slate-50 transition-colors">
-                                        <td class="px-6 py-3 whitespace-nowrap text-sm text-slate-500" x-text="siswa.nis"></td>
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm text-slate-500" x-text="siswa.nisn"></td>
                                         <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-slate-900" x-text="siswa.nama_lengkap"></td>
                                         <td class="px-6 py-3 whitespace-nowrap">
                                             <div class="flex justify-center gap-3">
@@ -367,6 +367,12 @@ document.addEventListener('alpine:init', () => {
             try {
                 const res = await fetch(`<?= BASEURL ?>/elearning/getAbsensiAjax/${this.jadwalId}/${this.absensiDate}`);
                 const data = await res.json();
+                
+                if (data.error) {
+                    console.error("Error from server:", data.error);
+                    alert("Terjadi kesalahan sistem: " + data.error);
+                    return;
+                }
                 
                 // Initialize default to Alpa if not set
                 this.daftarAbsensi = data.map(siswa => ({

@@ -121,7 +121,7 @@ class ElearningModel {
     {
         // Get all students in the rombel associated with this jadwal
         $this->db->query("
-            SELECT s.id as siswa_id, s.nis, s.nama_lengkap, a.status_kehadiran
+            SELECT s.id as siswa_id, s.nisn, s.nama_lengkap, a.status_kehadiran
             FROM jadwal_pelajaran jp
             JOIN anggota_rombel ar ON jp.rombel_id = ar.rombel_id
             JOIN siswa s ON ar.siswa_id = s.id

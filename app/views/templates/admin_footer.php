@@ -48,7 +48,7 @@
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3/dist/umd/simple-datatables.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const tables = document.querySelectorAll('table');
+            const tables = document.querySelectorAll('table:not(.no-datatable)');
             tables.forEach(table => {
                 if (table) {
                     new simpleDatatables.DataTable(table, {

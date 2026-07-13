@@ -109,6 +109,7 @@ class KeuanganModel {
             JOIN siswa s ON t.siswa_id = s.id
             JOIN users u ON s.user_id = u.id
             LEFT JOIN keuangan_kategori k ON t.kategori_id = k.id
+            WHERE s.status = 'Aktif'
             ORDER BY t.tahun DESC, FIELD(t.bulan, 'Desember', 'November', 'Oktober', 'September', 'Agustus', 'Juli', 'Juni', 'Mei', 'April', 'Maret', 'Februari', 'Januari') DESC, u.nama_lengkap ASC
         ");
         return $this->db->resultSet();
@@ -395,36 +396,63 @@ class KeuanganModel {
 
     public function generateTagihanMasal($data)
     {
-        // Ambil semua siswa
-        $this->db->query("SELECT id FROM siswa");
+        // Ambil semua siswa aktif
+        $this->db->query("SELECT id FROM siswa WHERE status = 'Aktif'");
         $siswa = $this->db->resultSet();
         
         $inserted = 0;
+        
+        $parts = explode('/', $data['tahun_ajaran']);
+        if(count($parts) != 2) return 0;
+        $start_year = (int)$parts[0];
+        $end_year = (int)$parts[1];
+        
+        // Define months from July to June
+        $academic_months = [
+            ['bulan' => 'Juli', 'tahun' => $start_year, 'm' => 7],
+            ['bulan' => 'Agustus', 'tahun' => $start_year, 'm' => 8],
+            ['bulan' => 'September', 'tahun' => $start_year, 'm' => 9],
+            ['bulan' => 'Oktober', 'tahun' => $start_year, 'm' => 10],
+            ['bulan' => 'November', 'tahun' => $start_year, 'm' => 11],
+            ['bulan' => 'Desember', 'tahun' => $start_year, 'm' => 12],
+            ['bulan' => 'Januari', 'tahun' => $end_year, 'm' => 1],
+            ['bulan' => 'Februari', 'tahun' => $end_year, 'm' => 2],
+            ['bulan' => 'Maret', 'tahun' => $end_year, 'm' => 3],
+            ['bulan' => 'April', 'tahun' => $end_year, 'm' => 4],
+            ['bulan' => 'Mei', 'tahun' => $end_year, 'm' => 5],
+            ['bulan' => 'Juni', 'tahun' => $end_year, 'm' => 6],
+        ];
+
         foreach($siswa as $s) {
-            // Cek apakah tagihan untuk siswa ini di bulan dan tahun tsb sudah ada
-            // Jika spesifik kategori, cek juga kategorinya
-            if (!empty($data['kategori_id'])) {
-                $this->db->query("SELECT id FROM tagihan_spp WHERE siswa_id = :siswa_id AND bulan = :bulan AND tahun = :tahun AND kategori_id = :kategori_id");
-                $this->db->bind('kategori_id', $data['kategori_id']);
-            } else {
-                $this->db->query("SELECT id FROM tagihan_spp WHERE siswa_id = :siswa_id AND bulan = :bulan AND tahun = :tahun AND kategori_id IS NULL");
-            }
-            $this->db->bind('siswa_id', $s['id']);
-            $this->db->bind('bulan', $data['bulan']);
-            $this->db->bind('tahun', $data['tahun']);
-            $this->db->single();
-            
-            if($this->db->rowCount() == 0) {
-                // Buat tagihan baru
-                $this->db->query("INSERT INTO tagihan_spp (siswa_id, kategori_id, bulan, tahun, nominal, jatuh_tempo) VALUES (:siswa_id, :kategori_id, :bulan, :tahun, :nominal, :jatuh_tempo)");
+            foreach($academic_months as $am) {
+                // Cek apakah tagihan untuk siswa ini di bulan dan tahun tsb sudah ada
+                if (!empty($data['kategori_id'])) {
+                    $this->db->query("SELECT id FROM tagihan_spp WHERE siswa_id = :siswa_id AND bulan = :bulan AND tahun = :tahun AND kategori_id = :kategori_id");
+                    $this->db->bind('kategori_id', $data['kategori_id']);
+                } else {
+                    $this->db->query("SELECT id FROM tagihan_spp WHERE siswa_id = :siswa_id AND bulan = :bulan AND tahun = :tahun AND kategori_id IS NULL");
+                }
                 $this->db->bind('siswa_id', $s['id']);
-                $this->db->bind('kategori_id', !empty($data['kategori_id']) ? $data['kategori_id'] : null);
-                $this->db->bind('bulan', $data['bulan']);
-                $this->db->bind('tahun', $data['tahun']);
-                $this->db->bind('nominal', $data['nominal']);
-                $this->db->bind('jatuh_tempo', $data['jatuh_tempo']);
-                $this->db->execute();
-                $inserted++;
+                $this->db->bind('bulan', $am['bulan']);
+                $this->db->bind('tahun', $am['tahun']);
+                $this->db->single();
+                
+                if($this->db->rowCount() == 0) {
+                    $tgl = (int)$data['tanggal_jatuh_tempo'];
+                    // Format YYYY-MM-DD
+                    $jatuh_tempo = sprintf("%04d-%02d-%02d", $am['tahun'], $am['m'], $tgl);
+
+                    // Buat tagihan baru
+                    $this->db->query("INSERT INTO tagihan_spp (siswa_id, kategori_id, bulan, tahun, nominal, jatuh_tempo) VALUES (:siswa_id, :kategori_id, :bulan, :tahun, :nominal, :jatuh_tempo)");
+                    $this->db->bind('siswa_id', $s['id']);
+                    $this->db->bind('kategori_id', !empty($data['kategori_id']) ? $data['kategori_id'] : null);
+                    $this->db->bind('bulan', $am['bulan']);
+                    $this->db->bind('tahun', $am['tahun']);
+                    $this->db->bind('nominal', $data['nominal']);
+                    $this->db->bind('jatuh_tempo', $jatuh_tempo);
+                    $this->db->execute();
+                    $inserted++;
+                }
             }
         }
         return $inserted;
@@ -692,5 +720,74 @@ class KeuanganModel {
         $this->db->bind('id', $id);
         $this->db->execute();
         return $this->db->rowCount();
+    }
+
+    // ==========================================
+    // TUNGGAKAN
+    // ==========================================
+
+    public function tambahTunggakan($data)
+    {
+        $siswa_id = $data['siswa_id'];
+        $kategori_id = empty($data['kategori_id']) ? null : $data['kategori_id'];
+        $nominal = $data['nominal'];
+        $dari_bulan = $data['dari_bulan'];
+        $dari_tahun = $data['dari_tahun'];
+        $sampai_bulan = $data['sampai_bulan'];
+        $sampai_tahun = $data['sampai_tahun'];
+        
+        $bulans = ['Januari'=>1,'Februari'=>2,'Maret'=>3,'April'=>4,'Mei'=>5,'Juni'=>6,'Juli'=>7,'Agustus'=>8,'September'=>9,'Oktober'=>10,'November'=>11,'Desember'=>12];
+        $nama_bulans = array_keys($bulans);
+        
+        $start_m = $bulans[$dari_bulan];
+        $start_y = $dari_tahun;
+        $end_m = $bulans[$sampai_bulan];
+        $end_y = $sampai_tahun;
+        
+        $inserted = 0;
+        
+        $curr_y = $start_y;
+        $curr_m = $start_m;
+        
+        while ($curr_y < $end_y || ($curr_y == $end_y && $curr_m <= $end_m)) {
+            $namaB = $nama_bulans[$curr_m - 1];
+            
+            // Check exist
+            if($kategori_id) {
+                $this->db->query("SELECT id FROM tagihan_spp WHERE siswa_id = :siswa_id AND bulan = :bulan AND tahun = :tahun AND kategori_id = :kategori_id");
+                $this->db->bind('kategori_id', $kategori_id);
+            } else {
+                $this->db->query("SELECT id FROM tagihan_spp WHERE siswa_id = :siswa_id AND bulan = :bulan AND tahun = :tahun AND kategori_id IS NULL");
+            }
+            $this->db->bind('siswa_id', $siswa_id);
+            $this->db->bind('bulan', $namaB);
+            $this->db->bind('tahun', $curr_y);
+            $this->db->single();
+            
+            if ($this->db->rowCount() == 0) {
+                $jatuh_tempo = sprintf("%04d-%02d-%02d", $curr_y, $curr_m, 10); // default tanggal 10
+                
+                $this->db->query("INSERT INTO tagihan_spp (siswa_id, kategori_id, bulan, tahun, nominal, jatuh_tempo) VALUES (:siswa_id, :kategori_id, :bulan, :tahun, :nominal, :jatuh_tempo)");
+                $this->db->bind('siswa_id', $siswa_id);
+                $this->db->bind('kategori_id', $kategori_id);
+                $this->db->bind('bulan', $namaB);
+                $this->db->bind('tahun', $curr_y);
+                $this->db->bind('nominal', $nominal);
+                $this->db->bind('jatuh_tempo', $jatuh_tempo);
+                $this->db->execute();
+                $inserted++;
+            }
+            
+            $curr_m++;
+            if ($curr_m > 12) {
+                $curr_m = 1;
+                $curr_y++;
+            }
+            
+            // Safety check to avoid infinite loop
+            if ($curr_y > $end_y + 10) break;
+        }
+        
+        return $inserted;
     }
 }

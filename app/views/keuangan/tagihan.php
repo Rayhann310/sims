@@ -163,25 +163,25 @@
                             <p class="text-xs text-slate-500 mt-1">Pilih Master Tarif, nominal akan otomatis terisi.</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Bulan</label>
-                            <select name="bulan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
-                                <?php $bulans = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; 
-                                foreach($bulans as $b): ?>
-                                    <option value="<?= $b; ?>"><?= $b; ?></option>
-                                <?php endforeach; ?>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Tahun Ajaran</label>
+                            <select name="tahun_ajaran" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+                                <?php 
+                                $current_year = date('Y');
+                                for($i = $current_year - 1; $i <= $current_year + 2; $i++): 
+                                    $thn = $i . '/' . ($i+1);
+                                ?>
+                                    <option value="<?= $thn; ?>" <?= ($i == $current_year) ? 'selected' : ''; ?>><?= $thn; ?></option>
+                                <?php endfor; ?>
                             </select>
+                            <p class="text-xs text-slate-500 mt-1">Otomatis generate untuk bulan Juli s/d Juni tahun berikutnya.</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Tahun</label>
-                            <input type="number" name="tahun" value="<?= date('Y'); ?>" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Nominal (Rp)</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Nominal per Bulan (Rp)</label>
                             <input type="number" name="nominal" x-model="nominalTagihan" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Jatuh Tempo</label>
-                            <input type="date" name="jatuh_tempo" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Jatuh Tempo Tiap Bulan</label>
+                            <input type="number" name="tanggal_jatuh_tempo" min="1" max="31" value="10" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
                     </div>
                     
