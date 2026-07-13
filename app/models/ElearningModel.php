@@ -121,13 +121,14 @@ class ElearningModel {
     {
         // Get all students in the rombel associated with this jadwal
         $this->db->query("
-            SELECT s.id as siswa_id, s.nisn, s.nama_lengkap, a.status_kehadiran
+            SELECT s.id as siswa_id, s.nisn, u.nama_lengkap, a.status_kehadiran
             FROM jadwal_pelajaran jp
             JOIN anggota_rombel ar ON jp.rombel_id = ar.rombel_id
             JOIN siswa s ON ar.siswa_id = s.id
+            JOIN users u ON s.user_id = u.id
             LEFT JOIN elearning_absensi a ON jp.id = a.jadwal_id AND s.id = a.siswa_id AND a.tanggal = :tanggal
             WHERE jp.id = :jadwal_id
-            ORDER BY s.nama_lengkap ASC
+            ORDER BY u.nama_lengkap ASC
         ");
         $this->db->bind('jadwal_id', $jadwal_id);
         $this->db->bind('tanggal', $tanggal);
