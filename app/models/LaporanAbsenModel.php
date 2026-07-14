@@ -93,6 +93,72 @@ class LaporanAbsenModel {
         }
     }
 
+    /**
+     * Akumulasi kehadiran per siswa dalam satu kelas untuk rentang tanggal tertentu.
+     * Mengembalikan: [siswa_id, nisn, nama_lengkap, kelas, hadir, sakit, izin, alpa, total]
+     */
+    public function getAkumulasiPerKelas($rombel_id, $tgl_mulai, $tgl_sampai)
+    {
+        $mode = $this->getModeSiswa();
+        $tabel = $mode === 'Normal' ? 'absensi_siswa' : 'absensi_siswa_detail';
+
+        $this->db->query("
+            SELECT
+                s.id AS siswa_id,
+                s.nisn,
+                u.nama_lengkap,
+                r.nama_rombel AS kelas,
+                SUM(CASE WHEN a.status = 'Hadir' THEN 1 ELSE 0 END) AS hadir,
+                SUM(CASE WHEN a.status = 'Sakit' THEN 1 ELSE 0 END) AS sakit,
+                SUM(CASE WHEN a.status = 'Izin'  THEN 1 ELSE 0 END) AS izin,
+                SUM(CASE WHEN a.status = 'Alpa'  THEN 1 ELSE 0 END) AS alpa,
+                COUNT(a.id) AS total
+            FROM anggota_rombel ar
+            JOIN siswa s ON ar.siswa_id = s.id
+            JOIN users u ON s.user_id = u.id
+            JOIN rombel r ON ar.rombel_id = r.id
+            LEFT JOIN {$tabel} a ON a.siswa_id = s.id
+                AND a.tanggal BETWEEN :mulai AND :sampai
+            WHERE ar.rombel_id = :rombel_id
+            GROUP BY s.id, s.nisn, u.nama_lengkap, r.nama_rombel
+            ORDER BY u.nama_lengkap ASC
+        ");
+        $this->db->bind('mulai', $tgl_mulai);
+        $this->db->bind('sampai', $tgl_sampai);
+        $this->db->bind('rombel_id', $rombel_id);
+        return $this->db->resultSet();
+    }
+
+    /**
+     * Kembalikan rentang tanggal semester aktif.
+     * Semester 1 : Juli - Desember, Semester 2 : Januari - Juni
+     */
+    public function getRentangSemester()
+    {
+        $bulan = (int)date('n');
+        $tahun = (int)date('Y');
+
+        if ($bulan >= 7) {
+            return [
+                'mulai'    => "{$tahun}-07-01",
+                'sampai'   => "{$tahun}-12-31",
+                'label'    => "Semester 1 {$tahun}/" . ($tahun + 1),
+                'semester' => 1,
+                'ta_mulai' => $tahun,
+                'ta_akhir' => $tahun + 1,
+            ];
+        } else {
+            return [
+                'mulai'    => ($tahun - 1) . '-07-01',
+                'sampai'   => "{$tahun}-06-30",
+                'label'    => 'Semester 2 ' . ($tahun - 1) . "/{$tahun}",
+                'semester' => 2,
+                'ta_mulai' => $tahun - 1,
+                'ta_akhir' => $tahun,
+            ];
+        }
+    }
+
     public function getGrafikSummary($tgl_mulai, $tgl_sampai, $rombel_id = null)
     {
         $mode = $this->getModeSiswa();

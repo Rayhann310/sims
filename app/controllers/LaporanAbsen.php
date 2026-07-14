@@ -178,4 +178,148 @@ class LaporanAbsen extends Controller {
         $writer->save('php://output');
         exit;
     }
+
+    // =========================================================
+    // REKAP PER KELAS (Akumulasi bulanan / semester)
+    // =========================================================
+
+    public function rekapKelas()
+    {
+        requireAccess('laporan_absen');
+
+        $data['judul'] = 'Rekap Absensi Per Kelas';
+
+        $laporanModel  = $this->model('LaporanAbsenModel');
+        $semester      = $laporanModel->getRentangSemester();
+
+        $mode_filter = $_GET['mode_filter'] ?? 'bulan';
+        $rombel_id   = $_GET['rombel_id']   ?? '';
+        $bulan       = $_GET['bulan']        ?? date('Y-m');
+
+        if ($mode_filter === 'semester') {
+            $tgl_mulai     = $semester['mulai'];
+            $tgl_sampai    = $semester['sampai'];
+            $label_periode = $semester['label'];
+        } else {
+            $tgl_mulai     = $bulan . '-01';
+            $tgl_sampai    = date('Y-m-t', strtotime($tgl_mulai));
+            $label_periode = date('F Y', strtotime($tgl_mulai));
+        }
+
+        $data['mode_filter']   = $mode_filter;
+        $data['rombel_id']     = $rombel_id;
+        $data['bulan']         = $bulan;
+        $data['tgl_mulai']     = $tgl_mulai;
+        $data['tgl_sampai']    = $tgl_sampai;
+        $data['label_periode'] = $label_periode;
+        $data['semester']      = $semester;
+        $data['mode']          = $laporanModel->getModeSiswa();
+
+        $db = new Database();
+        $db->query("SELECT * FROM rombel ORDER BY nama_rombel ASC");
+        $data['rombels'] = $db->resultSet();
+
+        $data['rekap']     = [];
+        $data['rombel_nama'] = '';
+        if ($rombel_id) {
+            $data['rekap'] = $laporanModel->getAkumulasiPerKelas($rombel_id, $tgl_mulai, $tgl_sampai);
+            foreach ($data['rombels'] as $r) {
+                if ($r['id'] == $rombel_id) {
+                    $data['rombel_nama'] = $r['nama_rombel'];
+                    break;
+                }
+            }
+        }
+
+        $this->view('templates/admin_header', $data);
+        $this->view('laporan_absen/rekap_kelas', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    public function cetakRekapKelas()
+    {
+        requireAccess('laporan_absen');
+
+        $laporanModel = $this->model('LaporanAbsenModel');
+        $semester     = $laporanModel->getRentangSemester();
+
+        $mode_filter = $_GET['mode_filter'] ?? 'bulan';
+        $rombel_id   = $_GET['rombel_id']   ?? '';
+        $bulan       = $_GET['bulan']        ?? date('Y-m');
+
+        if ($mode_filter === 'semester') {
+            $tgl_mulai     = $semester['mulai'];
+            $tgl_sampai    = $semester['sampai'];
+            $label_periode = $semester['label'];
+        } else {
+            $tgl_mulai     = $bulan . '-01';
+            $tgl_sampai    = date('Y-m-t', strtotime($tgl_mulai));
+            $label_periode = date('F Y', strtotime($tgl_mulai));
+        }
+
+        $rombelName = 'Semua Kelas';
+        if ($rombel_id) {
+            $db = new Database();
+            $db->query("SELECT nama_rombel FROM rombel WHERE id = :id");
+            $db->bind('id', $rombel_id);
+            $r = $db->single();
+            if ($r) $rombelName = $r['nama_rombel'];
+        }
+
+        $rekap = $rombel_id
+            ? $laporanModel->getAkumulasiPerKelas($rombel_id, $tgl_mulai, $tgl_sampai)
+            : [];
+
+        $html  = '<style>';
+        $html .= 'body{font-family:DejaVu Sans,sans-serif;font-size:11px;}';
+        $html .= 'h2,h3{text-align:center;margin:3px 0;}';
+        $html .= 'table{width:100%;border-collapse:collapse;margin-top:14px;}';
+        $html .= 'th,td{border:1px solid #444;padding:5px 7px;}';
+        $html .= 'th{background:#e8f5e9;text-align:center;font-weight:bold;}';
+        $html .= '.c{text-align:center;} .alpa{color:#c0392b;font-weight:bold;}';
+        $html .= '</style>';
+        $html .= '<h2>REKAP ABSENSI SISWA PER KELAS</h2>';
+        $html .= '<h3>Kelas: ' . htmlspecialchars($rombelName) . '</h3>';
+        $html .= '<h3>Periode: ' . htmlspecialchars($label_periode) . '</h3>';
+        $html .= '<table><thead><tr>';
+        $html .= '<th>No</th><th>Nama Siswa</th><th>NISN</th>';
+        $html .= '<th>Hadir</th><th>Sakit</th><th>Izin</th><th>Alpa</th><th>Total</th>';
+        $html .= '</tr></thead><tbody>';
+
+        $no = 1;
+        foreach ($rekap as $row) {
+            $html .= '<tr>';
+            $html .= '<td class="c">' . $no++ . '</td>';
+            $html .= '<td>' . htmlspecialchars($row['nama_lengkap']) . '</td>';
+            $html .= '<td class="c">' . htmlspecialchars($row['nisn']) . '</td>';
+            $html .= '<td class="c">' . $row['hadir'] . '</td>';
+            $html .= '<td class="c">' . $row['sakit'] . '</td>';
+            $html .= '<td class="c">' . $row['izin'] . '</td>';
+            $html .= '<td class="c alpa">' . $row['alpa'] . '</td>';
+            $html .= '<td class="c">' . $row['total'] . '</td>';
+            $html .= '</tr>';
+        }
+
+        if (empty($rekap)) {
+            $html .= '<tr><td colspan="8" style="text-align:center;padding:14px;">Tidak ada data untuk periode ini.</td></tr>';
+        }
+
+        $html .= '</tbody></table>';
+        $html .= '<p style="margin-top:18px;font-size:9px;color:#555;">Dicetak: ' . date('d/m/Y H:i') . '</p>';
+
+        if (!class_exists('\Dompdf\Dompdf')) {
+            require_once __DIR__ . '/../../vendor/autoload.php';
+        }
+
+        $opts = new \Dompdf\Options();
+        $opts->set('isRemoteEnabled', true);
+        $dompdf = new \Dompdf\Dompdf($opts);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $fname = 'Rekap_' . preg_replace('/[^a-zA-Z0-9_]/', '_', $rombelName) . '_' . str_replace(' ', '_', $label_periode) . '.pdf';
+        $dompdf->stream($fname, ['Attachment' => false]);
+        exit;
+    }
 }
+

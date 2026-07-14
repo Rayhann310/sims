@@ -230,9 +230,17 @@ $role = $_SESSION['user']['role'] ?? '';
                     </a>
                     <?php endif; ?>
                     <?php if (hasMenuAccess('laporan_absen')): ?>
-                    <a href="<?= BASEURL; ?>/LaporanAbsen" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/LaporanAbsen') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Laporan Absensi">
-                        <i class="fas fa-chart-bar w-5 h-5 text-center transition-colors group-hover:text-white <?= (strpos($_SERVER['REQUEST_URI'], '/LaporanAbsen') !== false) ? 'text-white' : 'text-emerald-300' ?>"></i>
+                    <?php
+                    $isLaporanActive = strpos($_SERVER['REQUEST_URI'], '/LaporanAbsen') !== false;
+                    $isRekapActive   = strpos($_SERVER['REQUEST_URI'], '/LaporanAbsen/rekapKelas') !== false;
+                    ?>
+                    <a href="<?= BASEURL; ?>/LaporanAbsen" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= ($isLaporanActive && !$isRekapActive) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Laporan Absensi">
+                        <i class="fas fa-chart-bar w-5 h-5 text-center transition-colors group-hover:text-white <?= ($isLaporanActive && !$isRekapActive) ? 'text-white' : 'text-emerald-300' ?>"></i>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Laporan Absensi</span>
+                    </a>
+                    <a href="<?= BASEURL; ?>/LaporanAbsen/rekapKelas" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= $isRekapActive ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Rekap Per Kelas">
+                        <i class="fas fa-table w-5 h-5 text-center transition-colors group-hover:text-white <?= $isRekapActive ? 'text-white' : 'text-emerald-300' ?>"></i>
+                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Rekap Per Kelas</span>
                     </a>
                     <?php endif; ?>
                 </div>

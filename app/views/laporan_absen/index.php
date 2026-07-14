@@ -4,7 +4,10 @@
             <h1 class="text-2xl font-bold text-slate-900"><?= $data['judul']; ?></h1>
             <p class="text-sm text-slate-500 mt-1">Laporan rekapitulasi kehadiran siswa. Mode sistem saat ini: <strong><?= $data['mode']; ?></strong></p>
         </div>
-        <div class="flex gap-2">
+        <div class="flex gap-2 flex-wrap">
+            <a href="<?= BASEURL; ?>/LaporanAbsen/rekapKelas" class="px-4 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-sm font-semibold rounded-lg transition-colors border border-indigo-200 inline-flex items-center shadow-sm">
+                <i class="fas fa-table mr-2"></i> Rekap Per Kelas
+            </a>
             <a href="<?= BASEURL; ?>/LaporanAbsen/eksporExcel?tgl_mulai=<?= $data['tgl_mulai'] ?>&tgl_sampai=<?= $data['tgl_sampai'] ?>&rombel_id=<?= $data['rombel_id'] ?>" target="_blank" class="px-4 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-sm font-semibold rounded-lg transition-colors border border-emerald-200 inline-flex items-center shadow-sm">
                 <i class="fas fa-file-excel mr-2"></i> Ekspor Excel
             </a>
@@ -13,6 +16,7 @@
             </a>
         </div>
     </div>
+
 
     <!-- Filter Form -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
