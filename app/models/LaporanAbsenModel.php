@@ -11,9 +11,8 @@ class LaporanAbsenModel {
 
     private function selfHealing()
     {
-        // Pastikan tabel dasar ada. Jika ada struktur tambahan nanti, taruh di sini.
-        // Saat ini, absensi_siswa dan absensi_siswa_detail dikelola oleh UserModel,
-        // namun kita dapat menambahkan check tambahan jika dibutuhkan.
+        // Tabel absensi_siswa dan absensi_siswa_detail dikelola oleh UserModel.
+        // Tidak ada penambahan tabel baru untuk laporan.
     }
 
     public function getModeSiswa()
@@ -28,14 +27,13 @@ class LaporanAbsenModel {
         $mode = $this->getModeSiswa();
 
         if ($mode === 'Normal') {
-            // Laporan Harian
             $query = "
                 SELECT 
                     a.id, 
                     a.tanggal, 
                     s.nisn, 
                     u.nama_lengkap, 
-                    r.nama_rombel as kelas, 
+                    r.nama_rombel AS kelas, 
                     a.status, 
                     a.waktu_scan 
                 FROM absensi_siswa a
@@ -57,8 +55,9 @@ class LaporanAbsenModel {
                 $this->db->bind('rombel_id', $rombel_id);
             }
             return $this->db->resultSet();
+
         } else {
-            // Laporan Per Jam Pelajaran
+            // Per Jam Pelajaran
             $query = "
                 SELECT 
                     ad.id, 
@@ -66,7 +65,7 @@ class LaporanAbsenModel {
                     ad.jam_ke,
                     s.nisn, 
                     u.nama_lengkap, 
-                    r.nama_rombel as kelas, 
+                    r.nama_rombel AS kelas, 
                     ad.status, 
                     ad.waktu_scan,
                     m.nama_mapel
@@ -99,8 +98,9 @@ class LaporanAbsenModel {
         $mode = $this->getModeSiswa();
 
         if ($mode === 'Normal') {
+            // Prefix a.status agar tidak ambigu dengan siswa.status
             $query = "
-                SELECT status, COUNT(id) as total 
+                SELECT a.status, COUNT(a.id) AS total 
                 FROM absensi_siswa a
                 JOIN siswa s ON a.siswa_id = s.id
                 JOIN anggota_rombel ar ON s.id = ar.siswa_id
@@ -109,10 +109,11 @@ class LaporanAbsenModel {
             if ($rombel_id) {
                 $query .= " AND ar.rombel_id = :rombel_id";
             }
-            $query .= " GROUP BY status";
+            $query .= " GROUP BY a.status";
         } else {
+            // Prefix a.status agar tidak ambigu dengan siswa.status
             $query = "
-                SELECT status, COUNT(id) as total 
+                SELECT a.status, COUNT(a.id) AS total 
                 FROM absensi_siswa_detail a
                 JOIN siswa s ON a.siswa_id = s.id
                 JOIN anggota_rombel ar ON s.id = ar.siswa_id
@@ -121,7 +122,7 @@ class LaporanAbsenModel {
             if ($rombel_id) {
                 $query .= " AND ar.rombel_id = :rombel_id";
             }
-            $query .= " GROUP BY status";
+            $query .= " GROUP BY a.status";
         }
 
         $this->db->query($query);
@@ -131,7 +132,7 @@ class LaporanAbsenModel {
             $this->db->bind('rombel_id', $rombel_id);
         }
 
-        $result = $this->db->resultSet();
+        $result  = $this->db->resultSet();
         $summary = ['Hadir' => 0, 'Sakit' => 0, 'Izin' => 0, 'Alpa' => 0];
         foreach ($result as $row) {
             if (isset($summary[$row['status']])) {
