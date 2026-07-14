@@ -203,23 +203,37 @@ $role = $_SESSION['user']['role'] ?? '';
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Presensi & Nilai</span>
                     </a>
                     <?php endif; ?>
-                    <?php if($_SESSION['user']['role'] === 'guru'): ?>
-                    <?php
-                    $showAbsensiKelas = true;
-                    // Check mode absen
-                    $db_absen = new Database();
-                    $db_absen->query("SELECT mode_siswa FROM pengaturan_absensi ORDER BY id ASC LIMIT 1");
-                    $pengaturan_absensi = $db_absen->single();
-                    if ($pengaturan_absensi && $pengaturan_absensi['mode_siswa'] === 'Normal') {
-                        $showAbsensiKelas = hasMenuAccess('absensi_kelas');
-                    }
-                    ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php
+            $showAbsensiKelas = false;
+            if ($_SESSION['user']['role'] === 'guru') {
+                $showAbsensiKelas = true;
+                $db_absen = new Database();
+                $db_absen->query("SELECT mode_siswa FROM pengaturan_absensi ORDER BY id ASC LIMIT 1");
+                $pengaturan_absensi = $db_absen->single();
+                if ($pengaturan_absensi && $pengaturan_absensi['mode_siswa'] === 'Normal') {
+                    $showAbsensiKelas = hasMenuAccess('absensi_kelas');
+                }
+            }
+            ?>
+            <?php if($showAbsensiKelas || hasMenuAccess('laporan_absen')): ?>
+            <div class="mb-6">
+                <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Absensi & Kehadiran</p>
+                <div class="space-y-1">
                     <?php if ($showAbsensiKelas): ?>
                     <a href="<?= BASEURL; ?>/ScannerKelas" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/ScannerKelas') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Absensi Kelas">
                         <i class="fas fa-qrcode w-5 h-5 text-center transition-colors group-hover:text-white <?= (strpos($_SERVER['REQUEST_URI'], '/ScannerKelas') !== false) ? 'text-white' : 'text-emerald-300' ?>"></i>
                         <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Absensi Kelas</span>
                     </a>
                     <?php endif; ?>
+                    <?php if (hasMenuAccess('laporan_absen')): ?>
+                    <a href="<?= BASEURL; ?>/LaporanAbsen" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/LaporanAbsen') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Laporan Absensi">
+                        <i class="fas fa-chart-bar w-5 h-5 text-center transition-colors group-hover:text-white <?= (strpos($_SERVER['REQUEST_URI'], '/LaporanAbsen') !== false) ? 'text-white' : 'text-emerald-300' ?>"></i>
+                        <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Laporan Absensi</span>
+                    </a>
                     <?php endif; ?>
                 </div>
             </div>
