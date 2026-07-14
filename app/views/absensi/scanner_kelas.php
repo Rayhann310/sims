@@ -135,12 +135,13 @@ function scannerKelasData() {
             if (!this.rombelId) return;
             this.isLoading = true;
             try {
-                const res = await fetch('<?= BASEURL; ?>/ScannerKelas/getSiswaByRombel/' + this.rombelId);
+                const res = await fetch(`<?= BASEURL; ?>/ScannerKelas/getSiswaByRombel/${this.rombelId}?jadwal_id=${this.jadwalId}`);
                 const result = await res.json();
                 if(result.status) {
+                    // Status dari server sudah termasuk absensi existing hari ini
                     this.siswaList = result.data.map(s => ({
                         ...s,
-                        status: null // Default belum diset
+                        status: s.status || null // null = belum diabsen
                     }));
                 }
             } catch (e) {

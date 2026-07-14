@@ -66,7 +66,8 @@ class ScannerKelas extends Controller {
 
     public function getSiswaByRombel($rombel_id)
     {
-        $siswa = $this->model('AbsensiSiswaModel')->getSiswaByRombel($rombel_id);
+        $jadwal_id = $_GET['jadwal_id'] ?? 0;
+        $siswa = $this->model('AbsensiSiswaModel')->getSiswaWithStatus($rombel_id, $jadwal_id);
         echo json_encode(['status' => true, 'data' => $siswa]);
     }
 

@@ -71,6 +71,54 @@ class AbsensiSiswaModel {
         return $this->db->resultSet();
     }
 
+    // Ambil siswa + status absensi yang sudah ada hari ini untuk jadwal tertentu
+    public function getSiswaWithStatus($rombel_id, $jadwal_id)
+    {
+        $tanggal = date('Y-m-d');
+
+        // Ambil daftar siswa
+        $this->db->query("
+            SELECT s.id, s.nisn, u.nama_lengkap, s.qr_token 
+            FROM anggota_rombel ar 
+            JOIN siswa s ON ar.siswa_id = s.id 
+            JOIN users u ON s.user_id = u.id 
+            WHERE ar.rombel_id = :rombel_id 
+            ORDER BY u.nama_lengkap ASC
+        ");
+        $this->db->bind('rombel_id', $rombel_id);
+        $siswaList = $this->db->resultSet();
+
+        if (empty($siswaList) || !$jadwal_id) return $siswaList;
+
+        // Ambil status existing hari ini untuk jam_ke tersebut
+        $siswaIds = array_column($siswaList, 'id');
+        $inClause = implode(',', array_map('intval', $siswaIds));
+
+        $this->db->query("
+            SELECT siswa_id, status 
+            FROM absensi_siswa_detail 
+            WHERE siswa_id IN ($inClause) 
+              AND tanggal = :tanggal 
+              AND jam_ke = :jam_ke
+        ");
+        $this->db->bind('tanggal', $tanggal);
+        $this->db->bind('jam_ke', $jadwal_id);
+        $existing = $this->db->resultSet();
+
+        // Index by siswa_id
+        $statusMap = [];
+        foreach ($existing as $row) {
+            $statusMap[$row['siswa_id']] = $row['status'];
+        }
+
+        // Merge status ke daftar siswa
+        foreach ($siswaList as &$s) {
+            $s['status'] = $statusMap[$s['id']] ?? null;
+        }
+
+        return $siswaList;
+    }
+
     public function absenKelas($data)
     {
         $siswa_id = $data['siswa_id'];
