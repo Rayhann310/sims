@@ -8,6 +8,17 @@ class ScannerKelas extends Controller {
             header('Location: ' . BASEURL . '/login');
             exit;
         }
+
+        $db = new Database();
+        $db->query("SELECT mode_siswa FROM pengaturan_absensi ORDER BY id ASC LIMIT 1");
+        $pengaturan_absensi = $db->single();
+        if ($pengaturan_absensi && $pengaturan_absensi['mode_siswa'] === 'Normal') {
+            require_once 'app/core/HakAksesHelper.php';
+            if (!hasMenuAccess('absensi_kelas')) {
+                header('Location: ' . BASEURL . '/dashboard');
+                exit;
+            }
+        }
     }
 
     public function index()

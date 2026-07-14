@@ -16,6 +16,8 @@ class HakAksesModel {
         'elearning'        => ['label' => 'E-Learning',             'group' => 'Akademik',          'url' => '/elearning'],
         'rombel'           => ['label' => 'Rombel & Siswa',         'group' => 'Akademik',          'url' => '/akademik/rombel'],
         'naik_kelas'       => ['label' => 'Naik Kelas',             'group' => 'Akademik',          'url' => '/akademik/naikKelas'],
+        // Absensi
+        'absensi_kelas'    => ['label' => 'Absensi Kelas (Sekali)', 'group' => 'Absensi & Kehadiran', 'url' => '/ScannerKelas'],
         // Master Data
         'data_siswa'       => ['label' => 'Data Siswa',             'group' => 'Master Data',       'url' => '/siswa'],
         'data_guru'        => ['label' => 'Data Guru',              'group' => 'Master Data',       'url' => '/guru'],

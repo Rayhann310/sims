@@ -111,6 +111,30 @@ class AbsensiSiswaModel {
         // Kita hitung apakah dia sudah memenuhi min_jam_pelajaran_siswa
         $this->evaluateDailyAbsensi($siswa_id, $tanggal);
 
+        // Jika mode absen adalah Normal (Absen Sekali), langsung catat ke absensi_siswa harian
+        require_once 'app/models/PengaturanAbsensiModel.php';
+        $pam = new PengaturanAbsensiModel();
+        $global = $pam->getPengaturanGlobal();
+        if ($global['mode_siswa'] === 'Normal') {
+            $this->db->query("SELECT id FROM absensi_siswa WHERE siswa_id = :siswa_id AND tanggal = :tanggal");
+            $this->db->bind('siswa_id', $siswa_id);
+            $this->db->bind('tanggal', $tanggal);
+            $existDaily = $this->db->single();
+
+            if ($existDaily) {
+                $this->db->query("UPDATE absensi_siswa SET status = :status WHERE id = :id");
+                $this->db->bind('status', $status);
+                $this->db->bind('id', $existDaily['id']);
+            } else {
+                $this->db->query("INSERT INTO absensi_siswa (siswa_id, tanggal, waktu_scan, status) VALUES (:siswa_id, :tanggal, :waktu_scan, :status)");
+                $this->db->bind('siswa_id', $siswa_id);
+                $this->db->bind('tanggal', $tanggal);
+                $this->db->bind('waktu_scan', $waktu_scan);
+                $this->db->bind('status', $status);
+            }
+            $this->db->execute();
+        }
+
         return ['status' => true, 'pesan' => 'Berhasil mencatat absensi kelas.'];
     }
 
