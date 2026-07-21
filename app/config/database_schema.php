@@ -887,6 +887,7 @@ return array (
   `siswa_id` INT(11) NOT NULL,
   `tanggal` DATE NOT NULL,
   `waktu_scan` TIME NOT NULL,
+  `tipe_absen` ENUM(\'masuk\',\'pulang\') NOT NULL DEFAULT \'masuk\',
   `status` ENUM(\'Hadir\',\'Sakit\',\'Izin\',\'Alpa\') NOT NULL DEFAULT \'Hadir\',
   `sync_status` BOOLEAN DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
@@ -896,6 +897,7 @@ return array (
       'siswa_id' => 'INT(11) NOT NULL',
       'tanggal' => 'DATE NOT NULL',
       'waktu_scan' => 'TIME NOT NULL',
+      'tipe_absen' => "ENUM('masuk','pulang') NOT NULL DEFAULT 'masuk'",
       'status' => 'ENUM(\'Hadir\',\'Sakit\',\'Izin\',\'Alpa\') NOT NULL DEFAULT \'Hadir\'',
       'sync_status' => 'BOOLEAN DEFAULT 1',
     ),
@@ -905,20 +907,26 @@ return array (
     'create_sql' => 'CREATE TABLE IF NOT EXISTS `pengaturan_absensi` (
   `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
   `mode_siswa` ENUM(\'Normal\', \'Per Jam Pelajaran\') NOT NULL DEFAULT \'Normal\',
+  `mode_absen_siswa` ENUM(\'Per Mata Pelajaran\',\'Masuk & Pulang\',\'Masuk Saja\') NOT NULL DEFAULT \'Masuk Saja\',
   `batas_jam_masuk_guru` TIME NOT NULL DEFAULT \'07:00:00\',
   `batas_jam_keluar_guru` TIME NOT NULL DEFAULT \'15:00:00\',
   `toleransi_terlambat_guru` INT(11) NOT NULL DEFAULT 15,
   `min_jam_pelajaran_siswa` INT(11) NOT NULL DEFAULT 4,
+  `batas_jam_masuk_siswa` TIME NOT NULL DEFAULT \'07:00:00\',
+  `batas_jam_pulang_siswa` TIME NOT NULL DEFAULT \'14:00:00\',
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
     'columns' => 
     array (
       'id' => 'INT(11) AUTO_INCREMENT PRIMARY KEY',
       'mode_siswa' => 'ENUM(\'Normal\', \'Per Jam Pelajaran\') NOT NULL DEFAULT \'Normal\'',
+      'mode_absen_siswa' => "ENUM('Per Mata Pelajaran','Masuk & Pulang','Masuk Saja') NOT NULL DEFAULT 'Masuk Saja'",
       'batas_jam_masuk_guru' => 'TIME NOT NULL DEFAULT \'07:00:00\'',
       'batas_jam_keluar_guru' => 'TIME NOT NULL DEFAULT \'15:00:00\'',
       'toleransi_terlambat_guru' => 'INT(11) NOT NULL DEFAULT 15',
       'min_jam_pelajaran_siswa' => 'INT(11) NOT NULL DEFAULT 4',
+      'batas_jam_masuk_siswa' => "TIME NOT NULL DEFAULT '07:00:00'",
+      'batas_jam_pulang_siswa' => "TIME NOT NULL DEFAULT '14:00:00'",
       'updated_at' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
     ),
   ),

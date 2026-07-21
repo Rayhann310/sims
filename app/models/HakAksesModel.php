@@ -18,6 +18,7 @@ class HakAksesModel {
         'naik_kelas'       => ['label' => 'Naik Kelas',             'group' => 'Akademik',          'url' => '/akademik/naikKelas'],
         // Absensi
         'absensi_kelas'    => ['label' => 'Absensi Kelas (Sekali)', 'group' => 'Absensi & Kehadiran', 'url' => '/ScannerKelas'],
+        'absensi_siswa'    => ['label' => 'Absensi Siswa Harian',   'group' => 'Absensi & Kehadiran', 'url' => '/AbsensiSiswa'],
         'laporan_absen'    => ['label' => 'Laporan Absensi',        'group' => 'Absensi & Kehadiran', 'url' => '/LaporanAbsen'],
         // Master Data
         'data_siswa'       => ['label' => 'Data Siswa',             'group' => 'Master Data',       'url' => '/siswa'],

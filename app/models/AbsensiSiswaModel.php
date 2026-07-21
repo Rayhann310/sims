@@ -18,6 +18,12 @@ class AbsensiSiswaModel {
         $waktu_scan = $data['waktu_scan'] ?? date('H:i:s');
         $tanggal = date('Y-m-d');
 
+        // Ambil pengaturan mode absensi siswa
+        require_once 'app/models/PengaturanAbsensiModel.php';
+        $pam = new PengaturanAbsensiModel();
+        $global = $pam->getPengaturanGlobal();
+        $mode_absen = $global['mode_absen_siswa'] ?? 'Masuk Saja';
+
         // Cari siswa berdasarkan qr_token
         $this->db->query("SELECT id FROM siswa WHERE qr_token = :qr_token");
         $this->db->bind('qr_token', $qr_token);
@@ -29,33 +35,89 @@ class AbsensiSiswaModel {
 
         $siswa_id = $siswa['id'];
 
-        // Cek apakah sudah absen hari ini
-        $this->db->query("SELECT id FROM absensi_siswa WHERE siswa_id = :siswa_id AND tanggal = :tanggal");
-        $this->db->bind('siswa_id', $siswa_id);
-        $this->db->bind('tanggal', $tanggal);
-        if ($this->db->single()) {
-            return ['status' => true, 'pesan' => 'Siswa sudah melakukan presensi hari ini.']; // Anggap success
+        // Ambil nama siswa
+        $this->db->query("SELECT u.nama_lengkap FROM users u JOIN siswa s ON u.id = s.user_id WHERE s.id = :id");
+        $this->db->bind('id', $siswa_id);
+        $user = $this->db->single();
+        $nama = $user['nama_lengkap'] ?? 'Siswa';
+
+        // ====== MODE: Per Mata Pelajaran ======
+        if ($mode_absen === 'Per Mata Pelajaran') {
+            return ['status' => false, 'pesan' => 'Mode absensi saat ini adalah Per Mata Pelajaran. Gunakan scanner di kelas.'];
         }
 
-        // Simpan absensi
-        $query = "INSERT INTO absensi_siswa (siswa_id, tanggal, waktu_scan, status) VALUES (:siswa_id, :tanggal, :waktu_scan, 'Hadir')";
-        $this->db->query($query);
-        $this->db->bind('siswa_id', $siswa_id);
-        $this->db->bind('tanggal', $tanggal);
-        $this->db->bind('waktu_scan', $waktu_scan);
-        
-        try {
-            $this->db->execute();
-            
-            // Get nama siswa
-            $this->db->query("SELECT nama_lengkap FROM users JOIN siswa ON users.id = siswa.user_id WHERE siswa.id = :id");
-            $this->db->bind('id', $siswa_id);
-            $user = $this->db->single();
+        // ====== MODE: Masuk Saja ======
+        if ($mode_absen === 'Masuk Saja') {
+            // Cek apakah sudah absen masuk hari ini
+            $this->db->query("SELECT id FROM absensi_siswa WHERE siswa_id = :siswa_id AND tanggal = :tanggal AND tipe_absen = 'masuk'");
+            $this->db->bind('siswa_id', $siswa_id);
+            $this->db->bind('tanggal', $tanggal);
+            if ($this->db->single()) {
+                return ['status' => true, 'tipe' => 'masuk', 'pesan' => $nama . ' sudah melakukan presensi masuk hari ini.'];
+            }
 
-            return ['status' => true, 'pesan' => 'Presensi berhasil: ' . $user['nama_lengkap']];
-        } catch (Exception $e) {
-            return ['status' => false, 'pesan' => 'Gagal mencatat presensi.'];
+            $query = "INSERT INTO absensi_siswa (siswa_id, tanggal, waktu_scan, tipe_absen, status) VALUES (:siswa_id, :tanggal, :waktu_scan, 'masuk', 'Hadir')";
+            $this->db->query($query);
+            $this->db->bind('siswa_id', $siswa_id);
+            $this->db->bind('tanggal', $tanggal);
+            $this->db->bind('waktu_scan', $waktu_scan);
+
+            try {
+                $this->db->execute();
+                return ['status' => true, 'tipe' => 'masuk', 'pesan' => 'Presensi Masuk berhasil: ' . $nama];
+            } catch (Exception $e) {
+                return ['status' => false, 'pesan' => 'Gagal mencatat presensi.'];
+            }
         }
+
+        // ====== MODE: Masuk & Pulang ======
+        if ($mode_absen === 'Masuk & Pulang') {
+            // Cek sudah absen masuk hari ini?
+            $this->db->query("SELECT id FROM absensi_siswa WHERE siswa_id = :siswa_id AND tanggal = :tanggal AND tipe_absen = 'masuk'");
+            $this->db->bind('siswa_id', $siswa_id);
+            $this->db->bind('tanggal', $tanggal);
+            $sudahMasuk = $this->db->single();
+
+            if (!$sudahMasuk) {
+                // Scan pertama = Masuk
+                $query = "INSERT INTO absensi_siswa (siswa_id, tanggal, waktu_scan, tipe_absen, status) VALUES (:siswa_id, :tanggal, :waktu_scan, 'masuk', 'Hadir')";
+                $this->db->query($query);
+                $this->db->bind('siswa_id', $siswa_id);
+                $this->db->bind('tanggal', $tanggal);
+                $this->db->bind('waktu_scan', $waktu_scan);
+                try {
+                    $this->db->execute();
+                    return ['status' => true, 'tipe' => 'masuk', 'pesan' => 'Presensi Masuk berhasil: ' . $nama];
+                } catch (Exception $e) {
+                    return ['status' => false, 'pesan' => 'Gagal mencatat presensi masuk.'];
+                }
+            }
+
+            // Cek sudah absen pulang hari ini?
+            $this->db->query("SELECT id FROM absensi_siswa WHERE siswa_id = :siswa_id AND tanggal = :tanggal AND tipe_absen = 'pulang'");
+            $this->db->bind('siswa_id', $siswa_id);
+            $this->db->bind('tanggal', $tanggal);
+            $sudahPulang = $this->db->single();
+
+            if ($sudahPulang) {
+                return ['status' => true, 'tipe' => 'pulang', 'pesan' => $nama . ' sudah melakukan presensi masuk dan pulang hari ini.'];
+            }
+
+            // Scan kedua = Pulang
+            $query = "INSERT INTO absensi_siswa (siswa_id, tanggal, waktu_scan, tipe_absen, status) VALUES (:siswa_id, :tanggal, :waktu_scan, 'pulang', 'Hadir')";
+            $this->db->query($query);
+            $this->db->bind('siswa_id', $siswa_id);
+            $this->db->bind('tanggal', $tanggal);
+            $this->db->bind('waktu_scan', $waktu_scan);
+            try {
+                $this->db->execute();
+                return ['status' => true, 'tipe' => 'pulang', 'pesan' => 'Presensi Pulang berhasil: ' . $nama];
+            } catch (Exception $e) {
+                return ['status' => false, 'pesan' => 'Gagal mencatat presensi pulang.'];
+            }
+        }
+
+        return ['status' => false, 'pesan' => 'Mode absensi tidak dikenal.'];
     }
 
     public function getSiswaByRombel($rombel_id)

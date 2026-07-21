@@ -27,46 +27,186 @@
     </div>
 
     <!-- Tab Global -->
-    <div x-show="activeTab == 'global'" class="bg-white rounded-2xl shadow-sm border border-slate-200">
-        <form action="<?= BASEURL; ?>/PengaturanAbsensi/updateGlobal" method="POST" class="p-6">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Mode Absensi Siswa</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Mode Kehadiran</label>
-                    <select name="mode_siswa" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
-                        <option value="Normal" <?= $data['global']['mode_siswa'] == 'Normal' ? 'selected' : '' ?>>Normal (Scan Pagi Sekali)</option>
-                        <option value="Per Jam Pelajaran" <?= $data['global']['mode_siswa'] == 'Per Jam Pelajaran' ? 'selected' : '' ?>>Per Jam Pelajaran (Oleh Guru di Kelas)</option>
-                    </select>
-                    <p class="text-xs text-slate-500 mt-2">Pilih "Per Jam Pelajaran" jika ingin guru yang menscan kehadiran siswa di tiap kelas.</p>
+    <div x-show="activeTab == 'global'" class="space-y-6">
+        <form action="<?= BASEURL; ?>/PengaturanAbsensi/updateGlobal" method="POST">
+
+            <!-- ===== SECTION: Mode Absensi Siswa ===== -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2">
+                    <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm"><i class="fas fa-user-check"></i></span>
+                    Mode Absensi Siswa
+                </h3>
+                <p class="text-xs text-slate-500 mb-5 ml-10">Tentukan bagaimana siswa mencatat kehadiran harian mereka.</p>
+
+                <!-- Mode Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" x-data="{ selected: '<?= htmlspecialchars($data['global']['mode_absen_siswa'] ?? 'Masuk Saja') ?>' }">
+
+                    <!-- Masuk Saja -->
+                    <label @click="selected = 'Masuk Saja'"
+                           class="relative cursor-pointer rounded-xl border-2 p-4 transition-all duration-200 block"
+                           :class="selected === 'Masuk Saja' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 bg-white hover:border-emerald-300'">
+                        <input type="radio" name="mode_absen_siswa" value="Masuk Saja" class="sr-only" :checked="selected === 'Masuk Saja'" required>
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center mt-0.5 shrink-0"
+                                 :class="selected === 'Masuk Saja' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'">
+                                <i class="fas fa-sign-in-alt text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm">Masuk Saja</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Siswa scan QR sekali saat datang. Cocok untuk absensi sederhana.</p>
+                            </div>
+                        </div>
+                        <!-- Check badge -->
+                        <div x-show="selected === 'Masuk Saja'" class="absolute top-2.5 right-2.5 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-white text-[10px]"></i>
+                        </div>
+                    </label>
+
+                    <!-- Masuk & Pulang -->
+                    <label @click="selected = 'Masuk & Pulang'"
+                           class="relative cursor-pointer rounded-xl border-2 p-4 transition-all duration-200 block"
+                           :class="selected === 'Masuk & Pulang' ? 'border-violet-500 bg-violet-50' : 'border-slate-200 bg-white hover:border-violet-300'">
+                        <input type="radio" name="mode_absen_siswa" value="Masuk & Pulang" class="sr-only" :checked="selected === 'Masuk & Pulang'">
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center mt-0.5 shrink-0"
+                                 :class="selected === 'Masuk & Pulang' ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-500'">
+                                <i class="fas fa-exchange-alt text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm">Masuk &amp; Pulang</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Scan pertama = masuk, scan kedua = pulang. Rekam dua waktu kehadiran.</p>
+                            </div>
+                        </div>
+                        <div x-show="selected === 'Masuk & Pulang'" class="absolute top-2.5 right-2.5 w-5 h-5 bg-violet-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-white text-[10px]"></i>
+                        </div>
+                    </label>
+
+                    <!-- Per Mata Pelajaran -->
+                    <label @click="selected = 'Per Mata Pelajaran'"
+                           class="relative cursor-pointer rounded-xl border-2 p-4 transition-all duration-200 block"
+                           :class="selected === 'Per Mata Pelajaran' ? 'border-sky-500 bg-sky-50' : 'border-slate-200 bg-white hover:border-sky-300'">
+                        <input type="radio" name="mode_absen_siswa" value="Per Mata Pelajaran" class="sr-only" :checked="selected === 'Per Mata Pelajaran'">
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center mt-0.5 shrink-0"
+                                 :class="selected === 'Per Mata Pelajaran' ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-500'">
+                                <i class="fas fa-chalkboard-teacher text-sm"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm">Per Mata Pelajaran</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Guru mencatat absensi di tiap kelas. Scanner siswa mandiri dinonaktifkan.</p>
+                            </div>
+                        </div>
+                        <div x-show="selected === 'Per Mata Pelajaran'" class="absolute top-2.5 right-2.5 w-5 h-5 bg-sky-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-white text-[10px]"></i>
+                        </div>
+                    </label>
+
+                    <!-- Hidden inputs agar value terkirim saat radio tidak di-click langsung -->
+                    <input type="hidden" name="mode_absen_siswa" :value="selected">
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Min. Jam Pelajaran (Hadir)</label>
-                    <input type="number" name="min_jam_pelajaran_siswa" value="<?= $data['global']['min_jam_pelajaran_siswa'] ?>" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
-                    <p class="text-xs text-slate-500 mt-2">Berapa kelas minimal yang harus diikuti siswa agar dianggap Hadir pada hari tersebut (jika Mode Per Jam Pelajaran).</p>
+
+                <!-- Batas Jam Siswa (hanya tampil jika bukan Per Mata Pelajaran) -->
+                <div x-data="{ selected: '<?= htmlspecialchars($data['global']['mode_absen_siswa'] ?? 'Masuk Saja') ?>' }"
+                     x-show="selected !== 'Per Mata Pelajaran'"
+                     class="border-t border-slate-100 pt-5">
+                    <!-- Perlu sync dengan radio di atas — kita gunakan event -->
+                </div>
+
+                <div class="border-t border-slate-100 pt-5 mt-2"
+                     x-data="{ modeAbsen: '<?= htmlspecialchars($data['global']['mode_absen_siswa'] ?? 'Masuk Saja') ?>' }"
+                     x-init="
+                         // Sinkronisasi dengan pilihan radio di atas lewat perubahan hidden input
+                         document.querySelectorAll('input[name=mode_absen_siswa]').forEach(el => {
+                             el.addEventListener('change', e => { if(e.target.type !== 'hidden') modeAbsen = e.target.value; });
+                         });
+                         $watch('modeAbsen', val => {
+                             // Update hidden input value
+                             document.querySelector('input[name=mode_absen_siswa][type=hidden]').value = val;
+                         });
+                     ">
+                    <h4 class="text-sm font-semibold text-slate-700 mb-3">Jam Batas Absensi Siswa <span class="text-slate-400 font-normal">(berlaku untuk mode Masuk Saja &amp; Masuk &amp; Pulang)</span></h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" :class="modeAbsen === 'Per Mata Pelajaran' ? 'opacity-40 pointer-events-none' : ''">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5">
+                                <i class="fas fa-sun text-amber-400 mr-1"></i> Batas Jam Masuk Siswa
+                            </label>
+                            <input type="time" name="batas_jam_masuk_siswa" value="<?= $data['global']['batas_jam_masuk_siswa'] ?? '07:00' ?>"
+                                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 text-sm">
+                            <p class="text-xs text-slate-400 mt-1">Waktu maksimal siswa dianggap tepat waktu saat masuk.</p>
+                        </div>
+                        <div x-show="modeAbsen === 'Masuk & Pulang'">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1.5">
+                                <i class="fas fa-moon text-violet-400 mr-1"></i> Batas Jam Pulang Siswa
+                            </label>
+                            <input type="time" name="batas_jam_pulang_siswa" value="<?= $data['global']['batas_jam_pulang_siswa'] ?? '14:00' ?>"
+                                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 text-sm">
+                            <p class="text-xs text-slate-400 mt-1">Waktu minimal siswa boleh scan pulang.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <h3 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Aturan Waktu Guru (Default)</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Batas Jam Masuk</label>
-                    <input type="time" name="batas_jam_masuk_guru" value="<?= $data['global']['batas_jam_masuk_guru'] ?>" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Batas Jam Pulang</label>
-                    <input type="time" name="batas_jam_keluar_guru" value="<?= $data['global']['batas_jam_keluar_guru'] ?>" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Toleransi Terlambat (Menit)</label>
-                    <input type="number" name="toleransi_terlambat_guru" value="<?= $data['global']['toleransi_terlambat_guru'] ?>" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
+            <!-- ===== SECTION: Mode Per Jam Pelajaran (untuk laporan) ===== -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2">
+                    <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm"><i class="fas fa-clock"></i></span>
+                    Evaluasi Kehadiran Harian (Per Jam Pelajaran)
+                </h3>
+                <p class="text-xs text-slate-500 mb-5 ml-10">Digunakan saat mode "Per Mata Pelajaran" — menentukan kapan siswa dianggap hadir.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Mode Evaluasi Harian (Lama)</label>
+                        <select name="mode_siswa" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
+                            <option value="Normal" <?= ($data['global']['mode_siswa'] ?? '') == 'Normal' ? 'selected' : '' ?>>Normal (Catat langsung)</option>
+                            <option value="Per Jam Pelajaran" <?= ($data['global']['mode_siswa'] ?? '') == 'Per Jam Pelajaran' ? 'selected' : '' ?>>Per Jam Pelajaran (Akumulasi)</option>
+                        </select>
+                        <p class="text-xs text-slate-400 mt-1.5">Pengaturan evaluasi rekap harian dari absensi per pelajaran.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Min. Jam Pelajaran (Hadir)</label>
+                        <input type="number" name="min_jam_pelajaran_siswa" value="<?= $data['global']['min_jam_pelajaran_siswa'] ?>"
+                               min="1" max="20"
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
+                        <p class="text-xs text-slate-400 mt-1.5">Berapa JP minimal agar dianggap Hadir (mode Per Jam Pelajaran).</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex justify-end pt-4 border-t border-slate-100 mt-6">
-                <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-md transition-colors">
-                    Simpan Pengaturan Global
+            <!-- ===== SECTION: Aturan Guru ===== -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+                <h3 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2">
+                    <span class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-sm"><i class="fas fa-chalkboard"></i></span>
+                    Aturan Waktu Guru (Default)
+                </h3>
+                <p class="text-xs text-slate-500 mb-5 ml-10">Jam batas masuk, pulang, dan toleransi keterlambatan untuk semua guru.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Batas Jam Masuk</label>
+                        <input type="time" name="batas_jam_masuk_guru" value="<?= $data['global']['batas_jam_masuk_guru'] ?>"
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Batas Jam Pulang</label>
+                        <input type="time" name="batas_jam_keluar_guru" value="<?= $data['global']['batas_jam_keluar_guru'] ?>"
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Toleransi Terlambat (Menit)</label>
+                        <input type="number" name="toleransi_terlambat_guru" value="<?= $data['global']['toleransi_terlambat_guru'] ?>"
+                               min="0" max="120"
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="flex justify-end">
+                <button type="submit" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 transition-all duration-200 flex items-center gap-2">
+                    <i class="fas fa-save"></i> Simpan Semua Pengaturan
                 </button>
             </div>
+
         </form>
     </div>
 
@@ -157,4 +297,20 @@
             </form>
         </div>
     </div>
+
+    <!-- Script: sinkronisasi card radio dengan hidden input -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const cards = document.querySelectorAll('label[data-mode]');
+        // Sinkronisasi via Alpine via events sudah ditangani di x-init
+        // Pastikan form tidak kirim dua kali hidden input
+        const hiddenInputs = document.querySelectorAll('input[name="mode_absen_siswa"][type="hidden"]');
+        if (hiddenInputs.length > 1) {
+            // Hapus yang duplikat, sisakan yang terakhir (dari x-data Alpine)
+            for (let i = 0; i < hiddenInputs.length - 1; i++) {
+                hiddenInputs[i].remove();
+            }
+        }
+    });
+    </script>
 </div>

@@ -18,12 +18,24 @@ class PengaturanAbsensiModel {
         $result = $this->db->single();
         if (!$result) {
             // default settings
-            $this->db->query("INSERT INTO pengaturan_absensi (mode_siswa, batas_jam_masuk_guru, batas_jam_keluar_guru, toleransi_terlambat_guru, min_jam_pelajaran_siswa) VALUES ('Normal', '07:00:00', '15:00:00', 15, 4)");
+            $this->db->query("INSERT INTO pengaturan_absensi (mode_siswa, mode_absen_siswa, batas_jam_masuk_guru, batas_jam_keluar_guru, toleransi_terlambat_guru, min_jam_pelajaran_siswa, batas_jam_masuk_siswa, batas_jam_pulang_siswa) VALUES ('Normal', 'Masuk Saja', '07:00:00', '15:00:00', 15, 4, '07:00:00', '14:00:00')");
             $this->db->execute();
             
             $this->db->query('SELECT * FROM pengaturan_absensi ORDER BY id ASC LIMIT 1');
             $result = $this->db->single();
         }
+
+        // Pastikan kolom baru punya nilai default jika NULL (migrasi dari instalasi lama)
+        if (empty($result['mode_absen_siswa'])) {
+            $result['mode_absen_siswa'] = 'Masuk Saja';
+        }
+        if (empty($result['batas_jam_masuk_siswa'])) {
+            $result['batas_jam_masuk_siswa'] = '07:00:00';
+        }
+        if (empty($result['batas_jam_pulang_siswa'])) {
+            $result['batas_jam_pulang_siswa'] = '14:00:00';
+        }
+
         return $result;
     }
 
@@ -31,18 +43,24 @@ class PengaturanAbsensiModel {
     {
         $query = "UPDATE pengaturan_absensi SET 
                     mode_siswa = :mode_siswa, 
+                    mode_absen_siswa = :mode_absen_siswa,
                     batas_jam_masuk_guru = :batas_jam_masuk_guru, 
                     batas_jam_keluar_guru = :batas_jam_keluar_guru, 
                     toleransi_terlambat_guru = :toleransi_terlambat_guru, 
-                    min_jam_pelajaran_siswa = :min_jam_pelajaran_siswa
+                    min_jam_pelajaran_siswa = :min_jam_pelajaran_siswa,
+                    batas_jam_masuk_siswa = :batas_jam_masuk_siswa,
+                    batas_jam_pulang_siswa = :batas_jam_pulang_siswa
                   ORDER BY id ASC LIMIT 1";
         
         $this->db->query($query);
         $this->db->bind('mode_siswa', $data['mode_siswa']);
+        $this->db->bind('mode_absen_siswa', $data['mode_absen_siswa'] ?? 'Masuk Saja');
         $this->db->bind('batas_jam_masuk_guru', $data['batas_jam_masuk_guru']);
         $this->db->bind('batas_jam_keluar_guru', $data['batas_jam_keluar_guru']);
         $this->db->bind('toleransi_terlambat_guru', $data['toleransi_terlambat_guru']);
         $this->db->bind('min_jam_pelajaran_siswa', $data['min_jam_pelajaran_siswa']);
+        $this->db->bind('batas_jam_masuk_siswa', $data['batas_jam_masuk_siswa'] ?? '07:00:00');
+        $this->db->bind('batas_jam_pulang_siswa', $data['batas_jam_pulang_siswa'] ?? '14:00:00');
 
         $this->db->execute();
         return $this->db->rowCount();

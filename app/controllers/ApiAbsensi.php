@@ -39,6 +39,7 @@ class ApiAbsensi extends Controller {
             if (isset($input['data']) && is_array($input['data'])) {
                 $model = $this->model('AbsensiSiswaModel');
                 $sukses = 0;
+                $lastResult = null;
                 
                 foreach ($input['data'] as $item) {
                     $data = [
@@ -46,10 +47,18 @@ class ApiAbsensi extends Controller {
                         'waktu_scan' => $item['waktu_scan']
                     ];
                     $res = $model->absenScan($data);
-                    if ($res['status']) $sukses++;
+                    if ($res['status']) {
+                        $sukses++;
+                        $lastResult = $res;
+                    }
                 }
 
-                echo json_encode(['status' => true, 'message' => "$sukses data tersinkronisasi"]);
+                $response = ['status' => true, 'message' => "$sukses data tersinkronisasi"];
+                if ($lastResult) {
+                    $response['pesan'] = $lastResult['pesan'];
+                    $response['tipe'] = $lastResult['tipe'] ?? 'masuk';
+                }
+                echo json_encode($response);
                 exit;
             }
         }

@@ -119,6 +119,43 @@ class UserModel {
             } catch (Exception $e) {
                 // Ignore errors
             }
+
+            // SELF-HEALING: Kolom mode_absen_siswa di pengaturan_absensi
+            try {
+                $this->db->query("SHOW COLUMNS FROM pengaturan_absensi LIKE 'mode_absen_siswa'");
+                if (count($this->db->resultSet()) == 0) {
+                    $this->db->query("ALTER TABLE pengaturan_absensi ADD COLUMN mode_absen_siswa ENUM('Per Mata Pelajaran','Masuk & Pulang','Masuk Saja') NOT NULL DEFAULT 'Masuk Saja' AFTER mode_siswa");
+                    $this->db->execute();
+                }
+            } catch (Exception $e) { error_log("Self-healing mode_absen_siswa: " . $e->getMessage()); }
+
+            // SELF-HEALING: Kolom batas_jam_masuk_siswa di pengaturan_absensi
+            try {
+                $this->db->query("SHOW COLUMNS FROM pengaturan_absensi LIKE 'batas_jam_masuk_siswa'");
+                if (count($this->db->resultSet()) == 0) {
+                    $this->db->query("ALTER TABLE pengaturan_absensi ADD COLUMN batas_jam_masuk_siswa TIME NOT NULL DEFAULT '07:00:00'");
+                    $this->db->execute();
+                }
+            } catch (Exception $e) { error_log("Self-healing batas_jam_masuk_siswa: " . $e->getMessage()); }
+
+            // SELF-HEALING: Kolom batas_jam_pulang_siswa di pengaturan_absensi
+            try {
+                $this->db->query("SHOW COLUMNS FROM pengaturan_absensi LIKE 'batas_jam_pulang_siswa'");
+                if (count($this->db->resultSet()) == 0) {
+                    $this->db->query("ALTER TABLE pengaturan_absensi ADD COLUMN batas_jam_pulang_siswa TIME NOT NULL DEFAULT '14:00:00'");
+                    $this->db->execute();
+                }
+            } catch (Exception $e) { error_log("Self-healing batas_jam_pulang_siswa: " . $e->getMessage()); }
+
+            // SELF-HEALING: Kolom tipe_absen di absensi_siswa
+            try {
+                $this->db->query("SHOW COLUMNS FROM absensi_siswa LIKE 'tipe_absen'");
+                if (count($this->db->resultSet()) == 0) {
+                    $this->db->query("ALTER TABLE absensi_siswa ADD COLUMN tipe_absen ENUM('masuk','pulang') NOT NULL DEFAULT 'masuk' AFTER waktu_scan");
+                    $this->db->execute();
+                }
+            } catch (Exception $e) { error_log("Self-healing tipe_absen: " . $e->getMessage()); }
+
         } catch (Exception $e) {
             error_log("Self-healing encountered a critical error: " . $e->getMessage());
         }
