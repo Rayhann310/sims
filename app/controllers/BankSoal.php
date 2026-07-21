@@ -3,7 +3,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory as WordIOFactory;
 
-require_once '../app/helpers/DocxParser.php';
+require_once __DIR__ . '/../helpers/DocxParser.php';
 
 class BankSoal extends Controller {
 
