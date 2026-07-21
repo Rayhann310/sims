@@ -22,9 +22,16 @@ class AbsensiSiswa extends Controller {
         $pam = $this->model('PengaturanAbsensiModel');
         $data['pengaturan'] = $pam->getPengaturanGlobal();
 
-        // Ambil daftar rombel untuk filter
+        // Ambil daftar rombel aktif (berdasarkan tahun akademik aktif)
         $db = new Database();
-        $db->query("SELECT r.id, r.nama_rombel, k.tingkat, k.jurusan FROM rombel r JOIN kelas k ON r.kelas_id = k.id ORDER BY k.tingkat ASC, r.nama_rombel ASC");
+        $db->query("
+            SELECT r.id, r.nama_rombel, k.tingkat, k.jurusan
+            FROM rombel r
+            JOIN kelas k ON r.kelas_id = k.id
+            JOIN tahun_akademik t ON r.tahun_akademik_id = t.id
+            WHERE t.status = 'Aktif'
+            ORDER BY k.tingkat ASC, r.nama_rombel ASC
+        ");
         $data['rombels'] = $db->resultSet();
 
         $this->view('templates/admin_header', $data);
