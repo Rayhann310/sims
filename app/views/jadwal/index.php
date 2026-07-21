@@ -18,6 +18,9 @@
             <button @click="openTambahModal()" :disabled="!rombel_id" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
                 <i class="fas fa-plus mr-2"></i> Tambah Manual
             </button>
+            <button @click="if(confirm('Yakin ingin MENGOSONGKAN seluruh jadwal untuk kelas ini? Tindakan ini tidak dapat dibatalkan.')) window.location.href='<?= BASEURL; ?>/jadwal/kosongkan?rombel_id=' + rombel_id + '&ta_id=' + ta_id" :disabled="!rombel_id" class="inline-flex items-center px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium rounded-lg border border-red-200 transition-colors shadow-sm">
+                <i class="fas fa-trash-alt mr-2"></i> Kosongkan Jadwal
+            </button>
         </div>
         <?php endif; ?>
     </div>
@@ -244,10 +247,15 @@
                     </button>
                 </div>
                 
-                <form action="<?= BASEURL; ?>/jadwal/import" method="post" enctype="multipart/form-data">
+                <form action="<?= BASEURL; ?>/jadwal/importPreview" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="rombel_id" :value="rombel_id">
                     
                     <div class="space-y-4">
+                        <div class="flex justify-end">
+                            <a href="<?= BASEURL; ?>/jadwal/template" class="inline-flex items-center px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors rounded-lg text-xs font-bold">
+                                <i class="fas fa-download mr-1"></i> Download Template Excel
+                            </a>
+                        </div>
                         <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
                             <p class="text-sm text-blue-800">
                                 Pastikan format Excel Anda memiliki urutan kolom (tanpa header):<br>
@@ -263,7 +271,7 @@
                     
                     <div class="mt-6 flex justify-end space-x-3">
                         <button type="button" @click="modalOpen = false" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">Batal</button>
-                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors shadow-sm">Upload & Import</button>
+                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors shadow-sm">Preview Data</button>
                     </div>
                 </form>
             </div>

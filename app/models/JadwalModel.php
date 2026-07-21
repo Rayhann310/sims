@@ -127,6 +127,14 @@ class JadwalModel {
         return $this->db->rowCount();
     }
 
+    public function kosongkanJadwalRombel($rombel_id)
+    {
+        $this->db->query("DELETE FROM jadwal_pelajaran WHERE rombel_id = :rombel_id");
+        $this->db->bind('rombel_id', $rombel_id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
     public function editJadwal($data)
     {
         $konflik = $this->cekKonflikJam(

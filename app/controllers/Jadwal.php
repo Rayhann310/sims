@@ -218,8 +218,8 @@ class Jadwal extends Controller {
         exit;
     }
 
-    // Import dari Excel
-    public function import()
+    // Import dari Excel ke Session (Preview)
+    public function importPreview()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file_excel'])) {
             $rombel_id = $_POST['rombel_id'];
@@ -264,12 +264,9 @@ class Jadwal extends Controller {
                 }
 
                 if (count($dataInsert) > 0) {
-                    $result = $this->model('JadwalModel')->importJadwalMassal($dataInsert);
-                    $msg = $result['inserted'] . ' jadwal berhasil diimport.';
-                    if (!empty($result['errors'])) {
-                        $msg .= ' ' . count($result['errors']) . ' baris dilewati (bentrok jam).';
-                    }
-                    $_SESSION['flash'] = ['pesan' => $msg, 'aksi' => '', 'tipe' => 'success'];
+                    $_SESSION['preview_import_jadwal'] = $dataInsert;
+                    header('Location: ' . BASEURL . '/jadwal/previewImport');
+                    exit;
                 } else {
                     $_SESSION['flash'] = ['pesan' => 'Tidak ada data valid di file Excel', 'aksi' => '', 'tipe' => 'danger'];
                 }
@@ -280,6 +277,81 @@ class Jadwal extends Controller {
             header('Location: ' . BASEURL . '/jadwal');
             exit;
         }
+    }
+
+    public function previewImport()
+    {
+        if (!isset($_SESSION['preview_import_jadwal'])) {
+            header('Location: ' . BASEURL . '/jadwal');
+            exit;
+        }
+
+        $dataInsert = $_SESSION['preview_import_jadwal'];
+        $rombel_id = $dataInsert[0]['rombel_id'];
+
+        $db = new Database();
+        $db->query("SELECT r.*, k.tingkat, k.jurusan FROM rombel r JOIN kelas k ON r.kelas_id = k.id WHERE r.id = :id");
+        $db->bind('id', $rombel_id);
+        $rombel = $db->single();
+
+        $mapel_list = $this->model('JadwalModel')->getAllMapel();
+        $guru_list = $this->model('JadwalModel')->getAllGuru();
+
+        $mapel_map = [];
+        foreach($mapel_list as $m) $mapel_map[$m['id']] = $m['nama_mapel'];
+
+        $guru_map = [];
+        foreach($guru_list as $g) $guru_map[$g['id']] = $g['nama_lengkap'];
+
+        // Lengkapi data dengan nama mapel dan guru
+        foreach($dataInsert as &$row) {
+            $row['nama_mapel'] = isset($mapel_map[$row['mapel_id']]) ? $mapel_map[$row['mapel_id']] : 'Unknown Mapel ID: ' . $row['mapel_id'];
+            $row['nama_guru'] = isset($guru_map[$row['guru_id']]) ? $guru_map[$row['guru_id']] : 'Unknown Guru ID: ' . $row['guru_id'];
+        }
+
+        $data['judul'] = 'Preview Import Jadwal';
+        $data['rombel'] = $rombel;
+        $data['jadwal'] = $dataInsert;
+
+        $this->view('templates/admin_header', $data);
+        $this->view('jadwal/preview_import', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    public function simpanImport()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['preview_import_jadwal'])) {
+            $dataInsert = $_SESSION['preview_import_jadwal'];
+            $result = $this->model('JadwalModel')->importJadwalMassal($dataInsert);
+            
+            $msg = $result['inserted'] . ' jadwal berhasil diimport.';
+            if (!empty($result['errors'])) {
+                $msg .= ' ' . count($result['errors']) . ' baris dilewati (bentrok jam).';
+            }
+            $_SESSION['flash'] = ['pesan' => $msg, 'aksi' => '', 'tipe' => 'success'];
+            
+            unset($_SESSION['preview_import_jadwal']);
+        }
+        header('Location: ' . BASEURL . '/jadwal');
+        exit;
+    }
+    public function kosongkan()
+    {
+        $rombel_id = isset($_GET['rombel_id']) ? $_GET['rombel_id'] : null;
+        $ta_id = isset($_GET['ta_id']) ? $_GET['ta_id'] : null;
+        
+        if ($rombel_id) {
+            $this->model('JadwalModel')->kosongkanJadwalRombel($rombel_id);
+            $_SESSION['flash'] = ['pesan' => 'Seluruh jadwal kelas berhasil dikosongkan.', 'aksi' => '', 'tipe' => 'success'];
+        }
+        
+        $url = BASEURL . '/jadwal';
+        if ($ta_id) {
+            $url .= '?ta_id=' . $ta_id . '&rombel_id=' . $rombel_id;
+        }
+        
+        header('Location: ' . $url);
+        exit;
     }
     // --- PENGATURAN & ALOKASI ---
     public function pengaturan()
