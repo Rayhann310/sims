@@ -345,6 +345,201 @@ class Jadwal extends Controller {
         header('Location: ' . BASEURL . '/jadwal/pengaturan');
         exit;
     }
+
+    // --- IMPORT ALOKASI BEBAN JAM ---
+    public function downloadTemplateAlokasi()
+    {
+        $mapel = $this->model('JadwalModel')->getAllMapel();
+        
+        require_once 'app/models/AkademikModel.php';
+        $akademikModel = new AkademikModel();
+        $kelas = $akademikModel->getAllKelas();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Template Alokasi Jam');
+
+        // Header
+        $sheet->setCellValue('A1', 'ID Mapel');
+        $sheet->setCellValue('B1', 'Nama Mapel (Info)');
+        $sheet->setCellValue('C1', 'ID Kelas');
+        $sheet->setCellValue('D1', 'Nama Kelas (Info)');
+        $sheet->setCellValue('E1', 'Jumlah JP');
+
+        // Style header
+        $headerStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '2563EB']],
+        ];
+        $sheet->getStyle('A1:E1')->applyFromArray($headerStyle);
+        foreach (['A', 'B', 'C', 'D', 'E'] as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Sheet referensi Mapel
+        $sheetMapel = $spreadsheet->createSheet();
+        $sheetMapel->setTitle('Ref Mapel');
+        $sheetMapel->setCellValue('A1', 'ID Mapel');
+        $sheetMapel->setCellValue('B1', 'Nama Mapel');
+        $sheetMapel->setCellValue('C1', 'Kode Mapel');
+        foreach ($mapel as $i => $m) {
+            $sheetMapel->setCellValue('A' . ($i + 2), $m['id']);
+            $sheetMapel->setCellValue('B' . ($i + 2), $m['nama_mapel']);
+            $sheetMapel->setCellValue('C' . ($i + 2), $m['kode_mapel']);
+        }
+
+        // Sheet referensi Kelas
+        $sheetKelas = $spreadsheet->createSheet();
+        $sheetKelas->setTitle('Ref Kelas');
+        $sheetKelas->setCellValue('A1', 'ID Kelas');
+        $sheetKelas->setCellValue('B1', 'Nama Kelas');
+        $sheetKelas->setCellValue('C1', 'Tingkat');
+        $sheetKelas->setCellValue('D1', 'Jurusan');
+        foreach ($kelas as $i => $k) {
+            $sheetKelas->setCellValue('A' . ($i + 2), $k['id']);
+            $sheetKelas->setCellValue('B' . ($i + 2), $k['nama_kelas']);
+            $sheetKelas->setCellValue('C' . ($i + 2), $k['tingkat']);
+            $sheetKelas->setCellValue('D' . ($i + 2), $k['jurusan']);
+        }
+
+        $spreadsheet->setActiveSheetIndex(0);
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="template_alokasi_jam.xlsx"');
+        header('Cache-Control: max-age=0');
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function importAlokasiPreview()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file_excel'])) {
+            $ext = strtolower(pathinfo($_FILES['file_excel']['name'], PATHINFO_EXTENSION));
+
+            if (!in_array($ext, ['xls', 'xlsx'])) {
+                $_SESSION['flash'] = ['pesan' => 'Format file harus .xlsx atau .xls', 'aksi' => '', 'tipe' => 'danger'];
+                header('Location: ' . BASEURL . '/jadwal/pengaturan');
+                exit;
+            }
+
+            try {
+                $spreadsheet = IOFactory::load($_FILES['file_excel']['tmp_name']);
+                $sheetData   = $spreadsheet->getActiveSheet()->toArray();
+
+                $mapel_list = $this->model('JadwalModel')->getAllMapel();
+                $mapelMap = [];
+                foreach($mapel_list as $m) {
+                    $mapelMap[$m['id']] = $m;
+                }
+
+                require_once 'app/models/AkademikModel.php';
+                $akademikModel = new AkademikModel();
+                $kelas_list = $akademikModel->getAllKelas();
+                $kelasMap = [];
+                foreach($kelas_list as $k) {
+                    $kelasMap[$k['id']] = $k;
+                }
+
+                $previewData = [];
+                // Skip baris pertama (header)
+                for ($i = 1; $i < count($sheetData); $i++) {
+                    $mapel_id = trim($sheetData[$i][0] ?? '');
+                    $kelas_id = trim($sheetData[$i][2] ?? '');
+                    $jumlah_jp = trim($sheetData[$i][4] ?? '');
+
+                    if ($mapel_id === '' && $kelas_id === '' && $jumlah_jp === '') {
+                        continue;
+                    }
+
+                    $is_valid = true;
+                    $error_msg = [];
+
+                    $nama_mapel = '-';
+                    if (isset($mapelMap[$mapel_id])) {
+                        $nama_mapel = $mapelMap[$mapel_id]['nama_mapel'];
+                    } else {
+                        $is_valid = false;
+                        $error_msg[] = 'Mapel ID tidak ditemukan';
+                    }
+
+                    $nama_kelas = '-';
+                    if (isset($kelasMap[$kelas_id])) {
+                        $nama_kelas = $kelasMap[$kelas_id]['nama_kelas'] . ' (' . $kelasMap[$kelas_id]['tingkat'] . ' ' . $kelasMap[$kelas_id]['jurusan'] . ')';
+                    } else {
+                        $is_valid = false;
+                        $error_msg[] = 'Kelas ID tidak ditemukan';
+                    }
+
+                    if (!is_numeric($jumlah_jp) || $jumlah_jp <= 0) {
+                        $is_valid = false;
+                        $error_msg[] = 'Jumlah JP tidak valid';
+                    }
+
+                    $previewData[] = [
+                        'mapel_id' => $mapel_id,
+                        'kelas_id' => $kelas_id,
+                        'jumlah_jp' => $jumlah_jp,
+                        'nama_mapel' => $nama_mapel,
+                        'nama_kelas' => $nama_kelas,
+                        'is_valid' => $is_valid,
+                        'error_msg' => implode(', ', $error_msg)
+                    ];
+                }
+
+                $_SESSION['preview_alokasi'] = $previewData;
+
+                $data['judul'] = 'Preview Import Alokasi Beban Jam';
+                $data['previewData'] = $previewData;
+
+                $this->view('templates/admin_header', $data);
+                $this->view('jadwal/preview_alokasi', $data);
+                $this->view('templates/admin_footer');
+
+            } catch (Exception $e) {
+                $_SESSION['flash'] = ['pesan' => 'Gagal membaca file: ' . $e->getMessage(), 'aksi' => '', 'tipe' => 'danger'];
+                header('Location: ' . BASEURL . '/jadwal/pengaturan');
+                exit;
+            }
+        } else {
+            header('Location: ' . BASEURL . '/jadwal/pengaturan');
+            exit;
+        }
+    }
+
+    public function simpanImportAlokasi()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['preview_alokasi'])) {
+            $previewData = $_SESSION['preview_alokasi'];
+            
+            $validData = array_filter($previewData, function($item) {
+                return $item['is_valid'];
+            });
+
+            $berhasil = 0;
+            $model = $this->model('JadwalModel');
+            
+            foreach($validData as $d) {
+                $model->simpanAlokasi([
+                    'id' => '', 
+                    'mapel_id' => $d['mapel_id'],
+                    'kelas_id' => $d['kelas_id'],
+                    'jumlah_jp' => $d['jumlah_jp']
+                ]);
+                $berhasil++;
+            }
+
+            unset($_SESSION['preview_alokasi']);
+
+            $_SESSION['flash'] = ['pesan' => $berhasil . ' Data Alokasi', 'aksi' => 'diimport', 'tipe' => 'success'];
+            header('Location: ' . BASEURL . '/jadwal/pengaturan');
+            exit;
+        } else {
+            header('Location: ' . BASEURL . '/jadwal/pengaturan');
+            exit;
+        }
+    }
+
     // --- AUTO GENERATE JADWAL ---
     public function autoGenerate()
     {

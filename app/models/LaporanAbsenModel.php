@@ -100,7 +100,21 @@ class LaporanAbsenModel {
     public function getAkumulasiPerKelas($rombel_id, $tgl_mulai, $tgl_sampai)
     {
         $mode = $this->getModeSiswa();
-        $tabel = $mode === 'Normal' ? 'absensi_siswa' : 'absensi_siswa_detail';
+        $tabel = $mode === 'Normal' ? "(
+            SELECT 
+                siswa_id, 
+                tanggal,
+                CASE
+                    WHEN COUNT(CASE WHEN status = 'Alpa' THEN 1 END) > 0 THEN 'Alpa'
+                    WHEN COUNT(CASE WHEN status = 'Izin' THEN 1 END) > 0 THEN 'Izin'
+                    WHEN COUNT(CASE WHEN status = 'Sakit' THEN 1 END) > 0 THEN 'Sakit'
+                    WHEN COUNT(CASE WHEN status = 'Hadir' THEN 1 END) > 0 THEN 'Hadir'
+                    ELSE 'Alpa'
+                END AS status,
+                MAX(id) as id
+            FROM absensi_siswa
+            GROUP BY siswa_id, tanggal
+        )" : 'absensi_siswa_detail';
 
         $this->db->query("
             SELECT
@@ -135,7 +149,21 @@ class LaporanAbsenModel {
     public function getSummarySiswa($tgl_mulai, $tgl_sampai, $rombel_id = null)
     {
         $mode = $this->getModeSiswa();
-        $tabel = $mode === 'Normal' ? 'absensi_siswa' : 'absensi_siswa_detail';
+        $tabel = $mode === 'Normal' ? "(
+            SELECT 
+                siswa_id, 
+                tanggal,
+                CASE
+                    WHEN COUNT(CASE WHEN status = 'Alpa' THEN 1 END) > 0 THEN 'Alpa'
+                    WHEN COUNT(CASE WHEN status = 'Izin' THEN 1 END) > 0 THEN 'Izin'
+                    WHEN COUNT(CASE WHEN status = 'Sakit' THEN 1 END) > 0 THEN 'Sakit'
+                    WHEN COUNT(CASE WHEN status = 'Hadir' THEN 1 END) > 0 THEN 'Hadir'
+                    ELSE 'Alpa'
+                END AS status,
+                MAX(id) as id
+            FROM absensi_siswa
+            GROUP BY siswa_id, tanggal
+        )" : 'absensi_siswa_detail';
 
         $query = "
             SELECT
@@ -210,7 +238,21 @@ class LaporanAbsenModel {
             // Prefix a.status agar tidak ambigu dengan siswa.status
             $query = "
                 SELECT a.status, COUNT(a.id) AS total 
-                FROM absensi_siswa a
+                FROM (
+                    SELECT 
+                        siswa_id, 
+                        tanggal,
+                        CASE
+                            WHEN COUNT(CASE WHEN status = 'Alpa' THEN 1 END) > 0 THEN 'Alpa'
+                            WHEN COUNT(CASE WHEN status = 'Izin' THEN 1 END) > 0 THEN 'Izin'
+                            WHEN COUNT(CASE WHEN status = 'Sakit' THEN 1 END) > 0 THEN 'Sakit'
+                            WHEN COUNT(CASE WHEN status = 'Hadir' THEN 1 END) > 0 THEN 'Hadir'
+                            ELSE 'Alpa'
+                        END AS status,
+                        MAX(id) as id
+                    FROM absensi_siswa
+                    GROUP BY siswa_id, tanggal
+                ) a
                 JOIN siswa s ON a.siswa_id = s.id
                 JOIN anggota_rombel ar ON s.id = ar.siswa_id
                 WHERE a.tanggal BETWEEN :mulai AND :sampai

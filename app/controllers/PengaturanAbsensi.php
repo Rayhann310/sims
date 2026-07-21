@@ -24,6 +24,10 @@ class PengaturanAbsensi extends Controller {
         $db->query("SELECT g.id, g.nip, u.nama_lengkap FROM guru g JOIN users u ON g.user_id = u.id");
         $data['list_guru'] = $db->resultSet();
 
+        require_once 'app/models/AkademikModel.php';
+        $akd = new AkademikModel();
+        $data['tahun_akademik'] = $akd->getAllTahun();
+
         $this->view('templates/admin_header', $data);
         $this->view('pengaturan_absensi/index', $data);
         $this->view('templates/admin_footer');
@@ -61,6 +65,36 @@ class PengaturanAbsensi extends Controller {
             $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'dihapus', 'tipe' => 'success'];
         } else {
             $_SESSION['flash'] = ['pesan' => 'gagal', 'aksi' => 'dihapus', 'tipe' => 'red'];
+        }
+        header('Location: ' . BASEURL . '/PengaturanAbsensi');
+        exit;
+    }
+
+    public function resetSiswa()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $ta_id = $_POST['ta_id'];
+            $count = $this->model('PengaturanAbsensiModel')->resetAbsensiSiswa($ta_id);
+            if ($count !== false) {
+                $_SESSION['flash'] = ['pesan' => 'Data absensi siswa (' . $count . ' baris)', 'aksi' => 'berhasil dihapus', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'Gagal mereset absensi siswa', 'aksi' => '', 'tipe' => 'red'];
+            }
+        }
+        header('Location: ' . BASEURL . '/PengaturanAbsensi');
+        exit;
+    }
+
+    public function resetGuru()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $ta_id = $_POST['ta_id'];
+            $count = $this->model('PengaturanAbsensiModel')->resetAbsensiGuru($ta_id);
+            if ($count !== false) {
+                $_SESSION['flash'] = ['pesan' => 'Data absensi guru (' . $count . ' baris)', 'aksi' => 'berhasil dihapus', 'tipe' => 'success'];
+            } else {
+                $_SESSION['flash'] = ['pesan' => 'Gagal mereset absensi guru', 'aksi' => '', 'tipe' => 'red'];
+            }
         }
         header('Location: ' . BASEURL . '/PengaturanAbsensi');
         exit;

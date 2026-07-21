@@ -77,7 +77,20 @@
         <!-- Alokasi Jam Mengajar -->
         <div class="lg:col-span-2">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 h-full">
-                <h2 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2"><i class="fas fa-book-open text-blue-500 mr-2"></i> Alokasi Beban Jam (JP / Minggu)</h2>
+                <div class="flex items-center justify-between mb-4 border-b pb-2">
+                    <h2 class="text-lg font-bold text-slate-800"><i class="fas fa-book-open text-blue-500 mr-2"></i> Alokasi Beban Jam (JP / Minggu)</h2>
+                    <div class="flex gap-2">
+                        <a href="<?= BASEURL; ?>/jadwal/downloadTemplateAlokasi" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors text-xs font-medium flex items-center gap-1">
+                            <i class="fas fa-download"></i> Template
+                        </a>
+                        <button type="button" onclick="document.getElementById('import_alokasi').click()" class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-xs font-medium flex items-center gap-1">
+                            <i class="fas fa-upload"></i> Import Excel
+                        </button>
+                    </div>
+                </div>
+                <form action="<?= BASEURL; ?>/jadwal/importAlokasiPreview" method="POST" enctype="multipart/form-data" class="hidden">
+                    <input type="file" name="file_excel" id="import_alokasi" accept=".xls,.xlsx" onchange="this.form.submit()">
+                </form>
                 <form action="<?= BASEURL; ?>/jadwal/simpanAlokasi" method="POST" class="mb-6 flex gap-3 flex-wrap items-end bg-slate-50 p-4 rounded-xl border border-slate-100" id="form-alokasi">
                     <input type="hidden" name="id" id="alokasi_id">
                     <div class="flex-1 min-w-[200px]">

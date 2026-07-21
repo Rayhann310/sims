@@ -195,6 +195,32 @@ $modeAbs = $g['mode_absen_siswa'] ?? 'Masuk Saja';
                 </button>
             </div>
         </form>
+
+        <!-- Reset Absensi Siswa -->
+        <div class="bg-red-50 rounded-2xl border border-red-200 shadow-sm p-6 mt-6">
+            <h3 class="font-bold text-red-800 text-base mb-1 flex items-center gap-2">
+                <span class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-trash-alt text-sm"></i>
+                </span>
+                Reset Absensi Siswa
+            </h3>
+            <p class="text-xs text-red-600 ml-10 mb-5">Hapus seluruh data absensi siswa berdasarkan Tahun Akademik/Semester. Tindakan ini tidak dapat dibatalkan!</p>
+            
+            <form action="<?= BASEURL ?>/PengaturanAbsensi/resetSiswa" method="POST" class="ml-10 flex gap-3 items-end" onsubmit="return confirm('YAKIN INGIN MENGHAPUS SEMUA DATA ABSENSI SISWA PADA SEMESTER INI? DATA TIDAK DAPAT DIKEMBALIKAN!');">
+                <div class="flex-1 max-w-xs">
+                    <label class="block text-xs font-semibold text-red-700 mb-1.5">Pilih Tahun Akademik</label>
+                    <select name="ta_id" required class="w-full px-4 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 bg-white text-sm">
+                        <option value="">-- Pilih Tahun Akademik --</option>
+                        <?php foreach($data['tahun_akademik'] as $ta): ?>
+                            <option value="<?= $ta['id'] ?>"><?= htmlspecialchars($ta['nama_tahun']) ?> - Semester <?= $ta['semester'] ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors flex items-center gap-2 text-sm">
+                    <i class="fas fa-trash"></i> Hapus Data
+                </button>
+            </form>
+        </div>
     </div>
 
     <!-- ======================= TAB GURU ======================= -->
@@ -321,6 +347,32 @@ $modeAbs = $g['mode_absen_siswa'] ?? 'Masuk Saja';
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Reset Absensi Guru -->
+        <div class="bg-red-50 rounded-2xl border border-red-200 shadow-sm p-6 mt-6">
+            <h3 class="font-bold text-red-800 text-base mb-1 flex items-center gap-2">
+                <span class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-trash-alt text-sm"></i>
+                </span>
+                Reset Absensi Guru
+            </h3>
+            <p class="text-xs text-red-600 ml-10 mb-5">Hapus seluruh data absensi guru berdasarkan Tahun Akademik/Semester. Tindakan ini tidak dapat dibatalkan!</p>
+            
+            <form action="<?= BASEURL ?>/PengaturanAbsensi/resetGuru" method="POST" class="ml-10 flex gap-3 items-end" onsubmit="return confirm('YAKIN INGIN MENGHAPUS SEMUA DATA ABSENSI GURU PADA SEMESTER INI? DATA TIDAK DAPAT DIKEMBALIKAN!');">
+                <div class="flex-1 max-w-xs">
+                    <label class="block text-xs font-semibold text-red-700 mb-1.5">Pilih Tahun Akademik</label>
+                    <select name="ta_id" required class="w-full px-4 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 bg-white text-sm">
+                        <option value="">-- Pilih Tahun Akademik --</option>
+                        <?php foreach($data['tahun_akademik'] as $ta): ?>
+                            <option value="<?= $ta['id'] ?>"><?= htmlspecialchars($ta['nama_tahun']) ?> - Semester <?= $ta['semester'] ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors flex items-center gap-2 text-sm">
+                    <i class="fas fa-trash"></i> Hapus Data
+                </button>
+            </form>
         </div>
     </div>
 

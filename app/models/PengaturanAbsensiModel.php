@@ -136,4 +136,64 @@ class PengaturanAbsensiModel {
             'toleransi_terlambat' => $global['toleransi_terlambat_guru'],
         ];
     }
+
+    public function resetAbsensiSiswa($ta_id)
+    {
+        $this->db->query("SELECT * FROM tahun_akademik WHERE id = :id");
+        $this->db->bind('id', $ta_id);
+        $ta = $this->db->single();
+        if (!$ta) return false;
+
+        $years = explode('/', $ta['nama_tahun']);
+        $y1 = $years[0];
+        $y2 = $years[1];
+        
+        if ($ta['semester'] == '1') {
+            $start = $y1 . '-07-01';
+            $end = $y1 . '-12-31';
+        } else {
+            $start = $y2 . '-01-01';
+            $end = $y2 . '-06-30';
+        }
+
+        $this->db->query("DELETE FROM absensi_siswa WHERE tanggal BETWEEN :start AND :end");
+        $this->db->bind('start', $start);
+        $this->db->bind('end', $end);
+        $this->db->execute();
+        $c1 = $this->db->rowCount();
+
+        $this->db->query("DELETE FROM absensi_siswa_detail WHERE tanggal BETWEEN :start AND :end");
+        $this->db->bind('start', $start);
+        $this->db->bind('end', $end);
+        $this->db->execute();
+        $c2 = $this->db->rowCount();
+
+        return $c1 + $c2;
+    }
+
+    public function resetAbsensiGuru($ta_id)
+    {
+        $this->db->query("SELECT * FROM tahun_akademik WHERE id = :id");
+        $this->db->bind('id', $ta_id);
+        $ta = $this->db->single();
+        if (!$ta) return false;
+
+        $years = explode('/', $ta['nama_tahun']);
+        $y1 = $years[0];
+        $y2 = $years[1];
+        
+        if ($ta['semester'] == '1') {
+            $start = $y1 . '-07-01';
+            $end = $y1 . '-12-31';
+        } else {
+            $start = $y2 . '-01-01';
+            $end = $y2 . '-06-30';
+        }
+
+        $this->db->query("DELETE FROM absensi_guru WHERE tanggal BETWEEN :start AND :end");
+        $this->db->bind('start', $start);
+        $this->db->bind('end', $end);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
 }
