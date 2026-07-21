@@ -77,9 +77,8 @@ class BankSoalModel {
                     (:id_mapel, :id_guru, :tipe_soal, :pertanyaan, :opsi_a, :opsi_b, :opsi_c, :opsi_d, :opsi_e, :kunci_jawaban, :tingkat_kesulitan)";
         
         $this->db->query($query);
-        $this->db->bind('id_mapel', $data['id_mapel']); 
-        $this->db->bind('id_guru', $_SESSION['user']['id'] ?? 1);
-        
+        $this->db->bind('id_mapel', $data['id_mapel']);
+        $this->db->bind('id_guru', $data['id_guru'] ?? 1);
         $this->db->bind('tipe_soal', $data['tipe_soal']);
         $this->db->bind('pertanyaan', $data['pertanyaan']);
         $this->db->bind('opsi_a', $data['opsi_a'] ?? '');
@@ -88,10 +87,37 @@ class BankSoalModel {
         $this->db->bind('opsi_d', $data['opsi_d'] ?? '');
         $this->db->bind('opsi_e', $data['opsi_e'] ?? '');
         $this->db->bind('kunci_jawaban', $data['kunci_jawaban'] ?? '');
-        $this->db->bind('tingkat_kesulitan', $data['tingkat_kesulitan']);
+        $this->db->bind('tingkat_kesulitan', $data['tingkat_kesulitan'] ?? 'Sedang');
 
         $this->db->execute();
         return $this->db->rowCount();
+    }
+
+    public function importSoalMassal($id_mapel, $id_guru, $dataSoal)
+    {
+        $inserted = 0;
+        $query = "INSERT INTO " . $this->table . "
+                    (id_mapel, id_guru, tipe_soal, pertanyaan, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci_jawaban, tingkat_kesulitan)
+                  VALUES
+                    (:id_mapel, :id_guru, :tipe_soal, :pertanyaan, :opsi_a, :opsi_b, :opsi_c, :opsi_d, :opsi_e, :kunci_jawaban, :tingkat_kesulitan)";
+
+        foreach ($dataSoal as $soal) {
+            $this->db->query($query);
+            $this->db->bind('id_mapel', $id_mapel);
+            $this->db->bind('id_guru', $id_guru);
+            $this->db->bind('tipe_soal', $soal['tipe_soal'] ?? 'PG');
+            $this->db->bind('pertanyaan', $soal['pertanyaan']);
+            $this->db->bind('opsi_a', $soal['opsi_a'] ?? '');
+            $this->db->bind('opsi_b', $soal['opsi_b'] ?? '');
+            $this->db->bind('opsi_c', $soal['opsi_c'] ?? '');
+            $this->db->bind('opsi_d', $soal['opsi_d'] ?? '');
+            $this->db->bind('opsi_e', $soal['opsi_e'] ?? '');
+            $this->db->bind('kunci_jawaban', $soal['kunci_jawaban'] ?? '');
+            $this->db->bind('tingkat_kesulitan', $soal['tingkat_kesulitan'] ?? 'Sedang');
+            $this->db->execute();
+            $inserted++;
+        }
+        return $inserted;
     }
 
     public function hapusDataSoal($id)
