@@ -46,8 +46,8 @@
                     <div class="space-y-3">
                         <input type="text" name="nama_istirahat" id="nama_istirahat" placeholder="Nama (cth: Istirahat 1, Upacara)" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
                         <div class="flex gap-2">
-                            <input type="number" name="setelah_jp_ke" id="setelah_jp_ke" placeholder="Stlh JP ke" class="w-1/2 px-3 py-2 border border-slate-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
-                            <input type="number" name="durasi_menit" id="durasi_menit" placeholder="Durasi (m)" class="w-1/2 px-3 py-2 border border-slate-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
+                            <input type="number" name="setelah_jp_ke" id="setelah_jp_ke" min="0" placeholder="Stlh JP ke (0=Sblm JP 1)" class="w-1/2 px-3 py-2 border border-slate-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm" title="Gunakan 0 untuk kegiatan sebelum jam pertama (misal: Upacara/Senam)" required>
+                            <input type="number" name="durasi_menit" id="durasi_menit" min="1" placeholder="Durasi (m)" class="w-1/2 px-3 py-2 border border-slate-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm" required>
                         </div>
                         <input type="text" name="hari_khusus" id="hari_khusus" placeholder="Khusus Hari (kosongkan = tiap hari)" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm">
                         <div class="flex gap-2">

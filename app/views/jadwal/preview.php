@@ -52,12 +52,15 @@
                             $refSlot = $data['grid'][$data['hari_aktif'][0]][$jk]; 
                             ?>
                             <td class="p-3 border-r border-slate-200 bg-slate-50 text-center align-middle">
-                                <?php if($refSlot['type'] == 'jp'): ?>
-                                    <div class="font-bold text-slate-700 text-base">JP <?= $refSlot['jp'] ?></div>
-                                <?php else: ?>
-                                    <div class="font-bold text-amber-600 text-xs uppercase"><i class="fas fa-coffee"></i></div>
-                                <?php endif; ?>
-                                <div class="text-[10px] text-slate-500 mt-1"><?= $refSlot['jam_mulai'] ?> - <?= $refSlot['jam_selesai'] ?></div>
+                                  <?php if($refSlot['type'] == 'jp'): ?>
+                                      <div class="font-bold text-slate-700 text-base">JP <?= $refSlot['jp'] ?></div>
+                                      <div class="text-[10px] text-slate-500 mt-1"><?= $refSlot['jam_mulai'] ?> - <?= $refSlot['jam_selesai'] ?></div>
+                                  <?php elseif($refSlot['type'] == 'break'): ?>
+                                      <div class="font-bold text-amber-600 text-xs uppercase"><i class="fas fa-coffee"></i></div>
+                                      <div class="text-[10px] text-slate-500 mt-1"><?= $refSlot['jam_mulai'] ?> - <?= $refSlot['jam_selesai'] ?></div>
+                                  <?php else: ?>
+                                      <div class="font-bold text-slate-400 text-xs uppercase"><i class="fas fa-clock"></i></div>
+                                  <?php endif; ?>
                             </td>
                             
                             <!-- Kolom Hari-Hari -->
@@ -68,9 +71,12 @@
                                     <?= $slot['type'] == 'jp' ? 'data-hari="'.$hari.'" data-jk="'.$jk.'" x-ref="dropzone"' : '' ?> >
                                     
                                     <?php if($slot['type'] == 'break'): ?>
-                                        <div class="flex items-center justify-center h-full text-amber-700 font-bold text-xs uppercase tracking-wider py-4">
-                                            <?= $slot['name'] ?>
+                                        <div class="flex flex-col items-center justify-center h-full text-amber-700 py-2">
+                                            <div class="font-bold text-xs uppercase tracking-wider"><?= $slot['name'] ?></div>
+                                            <div class="text-[10px] text-amber-600 mt-1"><?= $slot['jam_mulai'] ?> - <?= $slot['jam_selesai'] ?></div>
                                         </div>
+                                    <?php elseif($slot['type'] == 'empty'): ?>
+                                        <!-- Kosong, tidak ada kegiatan -->
                                     <?php else: ?>
                                         <div class="min-h-[80px] rounded-lg p-2 transition-colors border-2 border-dashed border-transparent hover:border-blue-300 dropzone-area" 
                                              @dragover.prevent="dragOver($event)" 

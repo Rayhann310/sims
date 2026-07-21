@@ -313,8 +313,8 @@ class Jadwal extends Controller {
     public function simpanIstirahat()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $this->model('JadwalModel')->tambahIstirahat($_POST);
-            $_SESSION['flash'] = ['pesan' => 'Jadwal Istirahat', 'aksi' => 'ditambahkan', 'tipe' => 'success'];
+            $this->model('JadwalModel')->simpanIstirahat($_POST);
+            $_SESSION['flash'] = ['pesan' => 'Jadwal Istirahat', 'aksi' => 'disimpan', 'tipe' => 'success'];
         }
         header('Location: ' . BASEURL . '/jadwal/pengaturan');
         exit;
@@ -653,6 +653,13 @@ class Jadwal extends Controller {
             }
         }
         
+        // Kumpulkan semua posisi break secara unik agar grid sejajar antar hari
+        $globalBreaks = [];
+        foreach($istirahat as $ist) {
+            $jpKe = (int)$ist['setelah_jp_ke'];
+            $globalBreaks[$jpKe] = true;
+        }
+
         // Persiapkan grid (Hari -> JP)
         $grid = [];
         foreach($hari_aktif as $h) {
@@ -662,32 +669,39 @@ class Jadwal extends Controller {
             $currentTime = strtotime($pengaturan['jam_mulai']);
             
             for($jp = 1; $jp <= $max_jp; $jp++) {
-                // Cek apakah JP ini adalah istirahat
-                $isBreak = false;
-                $breakName = '';
-                $breakDuration = 0;
-                
-                foreach($istirahat as $ist) {
-                    if ($ist['setelah_jp_ke'] == ($jp - 1)) {
-                        // Berlaku tiap hari ATAU hari ini khusus
-                        if (empty($ist['hari_khusus']) || strtolower($ist['hari_khusus']) == strtolower($h)) {
-                            $isBreak = true;
-                            $breakName = $ist['nama_istirahat'];
-                            $breakDuration = (int)$ist['durasi_menit'];
-                            break; // Anggap 1 istirahat per slot
+                // Cek apakah ada istirahat setelah JP sebelumnya
+                if (isset($globalBreaks[$jp - 1])) {
+                    $matchedBreak = null;
+                    foreach($istirahat as $ist) {
+                        if ((int)$ist['setelah_jp_ke'] == ($jp - 1)) {
+                            $hk = trim((string)$ist['hari_khusus']);
+                            if (strtolower($hk) == strtolower(trim($h))) {
+                                $matchedBreak = $ist;
+                                break;
+                            } elseif ($hk === '') {
+                                if (!$matchedBreak) $matchedBreak = $ist;
+                            }
                         }
                     }
-                }
-                
-                if ($isBreak) {
-                    $jamSelesaiBreak = $currentTime + ($breakDuration * 60);
-                    $grid[$h]['break_' . $jp] = [
-                        'type' => 'break',
-                        'name' => $breakName,
-                        'jam_mulai' => date('H:i', $currentTime),
-                        'jam_selesai' => date('H:i', $jamSelesaiBreak)
-                    ];
-                    $currentTime = $jamSelesaiBreak;
+                    
+                    if ($matchedBreak) {
+                        $jamSelesaiBreak = $currentTime + ((int)$matchedBreak['durasi_menit'] * 60);
+                        $grid[$h]['break_' . $jp] = [
+                            'type' => 'break',
+                            'name' => $matchedBreak['nama_istirahat'],
+                            'jam_mulai' => date('H:i', $currentTime),
+                            'jam_selesai' => date('H:i', $jamSelesaiBreak)
+                        ];
+                        $currentTime = $jamSelesaiBreak;
+                    } else {
+                        // Tidak ada break untuk hari ini, tapi untuk alignment row di view
+                        $grid[$h]['break_' . $jp] = [
+                            'type' => 'empty',
+                            'name' => '-',
+                            'jam_mulai' => date('H:i', $currentTime),
+                            'jam_selesai' => date('H:i', $currentTime)
+                        ];
+                    }
                 }
                 
                 // Normal JP
@@ -705,6 +719,40 @@ class Jadwal extends Controller {
                     'is_locked' => false // flag to track locked status
                 ];
                 $currentTime = $jamSelesai;
+            }
+
+            // Cek istirahat setelah JP terakhir (jika ada)
+            if (isset($globalBreaks[$max_jp])) {
+                $matchedBreak = null;
+                foreach($istirahat as $ist) {
+                    if ((int)$ist['setelah_jp_ke'] == $max_jp) {
+                        $hk = trim((string)$ist['hari_khusus']);
+                        if (strtolower($hk) == strtolower(trim($h))) {
+                            $matchedBreak = $ist;
+                            break;
+                        } elseif ($hk === '') {
+                            if (!$matchedBreak) $matchedBreak = $ist;
+                        }
+                    }
+                }
+                
+                if ($matchedBreak) {
+                    $jamSelesaiBreak = $currentTime + ((int)$matchedBreak['durasi_menit'] * 60);
+                    $grid[$h]['break_' . ($max_jp + 1)] = [
+                        'type' => 'break',
+                        'name' => $matchedBreak['nama_istirahat'],
+                        'jam_mulai' => date('H:i', $currentTime),
+                        'jam_selesai' => date('H:i', $jamSelesaiBreak)
+                    ];
+                    $currentTime = $jamSelesaiBreak;
+                } else {
+                    $grid[$h]['break_' . ($max_jp + 1)] = [
+                        'type' => 'empty',
+                        'name' => '-',
+                        'jam_mulai' => date('H:i', $currentTime),
+                        'jam_selesai' => date('H:i', $currentTime)
+                    ];
+                }
             }
         }
         
