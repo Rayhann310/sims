@@ -16,21 +16,81 @@ class LaporanAbsen extends Controller {
     {
         $data['judul'] = 'Laporan Absensi';
 
-        $tgl_mulai  = $_GET['tgl_mulai']  ?? date('Y-m-01');
-        $tgl_sampai = $_GET['tgl_sampai'] ?? date('Y-m-t');
+        $tgl_mulai = date('Y-m-01');
+        $tgl_sampai = date('Y-m-t');
+
+        $filter_type = $_GET['filter_type'] ?? 'rentang';
+        $data['filter_type'] = $filter_type;
         $rombel_id  = $_GET['rombel_id']  ?? '';
+        $data['rombel_id'] = $rombel_id;
+
+        $db = new Database();
+
+        if ($filter_type === 'rentang') {
+            $tgl_mulai  = $_GET['tgl_mulai']  ?? date('Y-m-01');
+            $tgl_sampai = $_GET['tgl_sampai'] ?? date('Y-m-t');
+        } elseif ($filter_type === 'mingguan') {
+            $bulan = $_GET['bulan'] ?? date('Y-m');
+            $minggu_ke = $_GET['minggu_ke'] ?? 1;
+            $data['bulan'] = $bulan;
+            $data['minggu_ke'] = $minggu_ke;
+            
+            $year = date('Y', strtotime($bulan));
+            $month = date('m', strtotime($bulan));
+            
+            if ($minggu_ke == 1) {
+                $tgl_mulai = "$year-$month-01";
+                $tgl_sampai = "$year-$month-07";
+            } elseif ($minggu_ke == 2) {
+                $tgl_mulai = "$year-$month-08";
+                $tgl_sampai = "$year-$month-14";
+            } elseif ($minggu_ke == 3) {
+                $tgl_mulai = "$year-$month-15";
+                $tgl_sampai = "$year-$month-21";
+            } elseif ($minggu_ke == 4) {
+                $tgl_mulai = "$year-$month-22";
+                $tgl_sampai = "$year-$month-28";
+            } elseif ($minggu_ke == 5) {
+                $tgl_mulai = "$year-$month-29";
+                $tgl_sampai = date('Y-m-t', strtotime("$year-$month-01"));
+            }
+        } elseif ($filter_type === 'semester') {
+            $tahun_akademik_id = $_GET['tahun_akademik_id'] ?? '';
+            $data['tahun_akademik_id'] = $tahun_akademik_id;
+            
+            if ($tahun_akademik_id) {
+                $db->query("SELECT * FROM tahun_akademik WHERE id = :id");
+                $db->bind('id', $tahun_akademik_id);
+                $ta = $db->single();
+                if ($ta) {
+                    $parts = explode('/', $ta['nama_tahun']);
+                    if (count($parts) == 2) {
+                        $tahun_mulai = trim($parts[0]);
+                        $tahun_akhir = trim($parts[1]);
+                        if ($ta['semester'] == 1) {
+                            $tgl_mulai = "$tahun_mulai-07-01";
+                            $tgl_sampai = "$tahun_mulai-12-31";
+                        } else {
+                            $tgl_mulai = "$tahun_akhir-01-01";
+                            $tgl_sampai = "$tahun_akhir-06-30";
+                        }
+                    }
+                }
+            }
+        }
 
         $data['tgl_mulai']  = $tgl_mulai;
         $data['tgl_sampai'] = $tgl_sampai;
-        $data['rombel_id']  = $rombel_id;
 
-        $db = new Database();
         $db->query("SELECT * FROM rombel ORDER BY nama_rombel ASC");
         $data['rombels'] = $db->resultSet();
 
+        $akademikModel = $this->model('AkademikModel');
+        $data['tahun_akademik'] = $akademikModel->getAllTahun();
+
         $laporanModel      = $this->model('LaporanAbsenModel');
         $data['mode']      = $laporanModel->getModeSiswa();
-        $data['laporan']   = $laporanModel->getLaporan($tgl_mulai, $tgl_sampai, $rombel_id);
+        $data['laporan']   = $laporanModel->getSummarySiswa($tgl_mulai, $tgl_sampai, $rombel_id);
         $data['grafik']    = $laporanModel->getGrafikSummary($tgl_mulai, $tgl_sampai, $rombel_id);
 
         $this->view('templates/admin_header', $data);

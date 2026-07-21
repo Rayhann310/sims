@@ -130,6 +130,49 @@ class LaporanAbsenModel {
     }
 
     /**
+     * Dapatkan rekapitulasi / summary absen per siswa untuk view laporan utama.
+     */
+    public function getSummarySiswa($tgl_mulai, $tgl_sampai, $rombel_id = null)
+    {
+        $mode = $this->getModeSiswa();
+        $tabel = $mode === 'Normal' ? 'absensi_siswa' : 'absensi_siswa_detail';
+
+        $query = "
+            SELECT
+                s.id AS siswa_id,
+                s.nisn,
+                u.nama_lengkap,
+                r.nama_rombel AS kelas,
+                SUM(CASE WHEN a.status = 'Hadir' THEN 1 ELSE 0 END) AS hadir,
+                SUM(CASE WHEN a.status = 'Sakit' THEN 1 ELSE 0 END) AS sakit,
+                SUM(CASE WHEN a.status = 'Izin'  THEN 1 ELSE 0 END) AS izin,
+                SUM(CASE WHEN a.status = 'Alpa'  THEN 1 ELSE 0 END) AS alpa,
+                COUNT(a.id) AS total
+            FROM anggota_rombel ar
+            JOIN siswa s ON ar.siswa_id = s.id
+            JOIN users u ON s.user_id = u.id
+            JOIN rombel r ON ar.rombel_id = r.id
+            LEFT JOIN {$tabel} a ON a.siswa_id = s.id
+                AND a.tanggal BETWEEN :mulai AND :sampai
+        ";
+
+        if ($rombel_id) {
+            $query .= " WHERE ar.rombel_id = :rombel_id";
+        }
+
+        $query .= " GROUP BY s.id, s.nisn, u.nama_lengkap, r.nama_rombel ORDER BY r.nama_rombel ASC, u.nama_lengkap ASC";
+
+        $this->db->query($query);
+        $this->db->bind('mulai', $tgl_mulai);
+        $this->db->bind('sampai', $tgl_sampai);
+        if ($rombel_id) {
+            $this->db->bind('rombel_id', $rombel_id);
+        }
+        
+        return $this->db->resultSet();
+    }
+
+    /**
      * Kembalikan rentang tanggal semester aktif.
      * Semester 1 : Juli - Desember, Semester 2 : Januari - Juni
      */
