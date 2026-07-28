@@ -106,8 +106,8 @@
                 <!-- Rincian Biaya -->
                 <div class="bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
                     <div class="bg-slate-50 py-4 px-6 text-center border-b border-slate-200">
-                        <h3 class="font-bold text-lg text-slate-800">RINCIAN BIAYA MASUK</h3>
-                        <p class="text-sm font-semibold text-emerald-700">TAHUN PELAJARAN 2026-2027</p>
+                        <h3 class="font-bold text-lg text-slate-800 uppercase tracking-wide">RINCIAN BIAYA MASUK</h3>
+                        <p class="text-sm font-semibold text-emerald-700">TAHUN PELAJARAN <?= !empty($data['tahun_akademik']) ? htmlspecialchars($data['tahun_akademik']['nama_tahun']) : '2026-2027' ?></p>
                     </div>
                     
                     <div class="p-6">
@@ -117,7 +117,7 @@
                             <?php if (count($data['kategori_biaya']) > 1): ?>
                             <div class="flex border-b border-gray-200 mb-4 overflow-x-auto gap-2 pb-2">
                                 <?php foreach($data['kategori_biaya'] as $index => $kat): ?>
-                                    <button class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-colors <?= $index === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-50 text-gray-600 hover:bg-gray-100' ?>" onclick="showBiayaTab('kat-<?= $kat['id'] ?>', this)">
+                                    <button class="px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-colors <?= $index === 0 ? 'bg-emerald-100 text-emerald-800 font-bold' : 'bg-gray-50 text-gray-600 hover:bg-gray-100' ?>" onclick="showBiayaTab('kat-<?= $kat['id'] ?>', this)">
                                         <?= htmlspecialchars($kat['nama_kategori']); ?>
                                     </button>
                                 <?php endforeach; ?>
@@ -127,31 +127,42 @@
                             <!-- Tab Contents -->
                             <?php foreach($data['kategori_biaya'] as $index => $kat): ?>
                                 <div id="kat-<?= $kat['id'] ?>" class="biaya-tab <?= $index !== 0 ? 'hidden' : '' ?>">
-                                    <div class="space-y-3 mb-6">
-                                        <?php $total = 0; $no = 1; ?>
-                                        <?php foreach($kat['rincian'] as $r): ?>
-                                            <?php $total += $r['nominal']; ?>
-                                            <div class="flex justify-between items-center py-2 border-b border-slate-100 border-dashed">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold"><?= $no++; ?></div>
-                                                    <span class="text-slate-700 text-sm font-medium"><?= htmlspecialchars($r['nama_item']); ?></span>
+                                    <?php if (!empty($kat['deskripsi'])): ?>
+                                        <p class="text-xs text-slate-500 mb-3 italic"><?= htmlspecialchars($kat['deskripsi']); ?></p>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($kat['rincian'])): ?>
+                                        <div class="space-y-3 mb-6">
+                                            <?php $total = 0; $no = 1; ?>
+                                            <?php foreach($kat['rincian'] as $r): ?>
+                                                <?php $total += $r['nominal']; ?>
+                                                <div class="flex justify-between items-center py-2 border-b border-slate-100 border-dashed">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold"><?= $no++; ?></div>
+                                                        <span class="text-slate-700 text-sm font-medium"><?= htmlspecialchars($r['nama_rincian'] ?? $r['nama_item'] ?? ''); ?></span>
+                                                    </div>
+                                                    <span class="font-bold text-slate-800 text-sm">Rp. <?= number_format($r['nominal'], 0, ',', '.'); ?>,-</span>
                                                 </div>
-                                                <span class="font-bold text-slate-800 text-sm">Rp. <?= number_format($r['nominal'], 0, ',', '.'); ?>,-</span>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                    <div class="bg-[#004d33] text-white rounded-xl p-4 flex justify-between items-center">
-                                        <span class="font-bold text-lg">TOTAL</span>
-                                        <span class="font-black text-xl">Rp. <?= number_format($total, 0, ',', '.'); ?>,-</span>
-                                    </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <div class="bg-[#004d33] text-white rounded-xl p-4 flex justify-between items-center shadow-sm">
+                                            <span class="font-bold text-lg">TOTAL</span>
+                                            <span class="font-black text-xl text-amber-300">Rp. <?= number_format($total, 0, ',', '.'); ?>,-</span>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="text-center py-6 text-slate-500">
+                                            <i class="fas fa-info-circle text-xl mb-1"></i>
+                                            <p class="text-xs italic">Belum ada rincian item biaya pada kategori ini.</p>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>
                             <p class="text-center text-xs text-slate-500 mt-4 italic">* Biaya dapat berubah sewaktu-waktu sesuai kebijakan Yayasan</p>
                         
                         <?php else: ?>
                             <div class="text-center py-8 text-slate-500">
-                                <i class="fas fa-info-circle text-2xl mb-2"></i>
-                                <p>Rincian biaya belum diatur.</p>
+                                <i class="fas fa-info-circle text-2xl mb-2 text-emerald-600"></i>
+                                <p class="text-sm font-medium">Rincian biaya belum diatur oleh Administrator.</p>
                             </div>
                         <?php endif; ?>
                     </div>
