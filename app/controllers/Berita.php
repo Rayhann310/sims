@@ -15,9 +15,16 @@ class Berita extends Controller {
 
     /**
      * Daftar semua berita (publik)
+     * Jika ada parameter (misal: /berita/slug-artikel), router MVC secara default 
+     * akan melemparkannya ke index() jika method tidak ditemukan.
+     * Maka kita tangkap dan teruskan ke detail().
      */
-    public function index()
+    public function index($slug = null)
     {
+        if ($slug !== null && $slug !== 'index') {
+            return $this->detail($slug);
+        }
+
         $artikelModel = $this->model('ArtikelModel');
 
         // Filter dari query string
