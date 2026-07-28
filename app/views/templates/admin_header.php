@@ -331,9 +331,15 @@ $role = $_SESSION['user']['role'] ?? '';
             </div>
             <?php endif; ?>
 
-            <?php if(hasMenuAccess('pengumuman') || hasMenuAccess('pesan')): ?>
+            <?php if(hasMenuAccess('pengumuman') || hasMenuAccess('pesan') || hasMenuAccess('artikel')): ?>
             <div class="mb-6">
-                <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Komunikasi</p>
+                <p x-show="sidebarOpen || mobileOpen" class="px-3 text-xs font-semibold text-emerald-400/60 uppercase tracking-wider mb-2">Komunikasi & Media</p>
+                <?php if(hasMenuAccess('artikel')): ?>
+                <a href="<?= BASEURL; ?>/artikel" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/artikel') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Artikel & Berita">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                    <span x-show="sidebarOpen || mobileOpen" class="ml-3 font-medium whitespace-nowrap">Artikel & Berita</span>
+                </a>
+                <?php endif; ?>
                 <?php if(hasMenuAccess('pengumuman')): ?>
                 <a href="<?= BASEURL; ?>/komunikasi/pengumuman" class="flex items-center px-3 py-2.5 rounded-lg transition-colors group <?= (strpos($_SERVER['REQUEST_URI'], '/komunikasi/pengumuman') !== false) ? 'bg-emerald-800 text-white' : 'text-emerald-100/70 hover:bg-emerald-800 hover:text-white' ?>" title="Pengumuman">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>

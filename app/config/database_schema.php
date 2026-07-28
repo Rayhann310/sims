@@ -1036,4 +1036,99 @@ return array (
       'jumlah_jp' => 'INT(11) NOT NULL DEFAULT 2',
     ),
   ),
+  'artikel_kategori' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `artikel_kategori` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `nama_kategori` VARCHAR(100) NOT NULL,
+  `slug` VARCHAR(120) NOT NULL,
+  `deskripsi` TEXT DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug_kategori` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'INT(11) NOT NULL AUTO_INCREMENT',
+      'nama_kategori' => 'VARCHAR(100) NOT NULL',
+      'slug' => 'VARCHAR(120) NOT NULL',
+      'deskripsi' => 'TEXT DEFAULT NULL',
+      'created_at' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    ),
+  ),
+  'artikel_tag' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `artikel_tag` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `nama_tag` VARCHAR(100) NOT NULL,
+  `slug` VARCHAR(120) NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug_tag` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'INT(11) NOT NULL AUTO_INCREMENT',
+      'nama_tag' => 'VARCHAR(100) NOT NULL',
+      'slug' => 'VARCHAR(120) NOT NULL',
+      'created_at' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    ),
+  ),
+  'artikel' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `artikel` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `judul` VARCHAR(255) NOT NULL,
+  `slug` VARCHAR(255) NOT NULL,
+  `kategori_id` INT(11) DEFAULT NULL,
+  `penulis_id` INT(11) NOT NULL,
+  `ringkasan` TEXT DEFAULT NULL,
+  `isi` LONGTEXT NOT NULL,
+  `gambar_sampul` LONGTEXT DEFAULT NULL,
+  `status` ENUM(\'Draft\',\'Dipublikasi\') DEFAULT \'Dipublikasi\',
+  `is_featured` TINYINT(1) DEFAULT 0,
+  `views` INT(11) DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug_artikel` (`slug`),
+  KEY `kategori_id` (`kategori_id`),
+  KEY `penulis_id` (`penulis_id`),
+  CONSTRAINT `artikel_ibfk_1` FOREIGN KEY (`kategori_id`) REFERENCES `artikel_kategori` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `artikel_ibfk_2` FOREIGN KEY (`penulis_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'id' => 'INT(11) NOT NULL AUTO_INCREMENT',
+      'judul' => 'VARCHAR(255) NOT NULL',
+      'slug' => 'VARCHAR(255) NOT NULL',
+      'kategori_id' => 'INT(11) DEFAULT NULL',
+      'penulis_id' => 'INT(11) NOT NULL',
+      'ringkasan' => 'TEXT DEFAULT NULL',
+      'isi' => 'LONGTEXT NOT NULL',
+      'gambar_sampul' => 'LONGTEXT DEFAULT NULL',
+      'status' => 'ENUM(\'Draft\',\'Dipublikasi\') DEFAULT \'Dipublikasi\'',
+      'is_featured' => 'TINYINT(1) DEFAULT 0',
+      'views' => 'INT(11) DEFAULT 0',
+      'created_at' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+      'updated_at' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    ),
+  ),
+  'artikel_tag_pivot' => 
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `artikel_tag_pivot` (
+  `artikel_id` INT(11) NOT NULL,
+  `tag_id` INT(11) NOT NULL,
+  PRIMARY KEY (`artikel_id`,`tag_id`),
+  KEY `tag_id` (`tag_id`),
+  CONSTRAINT `artikel_tag_pivot_ibfk_1` FOREIGN KEY (`artikel_id`) REFERENCES `artikel` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `artikel_tag_pivot_ibfk_2` FOREIGN KEY (`tag_id`) REFERENCES `artikel_tag` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' => 
+    array (
+      'artikel_id' => 'INT(11) NOT NULL',
+      'tag_id' => 'INT(11) NOT NULL',
+    ),
+  ),
 );
+

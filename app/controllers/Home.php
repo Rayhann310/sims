@@ -45,6 +45,16 @@ class Home extends Controller {
             $data['tahun_akademik'] = false;
         }
 
+        // Mengambil berita unggulan & artikel terbaru
+        try {
+            $artikelModel = $this->model('ArtikelModel');
+            $data['berita_unggul'] = $artikelModel->getFeaturedArtikel(3);
+            $data['berita_terbaru'] = $artikelModel->getLatestArtikel(6);
+        } catch (Throwable $e) {
+            $data['berita_unggul'] = [];
+            $data['berita_terbaru'] = [];
+        }
+
         $this->view('templates/header', $data);
         $this->view('home/index', $data);
         $this->view('templates/footer');

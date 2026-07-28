@@ -33,6 +33,7 @@ class HakAksesModel {
         // Komunikasi
         'pengumuman'       => ['label' => 'Pengumuman',             'group' => 'Komunikasi',        'url' => '/komunikasi/pengumuman'],
         'pesan'            => ['label' => 'Pesan Masuk',            'group' => 'Komunikasi',        'url' => '/komunikasi/pesan'],
+        'artikel'          => ['label' => 'Artikel & Berita',       'group' => 'Komunikasi',        'url' => '/artikel'],
         // Kedisiplinan
         'kedisiplinan'     => ['label' => 'Rekap & Catatan',        'group' => 'Kedisiplinan',      'url' => '/kedisiplinan/rekap'],
         'ked_kategori'     => ['label' => 'Master Kategori',        'group' => 'Kedisiplinan',      'url' => '/kedisiplinan/kategori'],
