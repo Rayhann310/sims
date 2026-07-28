@@ -562,4 +562,87 @@ class ArtikelModel {
         $this->db->execute();
         return $this->db->rowCount();
     }
+
+    // ==========================================
+    // ARTIKEL TERKAIT (PUBLIK)
+    // ==========================================
+
+    /**
+     * Mengambil artikel terkait berdasarkan kategori yang sama atau tag yang sama.
+     * Mengecualikan artikel saat ini.
+     *
+     * @param int   $current_id     ID artikel saat ini (dikecualikan)
+     * @param int   $kategori_id    ID kategori artikel
+     * @param array $tag_ids        Array ID tag artikel
+     * @param int   $limit          Jumlah maksimal hasil
+     * @return array
+     */
+    public function getArtikelTerkait($current_id, $kategori_id = null, array $tag_ids = [], $limit = 5)
+    {
+        try {
+            $found = [];
+
+            // 1. Cari berdasarkan kategori yang sama
+            if ($kategori_id) {
+                $this->db->query("SELECT a.*, k.nama_kategori, u.nama_lengkap as nama_penulis
+                                  FROM artikel a
+                                  LEFT JOIN artikel_kategori k ON a.kategori_id = k.id
+                                  LEFT JOIN users u ON a.penulis_id = u.id
+                                  WHERE a.status = 'Dipublikasi'
+                                    AND a.id != :current_id
+                                    AND a.kategori_id = :kategori_id
+                                  ORDER BY a.is_featured DESC, a.created_at DESC
+                                  LIMIT :limit");
+                $this->db->bind('current_id', $current_id);
+                $this->db->bind('kategori_id', $kategori_id);
+                $this->db->bind('limit', $limit);
+                $found = $this->db->resultSet();
+            }
+
+            // 2. Jika belum cukup dan ada tag, cari berdasarkan tag (safe intval)
+            if (count($found) < $limit && !empty($tag_ids)) {
+                $excludeIds  = array_merge([(int)$current_id], array_map('intval', array_column($found, 'id')));
+                $safeTagIds  = implode(',', array_map('intval', $tag_ids));
+                $safeExclude = implode(',', $excludeIds);
+                $needed      = $limit - count($found);
+
+                $this->db->query("SELECT DISTINCT a.*, k.nama_kategori, u.nama_lengkap as nama_penulis
+                                  FROM artikel a
+                                  LEFT JOIN artikel_kategori k ON a.kategori_id = k.id
+                                  LEFT JOIN users u ON a.penulis_id = u.id
+                                  JOIN artikel_tag_pivot p ON a.id = p.artikel_id
+                                  WHERE a.status = 'Dipublikasi'
+                                    AND p.tag_id IN ($safeTagIds)
+                                    AND a.id NOT IN ($safeExclude)
+                                  ORDER BY a.is_featured DESC, a.created_at DESC
+                                  LIMIT $needed");
+                $fromTag = $this->db->resultSet();
+                $found   = array_merge($found, $fromTag);
+            }
+
+            // 3. Jika masih belum cukup, ambil artikel terbaru apapun
+            if (count($found) < $limit) {
+                $excludeIds  = array_merge([(int)$current_id], array_map('intval', array_column($found, 'id')));
+                $safeExclude = implode(',', $excludeIds);
+                $needed      = $limit - count($found);
+
+                $this->db->query("SELECT a.*, k.nama_kategori, u.nama_lengkap as nama_penulis
+                                  FROM artikel a
+                                  LEFT JOIN artikel_kategori k ON a.kategori_id = k.id
+                                  LEFT JOIN users u ON a.penulis_id = u.id
+                                  WHERE a.status = 'Dipublikasi'
+                                    AND a.id NOT IN ($safeExclude)
+                                  ORDER BY a.created_at DESC
+                                  LIMIT $needed");
+                $fromLatest = $this->db->resultSet();
+                $found      = array_merge($found, $fromLatest);
+            }
+
+            return array_slice($found, 0, $limit);
+        } catch (Exception $e) {
+            error_log("getArtikelTerkait error: " . $e->getMessage());
+            return [];
+        }
+    }
 }
+

@@ -61,6 +61,7 @@ class HakAksesModel {
     private function selfHealing()
     {
         try {
+            // 1. Pastikan tabel hak_akses_menu ada
             $this->db->query("CREATE TABLE IF NOT EXISTS `hak_akses_menu` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `jabatan_id` int(11) NOT NULL,
@@ -70,7 +71,30 @@ class HakAksesModel {
                 UNIQUE KEY `jabatan_menu_unique` (`jabatan_id`, `menu_key`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
             $this->db->execute();
-        } catch (Exception $e) {}
+
+            // 2. Ambil semua jabatan yang ada
+            $this->db->query("SELECT id FROM jabatan");
+            $jabatans = $this->db->resultSet();
+            if (empty($jabatans)) return;
+
+            // 3. Untuk setiap jabatan × setiap menu key yang ada di MENU_LIST,
+            //    insert baris dengan is_active=0 jika belum ada.
+            //    INSERT IGNORE aman dijalankan setiap request — tidak menimpa nilai yang sudah ada.
+            foreach ($jabatans as $jabatan) {
+                foreach (array_keys(self::$MENU_LIST) as $menu_key) {
+                    $this->db->query(
+                        "INSERT IGNORE INTO hak_akses_menu (jabatan_id, menu_key, is_active)
+                         VALUES (:jabatan_id, :menu_key, 0)"
+                    );
+                    $this->db->bind('jabatan_id', $jabatan['id']);
+                    $this->db->bind('menu_key', $menu_key);
+                    $this->db->execute();
+                }
+            }
+        } catch (Exception $e) {
+            // Self-healing tidak boleh crash aplikasi
+            error_log('HakAksesModel selfHealing error: ' . $e->getMessage());
+        }
     }
 
     public function getAksesJabatan($jabatan_id)

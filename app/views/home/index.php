@@ -306,6 +306,149 @@
             </div>
         </div>
 
+        <!-- ============================= -->
+        <!-- SECTION: BERITA & PENGUMUMAN -->
+        <!-- ============================= -->
+        <?php if (!empty($data['berita_unggul']) || !empty($data['berita_terbaru'])): ?>
+        <section id="berita" class="mt-12">
+            <!-- Section Header -->
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 gap-3">
+                <div>
+                    <span class="inline-block text-xs font-bold uppercase tracking-widest text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full mb-2">Berita & Pengumuman</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-slate-900 leading-tight">Informasi Terkini<br class="hidden sm:block"> dari Sekolah</h2>
+                </div>
+                <a href="<?= BASEURL; ?>/berita" class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-900 transition-colors shrink-0 group">
+                    Lihat Semua Berita
+                    <i class="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+            <?php if (!empty($data['berita_unggul'])): ?>
+            <!-- FEATURED: Berita Unggulan (Hero Card) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+                <?php $unggulan = $data['berita_unggul'][0]; ?>
+                <!-- Main Featured -->
+                <a href="<?= BASEURL; ?>/berita/<?= htmlspecialchars($unggulan['slug']); ?>" class="lg:col-span-7 relative group rounded-2xl overflow-hidden shadow-lg block h-72 md:h-96 bg-slate-200">
+                    <?php if (!empty($unggulan['gambar_sampul'])): ?>
+                        <img src="<?= htmlspecialchars($unggulan['gambar_sampul']); ?>" alt="<?= htmlspecialchars($unggulan['judul']); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <?php else: ?>
+                        <div class="w-full h-full bg-gradient-to-br from-emerald-800 to-emerald-600 flex items-center justify-center">
+                            <i class="fas fa-newspaper text-white text-6xl opacity-30"></i>
+                        </div>
+                    <?php endif; ?>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6">
+                        <?php if (!empty($unggulan['nama_kategori'])): ?>
+                        <span class="inline-block bg-amber-400 text-[#004d33] text-xs font-bold px-3 py-1 rounded-full mb-3"><?= htmlspecialchars($unggulan['nama_kategori']); ?></span>
+                        <?php endif; ?>
+                        <h3 class="text-white text-xl md:text-2xl font-black leading-tight mb-2 line-clamp-2"><?= htmlspecialchars($unggulan['judul']); ?></h3>
+                        <p class="text-white/70 text-sm line-clamp-2"><?= htmlspecialchars($unggulan['ringkasan'] ?? ''); ?></p>
+                        <div class="flex items-center gap-3 text-white/50 text-xs mt-3">
+                            <span><i class="fas fa-user text-[10px]"></i> <?= htmlspecialchars($unggulan['nama_penulis'] ?? 'Tim Redaksi'); ?></span>
+                            <span>•</span>
+                            <span><i class="far fa-calendar text-[10px]"></i> <?= date('d M Y', strtotime($unggulan['created_at'])); ?></span>
+                        </div>
+                    </div>
+                    <div class="absolute top-4 right-4 bg-amber-400 text-[#004d33] font-bold text-xs px-2 py-1 rounded-full flex items-center gap-1 shadow">
+                        <i class="fas fa-star text-[10px]"></i> Unggulan
+                    </div>
+                </a>
+
+                <!-- Side Featured (max 2 berita unggulan lainnya) -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    <?php foreach(array_slice($data['berita_unggul'], 1, 2) as $item): ?>
+                    <a href="<?= BASEURL; ?>/berita/<?= htmlspecialchars($item['slug']); ?>" class="group flex gap-4 bg-white rounded-xl border border-slate-200 shadow-sm p-4 hover:shadow-md hover:border-emerald-300 transition-all">
+                        <div class="w-24 h-20 rounded-lg overflow-hidden shrink-0 bg-slate-100">
+                            <?php if (!empty($item['gambar_sampul'])): ?>
+                                <img src="<?= htmlspecialchars($item['gambar_sampul']); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="">
+                            <?php else: ?>
+                                <div class="w-full h-full bg-emerald-100 flex items-center justify-center"><i class="fas fa-newspaper text-emerald-400 text-xl"></i></div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <?php if (!empty($item['nama_kategori'])): ?>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full"><?= htmlspecialchars($item['nama_kategori']); ?></span>
+                            <?php endif; ?>
+                            <h4 class="font-bold text-slate-800 leading-snug mt-1 line-clamp-2 text-sm group-hover:text-emerald-700 transition-colors"><?= htmlspecialchars($item['judul']); ?></h4>
+                            <p class="text-xs text-slate-400 mt-1"><?= date('d M Y', strtotime($item['created_at'])); ?></p>
+                        </div>
+                    </a>
+                    <?php endforeach; ?>
+
+                    <!-- Link lihat semua berita unggulan -->
+                    <a href="<?= BASEURL; ?>/berita?filter=unggulan" class="flex items-center justify-center gap-2 border-2 border-dashed border-emerald-300 text-emerald-700 font-semibold text-sm py-4 rounded-xl hover:bg-emerald-50 transition-colors">
+                        <i class="fas fa-star text-amber-500"></i> Semua Berita Unggulan
+                    </a>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- LATEST: Berita Terbaru Grid -->
+            <?php if (!empty($data['berita_terbaru'])): ?>
+            <div>
+                <h3 class="font-bold text-slate-700 text-base mb-4 flex items-center gap-2">
+                    <i class="fas fa-clock text-emerald-500"></i> Berita Terbaru
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <?php 
+                    // Kecualikan berita unggulan pertama agar tidak duplikat
+                    $unggulan_id = !empty($data['berita_unggul'][0]['id']) ? $data['berita_unggul'][0]['id'] : 0;
+                    $shown = 0;
+                    foreach($data['berita_terbaru'] as $item):
+                        if ($item['id'] == $unggulan_id) continue;
+                        if ($shown >= 6) break;
+                        $shown++;
+                    ?>
+                    <a href="<?= BASEURL; ?>/berita/<?= htmlspecialchars($item['slug']); ?>" class="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col">
+                        <!-- Thumbnail -->
+                        <div class="h-44 bg-slate-100 overflow-hidden relative">
+                            <?php if (!empty($item['gambar_sampul'])): ?>
+                                <img src="<?= htmlspecialchars($item['gambar_sampul']); ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="<?= htmlspecialchars($item['judul']); ?>">
+                            <?php else: ?>
+                                <div class="w-full h-full bg-gradient-to-br from-emerald-700 to-emerald-500 flex items-center justify-center">
+                                    <i class="fas fa-newspaper text-white text-3xl opacity-40"></i>
+                                </div>
+                            <?php endif; ?>
+                            <?php if (!empty($item['nama_kategori'])): ?>
+                            <span class="absolute top-3 left-3 bg-white/90 text-emerald-800 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+                                <?= htmlspecialchars($item['nama_kategori']); ?>
+                            </span>
+                            <?php endif; ?>
+                        </div>
+                        <!-- Content -->
+                        <div class="p-4 flex flex-col flex-1">
+                            <h4 class="font-bold text-slate-800 leading-snug line-clamp-2 group-hover:text-emerald-700 transition-colors mb-2 text-sm"><?= htmlspecialchars($item['judul']); ?></h4>
+                            <?php if (!empty($item['ringkasan'])): ?>
+                            <p class="text-xs text-slate-500 line-clamp-2 mb-3 leading-relaxed"><?= htmlspecialchars(strip_tags($item['ringkasan'])); ?></p>
+                            <?php endif; ?>
+                            <!-- Tags -->
+                            <?php if (!empty($item['tags'])): ?>
+                            <div class="flex flex-wrap gap-1 mb-3">
+                                <?php foreach(array_slice($item['tags'], 0, 2) as $tag): ?>
+                                <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded">#<?= htmlspecialchars($tag['nama_tag']); ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php endif; ?>
+                            <div class="flex items-center justify-between text-xs text-slate-400 mt-auto pt-3 border-t border-slate-100">
+                                <span class="flex items-center gap-1"><i class="far fa-calendar text-[10px]"></i> <?= date('d M Y', strtotime($item['created_at'])); ?></span>
+                                <span class="flex items-center gap-1"><i class="fas fa-eye text-[10px]"></i> <?= number_format($item['views']); ?></span>
+                            </div>
+                        </div>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- CTA Lihat Semua -->
+                <div class="text-center mt-8">
+                    <a href="<?= BASEURL; ?>/berita" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3 rounded-xl shadow-md transition-all hover:-translate-y-0.5">
+                        <i class="fas fa-newspaper"></i> Lihat Semua Berita & Artikel
+                    </a>
+                </div>
+            </div>
+            <?php endif; ?>
+        </section>
+        <?php endif; ?>
+
         <!-- Footer / CTA Section -->
         <div class="mt-8 bg-[#004d33] rounded-3xl p-6 md:p-8 flex flex-col md:flex-row gap-8 justify-between items-center text-white overflow-hidden relative">
             <div class="absolute right-0 bottom-0 opacity-10">
