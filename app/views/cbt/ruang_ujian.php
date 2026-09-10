@@ -84,51 +84,58 @@
     </div>
 
     <!-- Top Header -->
-    <header class="bg-white border-b border-slate-200 px-6 py-3 shrink-0 flex justify-between items-center z-10 relative shadow-sm">
-        <div class="flex items-center gap-4">
-            <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold">
+    <header class="bg-white border-b border-slate-200 px-4 md:px-6 py-3 shrink-0 flex justify-between items-center z-30 relative shadow-sm">
+        <div class="flex items-center gap-3 md:gap-4">
+            <div class="w-8 h-8 md:w-10 md:h-10 bg-emerald-600 rounded-lg flex items-center justify-center text-white font-bold text-xs md:text-base">
                 CBT
             </div>
             <div>
-                <h1 class="font-bold text-slate-800 leading-tight"><?= htmlspecialchars($data['jadwal']['nama_ujian'] ?? 'Ujian') ?></h1>
-                <p class="text-xs text-slate-500 font-medium"><?= htmlspecialchars($data['nama_siswa']) ?></p>
+                <h1 class="font-bold text-slate-800 leading-tight text-sm md:text-base truncate max-w-[150px] sm:max-w-xs"><?= htmlspecialchars($data['jadwal']['nama_ujian'] ?? 'Ujian') ?></h1>
+                <p class="text-[10px] md:text-xs text-slate-500 font-medium truncate max-w-[150px] sm:max-w-xs"><?= htmlspecialchars($data['nama_siswa']) ?></p>
             </div>
         </div>
         
-        <div class="flex items-center gap-6">
-            <div class="bg-slate-100 rounded-lg px-4 py-2 flex items-center gap-3 border border-slate-200">
-                <i class="far fa-clock text-emerald-600 text-lg"></i>
-                <div class="font-mono text-xl font-bold tracking-wider text-slate-700" x-text="formattedTime">00:00:00</div>
+        <div class="flex items-center gap-2 md:gap-6">
+            <div class="bg-slate-100 rounded-lg px-2 md:px-4 py-1.5 md:py-2 flex items-center gap-2 md:gap-3 border border-slate-200">
+                <i class="far fa-clock text-emerald-600 text-sm md:text-lg"></i>
+                <div class="font-mono text-sm md:text-xl font-bold tracking-wider text-slate-700" x-text="formattedTime">00:00:00</div>
             </div>
+            
+            <button @click="isNavOpen = !isNavOpen" class="lg:hidden w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center text-slate-700 border border-slate-200 hover:bg-slate-200 transition-colors">
+                <i class="fas fa-th"></i>
+            </button>
         </div>
     </header>
 
     <!-- Main Content -->
     <div class="flex-1 flex overflow-hidden relative">
         
+        <!-- Overlay for mobile nav -->
+        <div x-show="isNavOpen" x-transition.opacity @click="isNavOpen = false" class="fixed inset-0 bg-slate-900/20 z-40 lg:hidden" style="display: none;"></div>
+
         <!-- Left: Question Area -->
-        <main class="flex-1 overflow-y-auto p-6 md:p-8 scrollbar-hide flex flex-col">
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide flex flex-col">
             <template x-if="soal.length > 0">
                 <div class="max-w-4xl mx-auto w-full flex-1 flex flex-col">
                     
                     <!-- Question Card -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6 flex-1">
-                        <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
-                            <h2 class="text-xl font-bold text-slate-800">Soal No. <span x-text="currentIndex + 1"></span></h2>
-                            <span class="text-sm font-medium text-slate-400">Pilihan Ganda</span>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-8 mb-4 md:mb-6 flex-1">
+                        <div class="flex justify-between items-center mb-4 md:mb-6 pb-4 border-b border-slate-100">
+                            <h2 class="text-lg md:text-xl font-bold text-slate-800">Soal No. <span x-text="currentIndex + 1"></span></h2>
+                            <span class="text-xs md:text-sm font-medium text-slate-400">Pilihan Ganda</span>
                         </div>
                         
-                        <div class="text-lg text-slate-700 leading-relaxed mb-8" x-html="currentSoal.pertanyaan"></div>
+                        <div class="text-base md:text-lg text-slate-700 leading-relaxed mb-6 md:mb-8 break-words overflow-x-auto" x-html="currentSoal.pertanyaan"></div>
                         
                         <div class="space-y-3">
                             <template x-for="(opt, idx) in optionsList" :key="idx">
                                 <label x-show="currentSoal['opsi_' + opt.key]" class="relative flex cursor-pointer group">
                                     <input type="radio" :name="'soal_'+currentSoal.id_soal" :value="opt.key.toUpperCase()" x-model="answers[currentSoal.id_soal]" class="peer sr-only" @change="saveAnswer()">
-                                    <div class="option-box w-full flex items-center p-4 rounded-xl border-2 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 transition-all">
-                                        <div class="option-letter w-8 h-8 rounded-lg border-2 border-slate-200 flex items-center justify-center font-bold text-slate-500 mr-4 transition-colors">
+                                    <div class="option-box w-full flex flex-row items-center p-3 md:p-4 rounded-xl border-2 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 transition-all">
+                                        <div class="option-letter shrink-0 w-8 h-8 rounded-lg border-2 border-slate-200 flex items-center justify-center font-bold text-slate-500 mr-3 md:mr-4 transition-colors">
                                             <span x-text="opt.key.toUpperCase()"></span>
                                         </div>
-                                        <div class="flex-1 text-slate-700" x-html="currentSoal['opsi_' + opt.key]"></div>
+                                        <div class="flex-1 text-slate-700 text-sm md:text-base break-words overflow-x-auto" x-html="currentSoal['opsi_' + opt.key]"></div>
                                     </div>
                                 </label>
                             </template>
@@ -136,21 +143,21 @@
                     </div>
 
                     <!-- Navigation Bar -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex justify-between items-center shrink-0">
-                        <button @click="prevQuestion()" :disabled="currentIndex === 0" class="px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2" :class="currentIndex === 0 ? 'text-slate-400 bg-slate-100 cursor-not-allowed' : 'text-slate-700 bg-slate-100 hover:bg-slate-200'">
-                            <i class="fas fa-chevron-left"></i> Sebelumnya
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-2 md:p-4 flex justify-between items-center shrink-0 gap-1 md:gap-3">
+                        <button @click="prevQuestion()" :disabled="currentIndex === 0" class="flex-1 md:flex-none px-2 md:px-6 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-1 md:gap-2 text-sm md:text-base" :class="currentIndex === 0 ? 'text-slate-400 bg-slate-100 cursor-not-allowed' : 'text-slate-700 bg-slate-100 hover:bg-slate-200'">
+                            <i class="fas fa-chevron-left"></i> <span class="hidden sm:inline">Sebelumnya</span>
                         </button>
                         
-                        <label class="flex items-center gap-3 cursor-pointer select-none px-4 py-2 rounded-lg hover:bg-amber-50 border border-transparent hover:border-amber-200 transition-colors">
-                            <div class="relative">
+                        <label class="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 cursor-pointer select-none px-2 md:px-4 py-1.5 md:py-2 rounded-lg hover:bg-amber-50 border border-transparent hover:border-amber-200 transition-colors">
+                            <div class="relative scale-75 md:scale-100">
                                 <input type="checkbox" class="sr-only peer" x-model="ragu[currentSoal.id_soal]" @change="saveAnswer()">
                                 <div class="w-10 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                             </div>
-                            <span class="font-medium" :class="ragu[currentSoal.id_soal] ? 'text-amber-600' : 'text-slate-500'">Ragu-ragu</span>
+                            <span class="text-xs md:text-sm font-medium" :class="ragu[currentSoal.id_soal] ? 'text-amber-600' : 'text-slate-500'">Ragu-ragu</span>
                         </label>
                         
-                        <button @click="nextQuestion()" :disabled="currentIndex === soal.length - 1" class="px-6 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2" :class="currentIndex === soal.length - 1 ? 'text-slate-400 bg-slate-100 cursor-not-allowed' : 'text-white bg-emerald-600 hover:bg-emerald-700'">
-                            Selanjutnya <i class="fas fa-chevron-right"></i>
+                        <button @click="nextQuestion()" :disabled="currentIndex === soal.length - 1" class="flex-1 md:flex-none px-2 md:px-6 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-1 md:gap-2 text-sm md:text-base" :class="currentIndex === soal.length - 1 ? 'text-slate-400 bg-slate-100 cursor-not-allowed' : 'text-white bg-emerald-600 hover:bg-emerald-700'">
+                            <span class="hidden sm:inline">Selanjutnya</span> <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
 
@@ -164,10 +171,15 @@
         </main>
 
         <!-- Right: Grid Area -->
-        <aside class="w-80 bg-white border-l border-slate-200 flex flex-col shrink-0 z-20 shadow-[-4px_0_15px_rgba(0,0,0,0.02)]">
-            <div class="p-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
-                <i class="fas fa-th text-emerald-600"></i>
-                <h3 class="font-bold text-slate-700">Navigasi Soal</h3>
+        <aside class="w-72 md:w-80 bg-white border-l border-slate-200 flex flex-col shrink-0 shadow-[-4px_0_15px_rgba(0,0,0,0.02)] absolute lg:relative right-0 top-0 bottom-0 z-50 lg:z-20 transform transition-transform duration-300 ease-in-out" :class="isNavOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'">
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-th text-emerald-600"></i>
+                    <h3 class="font-bold text-slate-700">Navigasi Soal</h3>
+                </div>
+                <button @click="isNavOpen = false" class="lg:hidden text-slate-500 hover:text-slate-700">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
             </div>
             
             <div class="flex-1 overflow-y-auto p-4 scrollbar-hide">
@@ -211,6 +223,7 @@
             return {
                 isExamActive: false,
                 isLocked: false,
+                isNavOpen: false,
                 lockReason: '',
                 unlockToken: '',
                 startToken: '',
