@@ -29,12 +29,14 @@
                     <p class="text-sm text-slate-500">NIS: <?= $data['siswa']['nisn']; ?></p>
                 </div>
             </div>
+            <?php if($_SESSION['user']['role'] !== 'siswa'): ?>
             <div class="border-t border-slate-100 pt-4">
                 <button onclick="document.getElementById('modalCatat').classList.remove('hidden')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     Catat Kedisiplinan
                 </button>
             </div>
+            <?php endif; ?>
         </div>
 
         <!-- Timeline Riwayat -->
@@ -81,6 +83,7 @@
     </div>
 </div>
 
+<?php if($_SESSION['user']['role'] !== 'siswa'): ?>
 <!-- Modal Catat Kedisiplinan -->
 <div id="modalCatat" class="fixed inset-0 z-50 hidden">
     <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="document.getElementById('modalCatat').classList.add('hidden')"></div>
@@ -126,3 +129,4 @@
         </div>
     </div>
 </div>
+<?php endif; ?>

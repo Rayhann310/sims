@@ -4,18 +4,56 @@ class AbsensiSiswa extends Controller {
 
     public function __construct()
     {
-        if (!isset($_SESSION['user']) || !in_array($_SESSION['user']['role'], ['admin', 'guru'])) {
+        if (!isset($_SESSION['user'])) {
             header('Location: ' . BASEURL . '/login');
             exit;
         }
-        requireAccess('absensi_siswa');
+        // role access check via HakAksesHelper in index/methods
     }
 
     /**
      * Halaman utama absensi harian siswa (manual + opsional scan QR)
+     * Untuk siswa: menampilkan riwayat absen sendiri.
      */
     public function index()
     {
+        requireAccess('absensi_siswa');
+        
+        if ($_SESSION['user']['role'] === 'siswa') {
+            $data['judul'] = 'Riwayat Kehadiran Saya';
+            
+            $db = new Database();
+            $db->query("SELECT id FROM siswa WHERE user_id = :uid");
+            $db->bind('uid', $_SESSION['user']['id']);
+            $siswa = $db->single();
+            $siswa_id = $siswa['id'] ?? 0;
+
+            // Ambil mode absen
+            $pam = $this->model('PengaturanAbsensiModel');
+            $data['mode'] = $pam->getPengaturanGlobal()['mode_siswa'] ?? 'Normal';
+
+            // Ambil histori
+            if ($data['mode'] === 'Normal') {
+                $db->query("SELECT * FROM absensi_siswa WHERE siswa_id = :sid ORDER BY tanggal DESC, waktu_scan DESC LIMIT 50");
+            } else {
+                $db->query("
+                    SELECT a.*, m.nama_mapel 
+                    FROM absensi_siswa_detail a 
+                    LEFT JOIN jadwal_pelajaran jp ON a.jam_ke = jp.id 
+                    LEFT JOIN mata_pelajaran m ON jp.mapel_id = m.id 
+                    WHERE a.siswa_id = :sid 
+                    ORDER BY a.tanggal DESC, a.jam_ke DESC LIMIT 50
+                ");
+            }
+            $db->bind('sid', $siswa_id);
+            $data['riwayat'] = $db->resultSet();
+
+            $this->view('templates/admin_header', $data);
+            $this->view('absensi_siswa/riwayat_siswa', $data);
+            $this->view('templates/admin_footer');
+            return;
+        }
+
         $data['judul'] = 'Absensi Siswa Harian';
 
         // Ambil setting mode absen
