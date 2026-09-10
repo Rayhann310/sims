@@ -37,6 +37,7 @@ class BankSoal extends Controller {
     public function simpan()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $_POST['id_guru'] = $_SESSION['user']['id'] ?? 1;
             if($this->model('BankSoalModel')->tambahDataSoal($_POST) > 0) {
                 Flasher::setFlash('Soal berhasil', 'ditambahkan', 'success');
                 header('Location: ' . BASEURL . '/BankSoal');
@@ -145,7 +146,7 @@ class BankSoal extends Controller {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['preview_import_soal'])) {
             $id_mapel = $_SESSION['preview_import_soal']['id_mapel'];
             $soal = $_SESSION['preview_import_soal']['soal'];
-            $id_guru = $_SESSION['user_id'] ?? 1; // Fallback jika tidak ada sesi login detail
+            $id_guru = $_SESSION['user']['id'] ?? 1; // Fallback jika tidak ada sesi login detail
 
             $result = $this->model('BankSoalModel')->importSoalMassal($id_mapel, $id_guru, $soal);
             
