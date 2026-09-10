@@ -101,6 +101,14 @@ class KeuanganModel {
 
     public function getAllTagihan()
     {
+        $role = $_SESSION['user']['role'] ?? '';
+        $user_id = $_SESSION['user']['id'] ?? 0;
+        
+        $where = "s.status = 'Aktif'";
+        if ($role === 'siswa') {
+            $where .= " AND s.user_id = :user_id";
+        }
+
         $this->db->query("
             SELECT t.*, u.nama_lengkap, s.nisn, s.nama_wali, s.no_hp_wali,
                    k.nama_kategori, k.tipe,
@@ -109,9 +117,14 @@ class KeuanganModel {
             JOIN siswa s ON t.siswa_id = s.id
             JOIN users u ON s.user_id = u.id
             LEFT JOIN keuangan_kategori k ON t.kategori_id = k.id
-            WHERE s.status = 'Aktif'
+            WHERE $where
             ORDER BY t.tahun DESC, FIELD(t.bulan, 'Desember', 'November', 'Oktober', 'September', 'Agustus', 'Juli', 'Juni', 'Mei', 'April', 'Maret', 'Februari', 'Januari') DESC, u.nama_lengkap ASC
         ");
+        
+        if ($role === 'siswa') {
+            $this->db->bind('user_id', $user_id);
+        }
+
         return $this->db->resultSet();
     }
 
@@ -340,15 +353,37 @@ class KeuanganModel {
 
     public function getTahunPembayaran()
     {
-        $this->db->query("SELECT DISTINCT t.tahun FROM tagihan_spp t JOIN pembayaran_spp p ON p.tagihan_id = t.id ORDER BY t.tahun DESC");
+        $role = $_SESSION['user']['role'] ?? '';
+        $user_id = $_SESSION['user']['id'] ?? 0;
+        
+        $query = "SELECT DISTINCT t.tahun FROM tagihan_spp t JOIN pembayaran_spp p ON p.tagihan_id = t.id";
+        if ($role === 'siswa') {
+            $query .= " JOIN siswa s ON t.siswa_id = s.id WHERE s.user_id = :user_id";
+        }
+        $query .= " ORDER BY t.tahun DESC";
+        
+        $this->db->query($query);
+        if ($role === 'siswa') {
+            $this->db->bind('user_id', $user_id);
+        }
         return $this->db->resultSet();
     }
 
     public function getRiwayatPembayaranBySiswa($tahun)
     {
+        $role = $_SESSION['user']['role'] ?? '';
+        $user_id = $_SESSION['user']['id'] ?? 0;
+        
         $whereClause = "";
+        $whereArr = [];
         if ($tahun !== 'semua') {
-            $whereClause = "WHERE t.tahun = :tahun";
+            $whereArr[] = "t.tahun = :tahun";
+        }
+        if ($role === 'siswa') {
+            $whereArr[] = "s.user_id = :user_id";
+        }
+        if (!empty($whereArr)) {
+            $whereClause = "WHERE " . implode(' AND ', $whereArr);
         }
         
         $this->db->query("
@@ -364,6 +399,9 @@ class KeuanganModel {
         
         if ($tahun !== 'semua') {
             $this->db->bind('tahun', $tahun);
+        }
+        if ($role === 'siswa') {
+            $this->db->bind('user_id', $user_id);
         }
         
         $results = $this->db->resultSet();
