@@ -96,6 +96,22 @@
         </div>
         
         <div class="flex items-center gap-2 md:gap-6">
+            <!-- Sync Indicator -->
+            <div class="hidden sm:flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full border"
+                 :class="{
+                    'bg-emerald-50 text-emerald-600 border-emerald-200': syncStatus === 'synced',
+                    'bg-amber-50 text-amber-600 border-amber-200': syncStatus === 'syncing',
+                    'bg-red-50 text-red-600 border-red-200': syncStatus === 'offline'
+                 }">
+                <i class="fas" :class="{
+                    'fa-check-circle': syncStatus === 'synced',
+                    'fa-spinner fa-spin': syncStatus === 'syncing',
+                    'fa-wifi': syncStatus === 'offline'
+                }"></i>
+                <span x-text="syncStatus === 'synced' ? 'Tersimpan' : (syncStatus === 'syncing' ? 'Menyimpan...' : 'Offline')"></span>
+                <span x-show="pendingSyncs.length > 0" class="ml-1 px-1.5 bg-red-100 text-red-700 rounded-full text-[10px]" x-text="pendingSyncs.length"></span>
+            </div>
+
             <div class="bg-slate-100 rounded-lg px-2 md:px-4 py-1.5 md:py-2 flex items-center gap-2 md:gap-3 border border-slate-200">
                 <i class="far fa-clock text-emerald-600 text-sm md:text-lg"></i>
                 <div class="font-mono text-sm md:text-xl font-bold tracking-wider text-slate-700" x-text="formattedTime">00:00:00</div>
@@ -242,6 +258,12 @@
                 durasiMenit: <?= isset($data['jadwal']['durasi_menit']) ? $data['jadwal']['durasi_menit'] : 60 ?>,
                 timeRemaining: 0,
                 timerInterval: null,
+
+                // Backup & Sync
+                syncStatus: 'synced', // synced, syncing, offline
+                pendingSyncs: [],
+                id_peserta: <?= $data['peserta']['id_peserta'] ?? 0 ?>,
+                id_jadwal: <?= $data['jadwal']['id_jadwal'] ?? 0 ?>,
                 
                 get currentSoal() {
                     return this.soal[this.currentIndex] || {};
@@ -257,6 +279,18 @@
                 init() {
                     this.timeRemaining = this.durasiMenit * 60;
                     this.setupAntiCheat();
+                    this.setupNetworkListeners();
+                    setInterval(() => this.processSyncQueue(), 3000);
+                },
+
+                setupNetworkListeners() {
+                    window.addEventListener('online', () => {
+                        this.syncStatus = this.pendingSyncs.length > 0 ? 'syncing' : 'synced';
+                        this.processSyncQueue();
+                    });
+                    window.addEventListener('offline', () => {
+                        this.syncStatus = 'offline';
+                    });
                 },
                 
                 startExam() {
@@ -267,8 +301,8 @@
                         method: "POST",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: new URLSearchParams({
-                            id_peserta: <?= $data['peserta']['id_peserta'] ?? 0 ?>,
-                            id_jadwal: <?= $data['jadwal']['id_jadwal'] ?? 0 ?>,
+                            id_peserta: this.id_peserta,
+                            id_jadwal: this.id_jadwal,
                             token: this.startToken
                         })
                     })
@@ -342,7 +376,7 @@
                         method: "POST",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: new URLSearchParams({
-                            id_peserta: <?= $data['peserta']['id_peserta'] ?? 0 ?>,
+                            id_peserta: this.id_peserta,
                             alasan: reason
                         })
                     });
@@ -356,8 +390,8 @@
                         method: "POST",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: new URLSearchParams({
-                            id_peserta: <?= $data['peserta']['id_peserta'] ?? 0 ?>,
-                            id_jadwal: <?= $data['jadwal']['id_jadwal'] ?? 0 ?>,
+                            id_peserta: this.id_peserta,
+                            id_jadwal: this.id_jadwal,
                             token: this.unlockToken
                         })
                     })
@@ -393,21 +427,71 @@
                 goToQuestion(index) {
                     this.currentIndex = index;
                 },
+
+                saveToLocalStorage() {
+                    localStorage.setItem('cbt_answers_' + this.id_peserta, JSON.stringify(this.answers));
+                    localStorage.setItem('cbt_ragu_' + this.id_peserta, JSON.stringify(this.ragu));
+                },
                 
                 saveAnswer() {
-                    let ans = this.answers[this.currentSoal.id_soal] || '';
-                    let r = this.ragu[this.currentSoal.id_soal] ? '1' : '0';
+                    let id_soal = this.currentSoal.id_soal;
+                    let ans = this.answers[id_soal] || '';
+                    let r = this.ragu[id_soal] ? '1' : '0';
+                    
+                    this.saveToLocalStorage();
+                    
+                    // Remove existing pending for this soal
+                    this.pendingSyncs = this.pendingSyncs.filter(item => item.id_soal !== id_soal);
+                    
+                    // Add to pending
+                    this.pendingSyncs.push({
+                        id_soal: id_soal,
+                        jawaban: ans,
+                        ragu_ragu: r
+                    });
+                    
+                    this.processSyncQueue();
+                },
+
+                processSyncQueue() {
+                    if(!navigator.onLine) {
+                        this.syncStatus = 'offline';
+                        return;
+                    }
+                    if(this.pendingSyncs.length === 0) {
+                        this.syncStatus = 'synced';
+                        return;
+                    }
+                    
+                    this.syncStatus = 'syncing';
+                    
+                    let item = this.pendingSyncs[0];
                     
                     fetch("<?= BASEURL ?>/UjianSiswa/simpanJawabanApi", {
                         method: "POST",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: new URLSearchParams({
-                            id_peserta: <?= $data['peserta']['id_peserta'] ?? 0 ?>,
-                            id_soal: this.currentSoal.id_soal,
-                            jawaban: ans,
-                            ragu_ragu: r
+                            id_peserta: this.id_peserta,
+                            id_soal: item.id_soal,
+                            jawaban: item.jawaban,
+                            ragu_ragu: item.ragu_ragu
                         })
-                    }).catch(e => console.error("Gagal menyimpan jawaban", e));
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.status) {
+                            this.pendingSyncs.shift(); // remove from queue
+                            if(this.pendingSyncs.length > 0) {
+                                this.processSyncQueue(); // process next
+                            } else {
+                                this.syncStatus = 'synced';
+                            }
+                        }
+                    })
+                    .catch(e => {
+                        this.syncStatus = 'offline';
+                        console.error("Gagal sinkronisasi", e);
+                    });
                 },
                 
                 toggleRagu() {
@@ -416,6 +500,10 @@
                 },
                 
                 finishExam() {
+                    if(this.pendingSyncs.length > 0) {
+                        alert("Sistem masih menyinkronkan data (" + this.pendingSyncs.length + " antrean). Harap tunggu sejenak atau pastikan internet Anda stabil.");
+                        return;
+                    }
                     if(confirm("Apakah Anda yakin ingin menyelesaikan ujian? Anda tidak akan dapat kembali masuk.")) {
                         this.autoSubmit();
                     }
@@ -423,36 +511,69 @@
                 
                 autoSubmit() {
                     this.isExamActive = false;
+
+                    let answersPayload = {};
+                    for(let id in this.answers) {
+                        answersPayload[id] = {
+                            jawaban: this.answers[id],
+                            ragu_ragu: this.ragu[id] ? '1' : '0'
+                        };
+                    }
                     
                     fetch("<?= BASEURL ?>/UjianSiswa/selesaiUjianApi", {
                         method: "POST",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: new URLSearchParams({
-                            id_peserta: <?= $data['peserta']['id_peserta'] ?? 0 ?>,
-                            id_jadwal: <?= $data['jadwal']['id_jadwal'] ?? 0 ?>
+                            id_peserta: this.id_peserta,
+                            id_jadwal: this.id_jadwal,
+                            answers: JSON.stringify(answersPayload)
                         })
                     })
                     .then(res => res.json())
                     .then(data => {
+                        localStorage.removeItem('cbt_answers_' + this.id_peserta);
+                        localStorage.removeItem('cbt_ragu_' + this.id_peserta);
                         window.location.href = "<?= BASEURL ?>/UjianSiswa";
                     })
                     .catch(e => {
-                        alert("Terjadi kesalahan saat menyelesaikan ujian. Harap hubungi pengawas.");
-                        window.location.href = "<?= BASEURL ?>/UjianSiswa";
+                        alert("Terjadi kesalahan koneksi saat mengirim jawaban akhir. Data sudah diamankan di browser ini. Mohon periksa internet Anda dan coba lagi.");
+                        // Jangan di redirect jika gagal, supaya payload backup localStorage tidak hilang dan bisa diretry.
+                        this.isExamActive = true; 
                     });
                 }
             }
         }
 
-        // Initialize answers from DB
+        // Initialize answers from DB & LocalStorage
         document.addEventListener('alpine:init', () => {
             let app = document.querySelector('[x-data="examApp()"]')._x_dataStack[0];
             let jawabanLama = <?= json_encode($data['jawaban_lama'] ?? []) ?>;
+            let id_peserta = <?= $data['peserta']['id_peserta'] ?? 0 ?>;
             
+            // 1. Data dari database
             jawabanLama.forEach(j => {
                 app.answers[j.id_soal] = j.jawaban_siswa;
                 app.ragu[j.id_soal] = (j.ragu_ragu == 1);
             });
+
+            // 2. Data dari LocalStorage (lebih kuat/override database karena bisa jadi database gagal sinkron)
+            try {
+                let localAns = JSON.parse(localStorage.getItem('cbt_answers_' + id_peserta));
+                let localRagu = JSON.parse(localStorage.getItem('cbt_ragu_' + id_peserta));
+                
+                if (localAns) {
+                    for(let id in localAns) {
+                        if(localAns[id]) app.answers[id] = localAns[id];
+                    }
+                }
+                if (localRagu) {
+                    for(let id in localRagu) {
+                        app.ragu[id] = localRagu[id];
+                    }
+                }
+            } catch(e) {
+                console.error("Gagal load localStorage");
+            }
         });
     </script>
 </body>

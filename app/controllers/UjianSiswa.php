@@ -117,6 +117,22 @@ class UjianSiswa extends Controller {
             $id_peserta = $_POST['id_peserta'] ?? 0;
             $id_jadwal = $_POST['id_jadwal'] ?? 0;
             
+            // Terima backup jawaban jika ada agar tidak ada data yang hilang
+            if(isset($_POST['answers'])) {
+                $answers = json_decode($_POST['answers'], true);
+                if(is_array($answers)) {
+                    $model = $this->model('UjianSiswaModel');
+                    foreach($answers as $id_soal => $ansData) {
+                        $model->simpanJawaban(
+                            $id_peserta, 
+                            $id_soal, 
+                            $ansData['jawaban'], 
+                            $ansData['ragu_ragu'] == '1' ? true : false
+                        );
+                    }
+                }
+            }
+            
             $nilai = $this->model('UjianSiswaModel')->hitungNilaiAkhir($id_peserta, $id_jadwal);
             
             echo json_encode(['status' => true, 'nilai' => $nilai]);
