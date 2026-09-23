@@ -4,10 +4,15 @@
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight"><?= $data['judul']; ?></h1>
             <p class="text-slate-500 mt-2">Menampilkan hasil ujian untuk jadwal: <strong class="text-slate-800"><?= htmlspecialchars($data['jadwal']['nama_ujian']); ?></strong></p>
         </div>
-        <a href="<?= BASEURL; ?>/JadwalUjian" class="inline-flex items-center px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg border border-slate-300 transition-colors shadow-sm">
-            <svg class="w-4 h-4 mr-2 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Kembali
-        </a>
+        <div class="flex gap-2">
+            <a href="<?= BASEURL; ?>/JadwalUjian/exportExcel/<?= $data['jadwal']['id_jadwal'] ?>" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                <i class="fas fa-file-excel mr-2"></i> Export Excel
+            </a>
+            <a href="<?= BASEURL; ?>/JadwalUjian" class="inline-flex items-center px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg border border-slate-300 transition-colors shadow-sm">
+                <svg class="w-4 h-4 mr-2 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali
+            </a>
+        </div>
     </div>
 
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">

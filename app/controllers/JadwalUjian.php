@@ -147,6 +147,75 @@ class JadwalUjian extends Controller {
         $this->view('templates/admin_footer');
     }
 
+    public function exportExcel($id)
+    {
+        $jadwal = $this->model('JadwalUjianModel')->getJadwalById($id);
+        if(!$jadwal) {
+            header('Location: ' . BASEURL . '/JadwalUjian');
+            exit;
+        }
+        
+        $hasil = $this->model('JadwalUjianModel')->getHasilUjian($id);
+        
+        // Menggunakan PhpSpreadsheet karena sudah tersedia di vendor
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        $sheet->setCellValue('A1', 'HASIL UJIAN: ' . strtoupper($jadwal['nama_ujian']));
+        $sheet->mergeCells('A1:F1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        
+        $sheet->setCellValue('A3', 'Mata Pelajaran: ' . $jadwal['nama_mapel']);
+        $sheet->setCellValue('A4', 'Tanggal Ujian: ' . date('d/m/Y', strtotime($jadwal['waktu_mulai'])));
+        
+        // Headers
+        $sheet->setCellValue('A6', 'No');
+        $sheet->setCellValue('B6', 'NISN');
+        $sheet->setCellValue('C6', 'Nama Siswa');
+        $sheet->setCellValue('D6', 'Waktu Mulai');
+        $sheet->setCellValue('E6', 'Status');
+        $sheet->setCellValue('F6', 'Nilai Akhir');
+        
+        $sheet->getStyle('A6:F6')->getFont()->setBold(true);
+        $sheet->getStyle('A6:F6')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFEFEFEF');
+        
+        $row = 7;
+        $no = 1;
+        foreach($hasil as $h) {
+            $status = 'Belum Mulai';
+            if($h['status_ujian'] == '1') $status = 'Mengerjakan';
+            if($h['status_ujian'] == '2') $status = 'Terkunci (' . $h['alasan_terkunci'] . ')';
+            if($h['status_ujian'] == '3') $status = 'Selesai';
+            
+            $waktu = $h['waktu_mulai'] ? date('d/m/Y H:i', strtotime($h['waktu_mulai'])) : '-';
+            
+            $sheet->setCellValue('A' . $row, $no++);
+            // Force NISN to string to prevent scientific notation
+            $sheet->setCellValueExplicit('B' . $row, $h['nisn'], \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValue('C' . $row, $h['nama_lengkap']);
+            $sheet->setCellValue('D' . $row, $waktu);
+            $sheet->setCellValue('E' . $row, $status);
+            $sheet->setCellValue('F' . $row, ($h['status_ujian'] == '3' || $h['nilai'] !== null) ? $h['nilai'] : 0);
+            
+            $row++;
+        }
+        
+        // Auto width
+        foreach(range('A', 'F') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        
+        $filename = 'Hasil_Ujian_' . preg_replace('/[^a-zA-Z0-9]/', '_', $jadwal['nama_ujian']) . '.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="'. $filename .'"');
+        header('Cache-Control: max-age=0');
+        
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
+        exit;
+    }
+
     public function hapus($id)
     {
         if($this->model('JadwalUjianModel')->hapusDataJadwal($id) > 0) {
