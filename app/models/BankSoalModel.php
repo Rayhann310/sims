@@ -166,6 +166,33 @@ class BankSoalModel {
         return $this->db->rowCount();
     }
 
+    public function hapusMassalSoal($ids)
+    {
+        if (empty($ids)) return 0;
+        
+        $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+        $query = "DELETE FROM " . $this->table . " WHERE id_soal IN ($placeholders)";
+        
+        // PDO direct execute is required for dynamic IN array
+        $stmt = $this->db->dbh->prepare($query);
+        $stmt->execute($ids);
+        return $stmt->rowCount();
+    }
+
+    public function getSoalByIds($ids)
+    {
+        if (empty($ids)) return [];
+        
+        $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+        $query = "SELECT bs.*, m.nama_mapel FROM " . $this->table . " bs 
+                  LEFT JOIN mata_pelajaran m ON bs.id_mapel = m.id 
+                  WHERE bs.id_soal IN ($placeholders)";
+                  
+        $stmt = $this->db->dbh->prepare($query);
+        $stmt->execute($ids);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function updateDataSoal($data)
     {
         $query = "UPDATE " . $this->table . " SET 

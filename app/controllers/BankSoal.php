@@ -118,6 +118,58 @@ class BankSoal extends Controller {
         }
     }
 
+    public function hapusMassal()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['selected_ids'])) {
+            $ids = json_decode($_POST['selected_ids'], true);
+            if(is_array($ids) && count($ids) > 0) {
+                $deleted = $this->model('BankSoalModel')->hapusMassalSoal($ids);
+                Flasher::setFlash("$deleted Soal berhasil", 'dihapus secara massal', 'success');
+            }
+        }
+        header('Location: ' . BASEURL . '/BankSoal');
+        exit;
+    }
+
+    public function editMassal()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['selected_ids'])) {
+            $ids = json_decode($_POST['selected_ids'], true);
+            if(is_array($ids) && count($ids) > 0) {
+                $data['judul'] = 'Edit Massal Soal';
+                $data['mapel'] = $this->model('BankSoalModel')->getAllMapel();
+                $data['soal'] = $this->model('BankSoalModel')->getSoalByIds($ids);
+                
+                $this->view('templates/admin_header', $data);
+                $this->view('bank_soal/form_edit_massal', $data);
+                $this->view('templates/admin_footer');
+                return;
+            }
+        }
+        header('Location: ' . BASEURL . '/BankSoal');
+        exit;
+    }
+
+    public function updateMassal()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['soal'])) {
+            $model = $this->model('BankSoalModel');
+            $updated = 0;
+            foreach($_POST['soal'] as $item) {
+                if(isset($item['id_soal'])) {
+                    // Inject mapel id to item to match updateDataSoal expectation
+                    $item['id_mapel'] = $_POST['id_mapel'];
+                    if($model->updateDataSoal($item) > 0) {
+                        $updated++;
+                    }
+                }
+            }
+            Flasher::setFlash("$updated Soal", 'berhasil diperbarui', 'success');
+            header('Location: ' . BASEURL . '/BankSoal');
+            exit;
+        }
+    }
+
     public function importPreview()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file_soal'])) {
