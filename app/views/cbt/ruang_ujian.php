@@ -22,11 +22,13 @@
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        input[type="radio"]:checked + .option-box { 
+        input[type="radio"]:checked + .option-box,
+        input[type="checkbox"]:checked + .option-box { 
             background-color: #ecfdf5; 
             border-color: #10b981; 
         }
-        input[type="radio"]:checked + .option-box .option-letter { 
+        input[type="radio"]:checked + .option-box .option-letter,
+        input[type="checkbox"]:checked + .option-box .option-letter { 
             background-color: #10b981; 
             color: white; 
             border-color: #10b981;
@@ -138,12 +140,13 @@
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-8 mb-4 md:mb-6 flex-1">
                         <div class="flex justify-between items-center mb-4 md:mb-6 pb-4 border-b border-slate-100">
                             <h2 class="text-lg md:text-xl font-bold text-slate-800">Soal No. <span x-text="currentIndex + 1"></span></h2>
-                            <span class="text-xs md:text-sm font-medium text-slate-400">Pilihan Ganda</span>
+                            <span class="text-xs md:text-sm font-medium text-slate-400" x-text="(!currentSoal.tipe_soal || currentSoal.tipe_soal === 'PG') ? 'Pilihan Ganda' : (currentSoal.tipe_soal === 'PG_KOMPLEKS' ? 'Pilihan Ganda Kompleks' : 'Esai')"></span>
                         </div>
                         
                         <div class="text-base md:text-lg text-slate-700 leading-relaxed mb-6 md:mb-8 break-words overflow-x-auto" x-html="currentSoal.pertanyaan"></div>
                         
-                        <div class="space-y-3">
+                        <!-- Pilihan Ganda Biasa -->
+                        <div class="space-y-3" x-show="!currentSoal.tipe_soal || currentSoal.tipe_soal === 'PG'">
                             <template x-for="(opt, idx) in optionsList" :key="idx">
                                 <label x-show="currentSoal['opsi_' + opt.key]" class="relative flex cursor-pointer group">
                                     <input type="radio" :name="'soal_'+currentSoal.id_soal" :value="opt.key.toUpperCase()" x-model="answers[currentSoal.id_soal]" class="peer sr-only" @change="saveAnswer()">
@@ -155,6 +158,29 @@
                                     </div>
                                 </label>
                             </template>
+                        </div>
+                        
+                        <!-- PG Kompleks (Banyak Jawaban) -->
+                        <div class="space-y-3" x-show="currentSoal.tipe_soal === 'PG_KOMPLEKS'">
+                            <div class="text-xs font-bold text-emerald-600 mb-2">*Pilih semua jawaban yang benar:</div>
+                            <template x-for="(opt, idx) in optionsList" :key="'komp_'+idx">
+                                <label x-show="currentSoal['opsi_' + opt.key]" class="relative flex cursor-pointer group">
+                                    <input type="checkbox" :name="'soal_kompleks_'+currentSoal.id_soal" :value="opt.key.toUpperCase()" x-model="kompleksAnswers[currentSoal.id_soal]" class="peer sr-only" @change="saveAnswerKompleks(currentSoal.id_soal)">
+                                    <div class="option-box w-full flex flex-row items-center p-3 md:p-4 rounded-xl border-2 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 transition-all">
+                                        <div class="option-letter shrink-0 w-8 h-8 rounded-lg border-2 border-slate-200 flex items-center justify-center font-bold text-slate-500 mr-3 md:mr-4 transition-colors">
+                                            <i class="fas fa-check text-sm" x-show="kompleksAnswers[currentSoal.id_soal] && kompleksAnswers[currentSoal.id_soal].includes(opt.key.toUpperCase())"></i>
+                                            <span x-show="!kompleksAnswers[currentSoal.id_soal] || !kompleksAnswers[currentSoal.id_soal].includes(opt.key.toUpperCase())" x-text="opt.key.toUpperCase()"></span>
+                                        </div>
+                                        <div class="flex-1 text-slate-700 text-sm md:text-base break-words overflow-x-auto" x-html="currentSoal['opsi_' + opt.key]"></div>
+                                    </div>
+                                </label>
+                            </template>
+                        </div>
+
+                        <!-- Essay -->
+                        <div x-show="currentSoal.tipe_soal === 'ESSAY'" class="w-full">
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Tulis Jawaban Anda:</label>
+                            <textarea x-model="answers[currentSoal.id_soal]" @blur="saveAnswer()" rows="6" class="w-full p-4 border-2 border-slate-300 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 outline-none transition-all resize-y text-slate-700" placeholder="Ketik jawaban Anda di sini..."></textarea>
                         </div>
                     </div>
 
@@ -248,7 +274,8 @@
                 
                 soal: <?= json_encode($data['soal'] ?? []) ?>,
                 currentIndex: 0,
-                answers: {}, // id_soal => jawaban (A/B/C/D/E)
+                answers: {}, // id_soal => jawaban (A/B/C/D/E) atau text essay
+                kompleksAnswers: {}, // id_soal => array ['A', 'C']
                 ragu: {}, // id_soal => boolean
                 optionsList: [
                     {key: 'a'}, {key: 'b'}, {key: 'c'}, {key: 'd'}, {key: 'e'}
@@ -433,6 +460,12 @@
                     localStorage.setItem('cbt_ragu_' + this.id_peserta, JSON.stringify(this.ragu));
                 },
                 
+                saveAnswerKompleks(id_soal) {
+                    let arr = this.kompleksAnswers[id_soal] || [];
+                    this.answers[id_soal] = arr.join(',');
+                    this.saveAnswer();
+                },
+                
                 saveAnswer() {
                     let id_soal = this.currentSoal.id_soal;
                     let ans = this.answers[id_soal] || '';
@@ -563,7 +596,9 @@
                 
                 if (localAns) {
                     for(let id in localAns) {
-                        if(localAns[id]) app.answers[id] = localAns[id];
+                        if(localAns[id]) {
+                            app.answers[id] = localAns[id];
+                        }
                     }
                 }
                 if (localRagu) {
@@ -574,6 +609,18 @@
             } catch(e) {
                 console.error("Gagal load localStorage");
             }
+            
+            // 3. Hydrate kompleksAnswers based on answers for PG_KOMPLEKS
+            app.soal.forEach(s => {
+                if (s.tipe_soal === 'PG_KOMPLEKS') {
+                    if (!app.kompleksAnswers[s.id_soal]) {
+                        app.kompleksAnswers[s.id_soal] = [];
+                    }
+                    if (app.answers[s.id_soal]) {
+                        app.kompleksAnswers[s.id_soal] = app.answers[s.id_soal].split(',');
+                    }
+                }
+            });
         });
     </script>
 </body>
