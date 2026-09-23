@@ -71,7 +71,7 @@
     <!-- Data Table -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200">
+            <table class="min-w-full divide-y divide-slate-200 no-datatable">
                 <thead class="bg-slate-50">
                     <tr>
                         <th class="px-6 py-3 text-left w-10">
