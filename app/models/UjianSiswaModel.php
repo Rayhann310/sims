@@ -167,16 +167,42 @@ class UjianSiswaModel {
         $total = count($soal);
         
         foreach($soal as $s) {
-            $kunci = strtoupper($s['kunci_jawaban'] ?? '');
-            $jawab = isset($mapJawaban[$s['id_soal']]) ? strtoupper($mapJawaban[$s['id_soal']]) : '';
+            $tipe = strtoupper($s['tipe_soal'] ?? 'PG');
+            // Bersihkan spasi berlebih
+            $kunci = trim(strtoupper(strip_tags($s['kunci_jawaban'] ?? '')));
+            $jawab = isset($mapJawaban[$s['id_soal']]) ? trim(strtoupper(strip_tags($mapJawaban[$s['id_soal']]))) : '';
             
-            if($jawab !== '' && $jawab === $kunci) {
-                $benar++;
+            if($jawab === '') continue;
+
+            if ($tipe === 'PG_KOMPLEKS') {
+                $kArr = array_filter(array_map('trim', explode(',', $kunci)));
+                $jArr = array_filter(array_map('trim', explode(',', $jawab)));
+                sort($kArr);
+                sort($jArr);
+                if (!empty($kArr) && implode(',', $jArr) === implode(',', $kArr)) {
+                    $benar++;
+                }
+            } else if ($tipe === 'ESSAY') {
+                // Sederhana: Benar jika salah satu kata kunci ada di jawaban (case-insensitive)
+                $kArr = array_filter(array_map('trim', explode(',', $kunci)));
+                $match = false;
+                foreach($kArr as $kw) {
+                    if ($kw !== '' && strpos($jawab, $kw) !== false) {
+                        $match = true;
+                        break;
+                    }
+                }
+                if ($match) $benar++;
+            } else {
+                // PG Biasa
+                if($jawab === $kunci) {
+                    $benar++;
+                }
             }
         }
         
         // Hitung nilai akhir (0-100)
-        $nilai = ($benar / $total) * 100;
+        $nilai = ($total > 0) ? round(($benar / $total) * 100, 2) : 0;
         
         // Update tabel peserta
         $this->db->query("UPDATE cbt_peserta SET nilai = :nilai, status_ujian = '3' WHERE id_peserta = :id_peserta");
