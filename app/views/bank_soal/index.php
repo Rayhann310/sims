@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ importModal: false }">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ importModal: false, detailModal: false, activeSoal: null, soalList: <?= htmlspecialchars(json_encode($data['soal'] ?? []), ENT_QUOTES, 'UTF-8') ?> }">
     <div class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight"><?= $data['judul']; ?></h1>
@@ -55,6 +55,10 @@
                                 <?php endif; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button @click="activeSoal = soalList.find(s => s.id_soal == <?= $row['id_soal']; ?>); detailModal = true" 
+                                   class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors mr-2">
+                                   <i class="fas fa-eye"></i> Detail
+                                </button>
                                 <a href="<?= BASEURL; ?>/BankSoal/edit/<?= $row['id_soal']; ?>" 
                                    class="text-amber-600 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-md transition-colors mr-2">Edit</a>
                                 <a href="<?= BASEURL; ?>/BankSoal/hapus/<?= $row['id_soal']; ?>" 
@@ -120,6 +124,67 @@
                         <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors shadow-sm">Preview Soal</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Soal -->
+    <div x-show="detailModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div x-show="detailModal" x-transition.opacity class="fixed inset-0 transition-opacity bg-slate-900/50 backdrop-blur-sm" @click="detailModal = false"></div>
+
+            <div x-show="detailModal" x-transition class="relative inline-block w-full max-w-2xl p-6 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl sm:my-8">
+                <div class="flex items-center justify-between mb-5 pb-4 border-b border-slate-100">
+                    <h3 class="text-lg font-bold text-slate-900">Detail Soal</h3>
+                    <button @click="detailModal = false" class="text-slate-400 hover:text-slate-500 transition-colors">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                
+                <template x-if="activeSoal">
+                    <div class="space-y-6 text-left">
+                        <!-- Pertanyaan -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block">Pertanyaan</span>
+                            <div class="text-slate-800 prose prose-sm max-w-none" x-html="activeSoal.pertanyaan"></div>
+                        </div>
+
+                        <!-- Opsi & Kunci Jawaban -->
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 block">Jawaban & Kunci</span>
+                            
+                            <!-- Mode PG / PG Kompleks -->
+                            <template x-if="activeSoal.tipe_soal === 'PG' || activeSoal.tipe_soal === 'PG_KOMPLEKS' || !activeSoal.tipe_soal">
+                                <div class="space-y-3">
+                                    <template x-for="opt in ['a', 'b', 'c', 'd', 'e']">
+                                        <div x-show="activeSoal['opsi_' + opt]" class="flex items-start p-3 rounded-lg border" :class="(activeSoal.kunci_jawaban && activeSoal.kunci_jawaban.toUpperCase().includes(opt.toUpperCase())) ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white'">
+                                            <div class="w-8 h-8 shrink-0 rounded flex items-center justify-center font-bold mr-3" :class="(activeSoal.kunci_jawaban && activeSoal.kunci_jawaban.toUpperCase().includes(opt.toUpperCase())) ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'" x-text="opt.toUpperCase()"></div>
+                                            <div class="prose prose-sm max-w-none text-slate-700 flex-1 pt-1 break-words overflow-x-auto" x-html="activeSoal['opsi_' + opt]"></div>
+                                            
+                                            <div x-show="activeSoal.kunci_jawaban && activeSoal.kunci_jawaban.toUpperCase().includes(opt.toUpperCase())" class="shrink-0 ml-3 text-emerald-500 flex flex-col justify-center h-8">
+                                                <i class="fas fa-check-circle text-xl"></i>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            
+                            <!-- Mode Esai -->
+                            <template x-if="activeSoal.tipe_soal === 'ESSAY'">
+                                <div class="p-4 rounded-lg border border-emerald-200 bg-emerald-50">
+                                    <div class="font-semibold text-emerald-800 mb-1">Kata Kunci Validasi:</div>
+                                    <div class="text-emerald-700 font-mono text-sm" x-text="activeSoal.kunci_jawaban"></div>
+                                </div>
+                            </template>
+                        </div>
+                        
+                        <!-- Info Tambahan -->
+                        <div class="flex gap-4 pt-4 border-t border-slate-100 text-sm">
+                            <div class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-md font-medium"><i class="fas fa-tag mr-1"></i> <span x-text="activeSoal.tipe_soal || 'PG'"></span></div>
+                            <div class="bg-amber-50 text-amber-700 px-3 py-1 rounded-md font-medium"><i class="fas fa-signal mr-1"></i> <span x-text="activeSoal.tingkat_kesulitan || 'Sedang'"></span></div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
