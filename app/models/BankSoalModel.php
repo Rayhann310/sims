@@ -165,4 +165,41 @@ class BankSoalModel {
         $this->db->execute();
         return $this->db->rowCount();
     }
+
+    public function updateDataSoal($data)
+    {
+        $query = "UPDATE " . $this->table . " SET 
+                    id_mapel = :id_mapel,
+                    tipe_soal = :tipe_soal,
+                    pertanyaan = :pertanyaan,
+                    opsi_a = :opsi_a,
+                    opsi_b = :opsi_b,
+                    opsi_c = :opsi_c,
+                    opsi_d = :opsi_d,
+                    opsi_e = :opsi_e,
+                    kunci_jawaban = :kunci_jawaban,
+                    tingkat_kesulitan = :tingkat_kesulitan
+                  WHERE id_soal = :id_soal";
+                  
+        $this->db->query($query);
+        $this->db->bind('id_soal', $data['id_soal']);
+        $this->db->bind('id_mapel', $data['id_mapel']);
+        $this->db->bind('tipe_soal', $data['tipe_soal']);
+        $this->db->bind('pertanyaan', $data['pertanyaan']);
+        $this->db->bind('opsi_a', $data['opsi_a'] ?? '');
+        $this->db->bind('opsi_b', $data['opsi_b'] ?? '');
+        $this->db->bind('opsi_c', $data['opsi_c'] ?? '');
+        $this->db->bind('opsi_d', $data['opsi_d'] ?? '');
+        $this->db->bind('opsi_e', $data['opsi_e'] ?? '');
+        
+        $kunci = $data['kunci_jawaban'] ?? '';
+        if (is_array($kunci)) {
+            $kunci = implode(',', $kunci);
+        }
+        $this->db->bind('kunci_jawaban', $kunci);
+        $this->db->bind('tingkat_kesulitan', $data['tingkat_kesulitan'] ?? 'Sedang');
+
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
 }

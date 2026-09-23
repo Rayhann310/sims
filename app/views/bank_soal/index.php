@@ -55,6 +55,8 @@
                                 <?php endif; ?>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="<?= BASEURL; ?>/BankSoal/edit/<?= $row['id_soal']; ?>" 
+                                   class="text-amber-600 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-md transition-colors mr-2">Edit</a>
                                 <a href="<?= BASEURL; ?>/BankSoal/hapus/<?= $row['id_soal']; ?>" 
                                    class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors"
                                    onclick="return confirm('Yakin ingin menghapus soal ini?');">Hapus</a>

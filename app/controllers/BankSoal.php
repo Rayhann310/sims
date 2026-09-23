@@ -88,6 +88,36 @@ class BankSoal extends Controller {
         }
     }
 
+    public function edit($id)
+    {
+        $data['judul'] = 'Edit Soal';
+        $data['mapel'] = $this->model('BankSoalModel')->getAllMapel();
+        $data['soal'] = $this->model('BankSoalModel')->getSoalById($id);
+        
+        if(!$data['soal']) {
+            Flasher::setFlash('Soal', 'tidak ditemukan', 'danger');
+            header('Location: ' . BASEURL . '/BankSoal');
+            exit;
+        }
+        
+        $this->view('templates/admin_header', $data);
+        $this->view('bank_soal/edit', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    public function update()
+    {
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if($this->model('BankSoalModel')->updateDataSoal($_POST) > 0) {
+                Flasher::setFlash('Soal berhasil', 'diperbarui', 'success');
+            } else {
+                Flasher::setFlash('Soal gagal', 'diperbarui / tidak ada perubahan', 'warning');
+            }
+            header('Location: ' . BASEURL . '/BankSoal');
+            exit;
+        }
+    }
+
     public function importPreview()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file_soal'])) {
