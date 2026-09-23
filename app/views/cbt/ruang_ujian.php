@@ -198,9 +198,16 @@
                             <span class="text-xs md:text-sm font-medium" :class="ragu[currentSoal.id_soal] ? 'text-amber-600' : 'text-slate-500'">Ragu-ragu</span>
                         </label>
                         
-                        <button @click="nextQuestion()" :disabled="currentIndex === soal.length - 1" class="flex-1 md:flex-none px-2 md:px-6 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-1 md:gap-2 text-sm md:text-base" :class="currentIndex === soal.length - 1 ? 'text-slate-400 bg-slate-100 cursor-not-allowed' : 'text-white bg-emerald-600 hover:bg-emerald-700'">
-                            <span class="hidden sm:inline">Selanjutnya</span> <i class="fas fa-chevron-right"></i>
-                        </button>
+                        <template x-if="currentIndex < soal.length - 1">
+                            <button @click="nextQuestion()" class="flex-1 md:flex-none px-2 md:px-6 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-1 md:gap-2 text-sm md:text-base text-white bg-emerald-600 hover:bg-emerald-700">
+                                <span class="hidden sm:inline">Selanjutnya</span> <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </template>
+                        <template x-if="currentIndex === soal.length - 1">
+                            <button @click="finishExam()" class="flex-1 md:flex-none px-2 md:px-6 py-3 rounded-xl font-semibold transition-colors flex items-center justify-center gap-1 md:gap-2 text-sm md:text-base text-white bg-red-500 hover:bg-red-600 shadow-sm shadow-red-200">
+                                <span class="hidden sm:inline">Selesai Ujian</span> <i class="fas fa-flag-checkered"></i>
+                            </button>
+                        </template>
                     </div>
 
                 </div>
