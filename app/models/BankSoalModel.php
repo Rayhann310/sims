@@ -93,6 +93,43 @@ class BankSoalModel {
         return $this->db->rowCount();
     }
 
+    public function tambahBanyakSoal($id_mapel, $id_guru, $soal_array)
+    {
+        if (empty($soal_array)) return 0;
+        
+        $inserted = 0;
+        $query = "INSERT INTO " . $this->table . "
+                    (id_mapel, id_guru, tipe_soal, pertanyaan, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, kunci_jawaban, tingkat_kesulitan)
+                  VALUES
+                    (:id_mapel, :id_guru, :tipe_soal, :pertanyaan, :opsi_a, :opsi_b, :opsi_c, :opsi_d, :opsi_e, :kunci_jawaban, :tingkat_kesulitan)";
+                    
+        foreach ($soal_array as $soal) {
+            if (empty(trim(strip_tags($soal['pertanyaan'])))) continue; // skip if question is totally empty
+            
+            $this->db->query($query);
+            $this->db->bind('id_mapel', $id_mapel);
+            $this->db->bind('id_guru', $id_guru);
+            $this->db->bind('tipe_soal', $soal['tipe_soal'] ?? 'PG');
+            $this->db->bind('pertanyaan', $soal['pertanyaan']);
+            $this->db->bind('opsi_a', $soal['opsi_a'] ?? '');
+            $this->db->bind('opsi_b', $soal['opsi_b'] ?? '');
+            $this->db->bind('opsi_c', $soal['opsi_c'] ?? '');
+            $this->db->bind('opsi_d', $soal['opsi_d'] ?? '');
+            $this->db->bind('opsi_e', $soal['opsi_e'] ?? '');
+            
+            // Format kunci jawaban if it's an array (from checkboxes)
+            $kunci = $soal['kunci_jawaban'] ?? '';
+            if (is_array($kunci)) {
+                $kunci = implode(',', $kunci);
+            }
+            $this->db->bind('kunci_jawaban', $kunci);
+            $this->db->bind('tingkat_kesulitan', $soal['tingkat_kesulitan'] ?? 'Sedang');
+            $this->db->execute();
+            $inserted++;
+        }
+        return $inserted;
+    }
+
     public function importSoalMassal($id_mapel, $id_guru, $dataSoal)
     {
         $inserted = 0;
