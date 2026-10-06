@@ -238,4 +238,10 @@ class EraporModel {
         $this->db->bind('id', $guru_id);
         return $this->db->single();
     }
+
+    public function getSettingSekolah()
+    {
+        $this->db->query("SELECT * FROM pengaturan LIMIT 1");
+        return $this->db->single();
+    }
 }
