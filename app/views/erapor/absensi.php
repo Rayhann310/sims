@@ -53,32 +53,32 @@
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left border-collapse whitespace-nowrap">
                     <thead>
                         <tr class="bg-white">
-                            <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 w-16">No</th>
-                            <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100">NISN / Nama Siswa</th>
-                            <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 text-center w-32">Sakit (Hari)</th>
-                            <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 text-center w-32">Izin (Hari)</th>
-                            <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 text-center w-32">Alfa (Hari)</th>
+                            <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 w-16">No</th>
+                            <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 min-w-[200px]">NISN / Nama Siswa</th>
+                            <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 text-center min-w-[120px]">Sakit (Hari)</th>
+                            <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 text-center min-w-[120px]">Izin (Hari)</th>
+                            <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 text-center min-w-[120px]">Alfa (Hari)</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         <?php $no=1; foreach($data['siswa_list'] as $s): ?>
                         <?php $ab = $data['absensi'][$s['id']]; ?>
                         <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="py-4 px-6 text-sm text-slate-600"><?= $no++; ?></td>
-                            <td class="py-4 px-6">
-                                <p class="font-medium text-slate-800"><?= htmlspecialchars($s['nama_lengkap']) ?></p>
+                            <td class="py-4 px-4 md:px-6 text-sm text-slate-600"><?= $no++; ?></td>
+                            <td class="py-4 px-4 md:px-6">
+                                <p class="font-medium text-slate-800 whitespace-normal min-w-[150px]"><?= htmlspecialchars($s['nama_lengkap']) ?></p>
                                 <p class="text-xs text-slate-500"><?= htmlspecialchars($s['nisn']) ?></p>
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-4 md:px-6">
                                 <input type="number" min="0" name="sakit[<?= $s['id'] ?>]" value="<?= $ab['sakit'] ?>" class="w-full text-center px-3 py-2 rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all text-sm">
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-4 md:px-6">
                                 <input type="number" min="0" name="izin[<?= $s['id'] ?>]" value="<?= $ab['izin'] ?>" class="w-full text-center px-3 py-2 rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all text-sm">
                             </td>
-                            <td class="py-4 px-6">
+                            <td class="py-4 px-4 md:px-6">
                                 <input type="number" min="0" name="alfa[<?= $s['id'] ?>]" value="<?= $ab['alfa'] ?>" class="w-full text-center px-3 py-2 rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all text-sm">
                             </td>
                         </tr>

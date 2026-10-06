@@ -44,20 +44,20 @@
             <p class="text-sm text-slate-500">Pilih siswa untuk menambah atau mengedit ekskul.</p>
         </div>
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                     <tr class="bg-slate-50/50">
-                        <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 w-16">No</th>
-                        <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100">NISN / Nama Siswa</th>
-                        <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 text-center w-48">Aksi</th>
+                        <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 w-16">No</th>
+                        <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 min-w-[200px]">NISN / Nama Siswa</th>
+                        <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 text-center w-48">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     <?php $no=1; foreach($data['siswa_list'] as $s): ?>
                     <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="py-4 px-6 text-sm text-slate-600"><?= $no++; ?></td>
-                        <td class="py-4 px-6">
-                            <p class="font-medium text-slate-800"><?= htmlspecialchars($s['nama_lengkap']) ?></p>
+                        <td class="py-4 px-4 md:px-6 text-sm text-slate-600"><?= $no++; ?></td>
+                        <td class="py-4 px-4 md:px-6">
+                            <p class="font-medium text-slate-800 whitespace-normal min-w-[150px]"><?= htmlspecialchars($s['nama_lengkap']) ?></p>
                             <p class="text-xs text-slate-500"><?= htmlspecialchars($s['nisn']) ?></p>
                         </td>
                         <td class="py-4 px-6 text-center">
@@ -113,22 +113,22 @@
                 </form>
 
                 <!-- Daftar Ekskul Tersimpan -->
-                <div class="border border-slate-100 rounded-xl overflow-hidden">
-                    <table class="w-full text-left">
+                <div class="border border-slate-100 rounded-xl overflow-x-auto">
+                    <table class="w-full text-left whitespace-nowrap">
                         <thead class="bg-slate-50">
                             <tr>
-                                <th class="py-2 px-4 text-xs font-semibold text-slate-600">Nama Ekskul</th>
+                                <th class="py-2 px-4 text-xs font-semibold text-slate-600 min-w-[150px]">Nama Ekskul</th>
                                 <th class="py-2 px-4 text-xs font-semibold text-slate-600">Nilai</th>
-                                <th class="py-2 px-4 text-xs font-semibold text-slate-600">Keterangan</th>
+                                <th class="py-2 px-4 text-xs font-semibold text-slate-600 min-w-[150px]">Keterangan</th>
                                 <th class="py-2 px-4 text-xs font-semibold text-slate-600 text-center w-16">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             <template x-for="item in ekskulList" :key="item.id">
                                 <tr>
-                                    <td class="py-2 px-4 text-sm text-slate-700" x-text="item.nama_ekskul"></td>
+                                    <td class="py-2 px-4 text-sm text-slate-700 whitespace-normal" x-text="item.nama_ekskul"></td>
                                     <td class="py-2 px-4 text-sm text-slate-700 font-bold" x-text="item.nilai"></td>
-                                    <td class="py-2 px-4 text-sm text-slate-700" x-text="item.keterangan"></td>
+                                    <td class="py-2 px-4 text-sm text-slate-700 whitespace-normal" x-text="item.keterangan"></td>
                                     <td class="py-2 px-4 text-center">
                                         <button @click="deleteEkskul(item.id)" class="text-red-500 hover:text-red-700 p-1">
                                             <i class="fas fa-trash"></i>

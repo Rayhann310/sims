@@ -51,14 +51,14 @@
             <p class="text-sm text-slate-500">Nilai akan otomatis tersimpan saat Anda berpindah kolom (auto-save).</p>
         </div>
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                     <tr class="bg-slate-50/50">
-                        <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 w-16">No</th>
-                        <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100">NISN / Nama Siswa</th>
-                        <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 w-48 text-center">Nilai Pengetahuan & Keterampilan</th>
-                        <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 w-48 text-center">Nilai Sikap</th>
-                        <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 w-32 text-center">Status</th>
+                        <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 w-16">No</th>
+                        <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 min-w-[200px]">NISN / Nama Siswa</th>
+                        <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 min-w-[150px] text-center">Nilai Pengetahuan</th>
+                        <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 min-w-[150px] text-center">Nilai Sikap</th>
+                        <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 min-w-[100px] text-center">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -67,19 +67,19 @@
                         $n = $data['nilai_lama'][$s['id']];
                     ?>
                     <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="py-4 px-6 text-sm text-slate-600"><?= $no++; ?></td>
-                        <td class="py-4 px-6">
-                            <p class="font-medium text-slate-800"><?= htmlspecialchars($s['nama_lengkap']) ?></p>
+                        <td class="py-4 px-4 md:px-6 text-sm text-slate-600"><?= $no++; ?></td>
+                        <td class="py-4 px-4 md:px-6">
+                            <p class="font-medium text-slate-800 whitespace-normal min-w-[150px]"><?= htmlspecialchars($s['nama_lengkap']) ?></p>
                             <p class="text-xs text-slate-500"><?= htmlspecialchars($s['nisn']) ?></p>
                         </td>
-                        <td class="py-4 px-6">
-                            <input type="number" min="0" max="100" class="w-full text-center px-3 py-2 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all input-nilai" 
+                        <td class="py-4 px-4 md:px-6">
+                            <input type="number" min="0" max="100" class="w-full min-w-[80px] text-center px-3 py-2 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all input-nilai" 
                                    data-siswa="<?= $s['id'] ?>" 
                                    value="<?= htmlspecialchars($n['nilai'] ?? '') ?>"
                                    @change="saveRow(<?= $s['id'] ?>)">
                         </td>
-                        <td class="py-4 px-6">
-                            <select class="w-full text-center px-3 py-2 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all input-sikap"
+                        <td class="py-4 px-4 md:px-6">
+                            <select class="w-full min-w-[120px] text-center px-3 py-2 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all input-sikap"
                                     data-siswa="<?= $s['id'] ?>"
                                     @change="saveRow(<?= $s['id'] ?>)">
                                 <option value="">--</option>
@@ -89,8 +89,8 @@
                                 <option value="D" <?= ($n['sikap']??'') == 'D' ? 'selected' : '' ?>>D (Kurang)</option>
                             </select>
                         </td>
-                        <td class="py-4 px-6 text-center">
-                            <span :id="'status-' + <?= $s['id'] ?>" class="text-xs font-medium px-2.5 py-1 rounded-full <?= !empty($n['nilai']) ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' ?>">
+                        <td class="py-4 px-4 md:px-6 text-center">
+                            <span :id="'status-' + <?= $s['id'] ?>" class="inline-block text-xs font-medium px-2.5 py-1 rounded-full <?= !empty($n['nilai']) ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' ?>">
                                 <?= !empty($n['nilai']) ? 'Tersimpan' : 'Belum' ?>
                             </span>
                         </td>
