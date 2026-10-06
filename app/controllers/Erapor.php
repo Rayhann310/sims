@@ -438,16 +438,23 @@ class Erapor extends Controller {
             $total_siswa = count($data['siswa_data']);
             
             foreach($data['siswa_data'] as $index => $siswa) {
+                // Tambah halaman untuk cover jika ini adalah siswa kedua dan seterusnya
+                if ($index > 0) {
+                    $mpdf->AddPageByArray([
+                        'margin-left' => 0,
+                        'margin-right' => 0,
+                        'margin-top' => 0,
+                        'margin-bottom' => 0,
+                    ]);
+                }
+
                 // -------- COVER --------
                 ob_start();
                 extract(compact('siswa','pengaturan','tahun_name','semester'));
                 include $cover_template;
                 $cover_html = ob_get_clean();
 
-                $mpdf->SetMargins(0, 0, 0);
-                $mpdf->SetHTMLFooter('');
                 $mpdf->WriteHTML($cover_html);
-                $mpdf->AddPage();
 
                 // -------- RAPOR --------
                 $nilai_data = $this->model('EraporModel')->getNilaiKelompokBySiswa($siswa['id'], $tahun_id);
@@ -474,14 +481,14 @@ class Erapor extends Controller {
                 include $rapor_template;
                 $content = ob_get_clean();
                 
-                // Set margin normal untuk halaman rapor
-                $mpdf->SetMargins($raporMargin['left'], $raporMargin['right'], $raporMargin['top']);
+                // Tambah halaman baru dengan margin yang sesuai untuk Rapor
+                $mpdf->AddPageByArray([
+                    'margin-left' => 15,
+                    'margin-right' => 15,
+                    'margin-top' => 15,
+                    'margin-bottom' => 15,
+                ]);
                 $mpdf->WriteHTML($content);
-                
-                // Jika masih ada siswa berikutnya, tambah halaman baru
-                if ($index < $total_siswa - 1) {
-                    $mpdf->AddPage();
-                }
             }
             
             $filename = $total_siswa > 1
