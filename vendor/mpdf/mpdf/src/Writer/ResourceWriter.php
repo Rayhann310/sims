@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf\Writer;
 
@@ -130,7 +130,7 @@ final class ResourceWriter implements \Psr\Log\LoggerAwareInterface
 			if (isset($font['type']) && $font['type'] === 'TTF' && !$font['used']) {
 				continue;
 			}
-			if (isset($font['type']) && $font['type'] === 'TTF' && ($font['sip'] || $font['smp'])) {
+			if (isset($font['type']) && $font['type'] === 'TTF' && ($font['sip'] || $font['SMA'])) {
 				foreach ($font['n'] as $k => $fid) {
 					$this->writer->write('/F' . $font['subsetfontids'][$k] . ' ' . $font['n'][$k] . ' 0 R');
 				}

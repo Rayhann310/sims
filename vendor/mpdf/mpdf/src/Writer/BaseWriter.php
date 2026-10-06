@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf\Writer;
 
@@ -89,7 +89,7 @@ final class BaseWriter
 				$str = preg_replace("/[\x{20000}-\x{2FFFF}]/u", chr(0), $str);
 			}
 		}
-		if ($this->mpdf->checkSMP && preg_match("/([\x{10000}-\x{1FFFF}])/u", $str)) {
+		if ($this->mpdf->checkSMA && preg_match("/([\x{10000}-\x{1FFFF}])/u", $str)) {
 			$str = preg_replace("/[\x{10000}-\x{1FFFF}]/u", chr(0), $str);
 		}
 

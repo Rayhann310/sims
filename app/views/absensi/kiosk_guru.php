@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -20,7 +20,7 @@
             <i class="fas fa-school text-2xl"></i>
             <div>
                 <h1 class="font-bold text-xl leading-tight">Sistem Presensi Guru</h1>
-                <p class="text-xs text-indigo-200">SMP Nahdlatul Wathan Jakarta</p>
+                <p class="text-xs text-indigo-200">SMA Nahdlatul Wathan Jakarta</p>
             </div>
         </div>
         <div class="flex items-center gap-6">

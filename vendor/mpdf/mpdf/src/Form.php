@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf;
 
@@ -816,7 +816,7 @@ class Form
 			$f = '';
 			foreach ($this->form_fonts as $fn) {
 				if (is_array($this->mpdf->fonts[$fn]['n'])) {
-					throw new \Mpdf\MpdfException('Cannot use fonts with SMP or SIP characters for interactive Form elements');
+					throw new \Mpdf\MpdfException('Cannot use fonts with SMA or SIP characters for interactive Form elements');
 				}
 				$f .= '/F' . $this->mpdf->fonts[$fn]['i'] . ' ' . $this->mpdf->fonts[$fn]['n'] . ' 0 R ';
 			}

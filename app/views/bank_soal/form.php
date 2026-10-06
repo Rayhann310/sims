@@ -1,4 +1,4 @@
-<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="soalBuilder()">
+﻿<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="soalBuilder()">
     <div class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight"><?= $data['judul']; ?></h1>
@@ -87,7 +87,7 @@
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2 mb-1">
                                             <span class="inline-block w-6 h-6 rounded bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm" x-text="opt.toUpperCase()"></span>
-                                            <span class="text-xs text-slate-500 italic" x-show="opt === 'e'">(Kosongkan jika SMP/MTS)</span>
+                                            <span class="text-xs text-slate-500 italic" x-show="opt === 'e'">(Kosongkan jika SMA/MTS)</span>
                                         </div>
                                         <textarea :id="'editor_opsi_' + opt + '_' + soal.id" :name="'soal['+index+'][opsi_' + opt + ']'" x-model="soal['opsi_'+opt]" class="w-full"></textarea>
                                     </div>

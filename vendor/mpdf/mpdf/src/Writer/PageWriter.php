@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf\Writer;
 
@@ -117,7 +117,7 @@ final class PageWriter
 
 			// Remove references to unused fonts (usually default font)
 			foreach ($unused as $fk) {
-				if ($this->mpdf->fonts[$fk]['sip'] || $this->mpdf->fonts[$fk]['smp']) {
+				if ($this->mpdf->fonts[$fk]['sip'] || $this->mpdf->fonts[$fk]['SMA']) {
 					foreach ($this->mpdf->fonts[$fk]['subsetfontids'] as $k => $fid) {
 						$thispage = preg_replace('/\s\/F' . $fid . ' \d[\d.]* Tf\s/is', ' ', $thispage);
 					}

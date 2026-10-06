@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -508,9 +508,9 @@ class Jadwal extends Controller {
                 require_once 'app/models/AkademikModel.php';
                 $akademikModel = new AkademikModel();
                 $kelas_list = $akademikModel->getAllKelas();
-                $kelaSMPp = [];
+                $kelaSMAp = [];
                 foreach($kelas_list as $k) {
-                    $kelaSMPp[$k['id']] = $k;
+                    $kelaSMAp[$k['id']] = $k;
                 }
 
                 $previewData = [];
@@ -536,8 +536,8 @@ class Jadwal extends Controller {
                     }
 
                     $nama_kelas = '-';
-                    if (isset($kelaSMPp[$kelas_id])) {
-                        $nama_kelas = $kelaSMPp[$kelas_id]['nama_kelas'] . ' (' . $kelaSMPp[$kelas_id]['tingkat'] . ' ' . $kelaSMPp[$kelas_id]['jurusan'] . ')';
+                    if (isset($kelaSMAp[$kelas_id])) {
+                        $nama_kelas = $kelaSMAp[$kelas_id]['nama_kelas'] . ' (' . $kelaSMAp[$kelas_id]['tingkat'] . ' ' . $kelaSMAp[$kelas_id]['jurusan'] . ')';
                     } else {
                         $is_valid = false;
                         $error_msg[] = 'Kelas ID tidak ditemukan';

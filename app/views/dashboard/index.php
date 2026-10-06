@@ -1,9 +1,9 @@
-<div class="max-w-7xl mx-auto space-y-8">
+﻿<div class="max-w-7xl mx-auto space-y-8">
     <!-- Header Minimalist -->
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <h2 class="text-2xl font-bold text-slate-800">Ringkasan Sistem</h2>
-            <p class="text-sm text-slate-500 mt-1">Pantau seluruh aktivitas akademik SMP Nahdlatul Wathan Jakarta dari satu tempat.</p>
+            <p class="text-sm text-slate-500 mt-1">Pantau seluruh aktivitas akademik SMA Nahdlatul Wathan Jakarta dari satu tempat.</p>
         </div>
         <div class="px-4 py-2 bg-blue-50 text-blue-600 font-semibold rounded-lg text-sm">
             Tahun Ajaran: <?= htmlspecialchars($data['tahun_ajaran']); ?>

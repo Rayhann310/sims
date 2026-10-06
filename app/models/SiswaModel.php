@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 class SiswaModel {
     private $db;
@@ -258,7 +258,7 @@ class SiswaModel {
         return 0;
     }
 
-    public function hapuSMPsalDataSiswa($ids)
+    public function hapuSMAsalDataSiswa($ids)
     {
         if (empty($ids)) return 0;
 

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory as WordIOFactory;
@@ -118,12 +118,12 @@ class BankSoal extends Controller {
         }
     }
 
-    public function hapuSMPssal()
+    public function hapuSMAssal()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['selected_ids'])) {
             $ids = json_decode($_POST['selected_ids'], true);
             if(is_array($ids) && count($ids) > 0) {
-                $deleted = $this->model('BankSoalModel')->hapuSMPssalSoal($ids);
+                $deleted = $this->model('BankSoalModel')->hapuSMAssalSoal($ids);
                 Flasher::setFlash("$deleted Soal berhasil", 'dihapus secara massal', 'success');
             }
         }
@@ -275,7 +275,7 @@ class BankSoal extends Controller {
         $sheet->setCellValue('C1', 'Opsi B');
         $sheet->setCellValue('D1', 'Opsi C');
         $sheet->setCellValue('E1', 'Opsi D');
-        $sheet->setCellValue('F1', 'Opsi E (Kosongkan jika SMP/MTS)');
+        $sheet->setCellValue('F1', 'Opsi E (Kosongkan jika SMA/MTS)');
         $sheet->setCellValue('G1', 'Kunci (Contoh: A, atau A,B,C untuk kompleks)');
         $sheet->setCellValue('H1', 'Tipe (PG / PG_KOMPLEKS / ESSAY)');
         $sheet->setCellValue('I1', 'Tingkat (Mudah/Sedang/Sulit)');

@@ -1,5 +1,5 @@
-<?php
-$filterLabel = !empty($data['filter_label']) ? ' — ' . htmlspecialchars($data['filter_label']) : '';
+﻿<?php
+$filterLabel = !empty($data['filter_label']) ? ' â€” ' . htmlspecialchars($data['filter_label']) : '';
 ?>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -15,10 +15,10 @@ $filterLabel = !empty($data['filter_label']) ? ' — ' . htmlspecialchars($data[
         <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 leading-tight">
             <?= !empty($data['filter_label']) ? $data['filter_label'] : 'Berita & Artikel'; ?>
         </h1>
-        <p class="text-slate-500 text-sm mt-2">Informasi, pengumuman, dan kegiatan terkini dari SMP Nahdlatul Wathan Jakarta.</p>
+        <p class="text-slate-500 text-sm mt-2">Informasi, pengumuman, dan kegiatan terkini dari SMA Nahdlatul Wathan Jakarta.</p>
     </div>
 
-    <!-- Filter & Search — mobile stacked, desktop row -->
+    <!-- Filter & Search â€” mobile stacked, desktop row -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6">
         <form method="GET" action="<?= BASEURL; ?>/berita">
             <!-- Row 1: search full width -->
@@ -54,7 +54,7 @@ $filterLabel = !empty($data['filter_label']) ? ' — ' . htmlspecialchars($data[
         </form>
     </div>
 
-    <!-- Tags cloud — horizontal scroll on mobile -->
+    <!-- Tags cloud â€” horizontal scroll on mobile -->
     <?php if (!empty($data['tag_list'])): ?>
     <div class="flex gap-2 mb-6 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap scrollbar-hide">
         <?php foreach($data['tag_list'] as $tag): ?>
@@ -77,7 +77,7 @@ $filterLabel = !empty($data['filter_label']) ? ' — ' . htmlspecialchars($data[
     </div>
     <?php else: ?>
 
-    <!-- Article Grid: 1 col → 2 col → 3 col -->
+    <!-- Article Grid: 1 col â†’ 2 col â†’ 3 col -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <?php foreach($data['artikels'] as $item): ?>
         <a href="<?= BASEURL; ?>/berita/<?= htmlspecialchars($item['slug']); ?>"
@@ -85,7 +85,7 @@ $filterLabel = !empty($data['filter_label']) ? ' — ' . htmlspecialchars($data[
                   active:scale-[0.98] hover:shadow-lg hover:-translate-y-0.5
                   transition-all duration-200 overflow-hidden flex flex-col">
 
-            <!-- Cover — taller on mobile for readability -->
+            <!-- Cover â€” taller on mobile for readability -->
             <div class="relative h-44 sm:h-48 bg-slate-100 overflow-hidden">
                 <?php if (!empty($item['gambar_sampul'])): ?>
                     <img src="<?= htmlspecialchars($item['gambar_sampul']); ?>"
@@ -132,7 +132,7 @@ $filterLabel = !empty($data['filter_label']) ? ' — ' . htmlspecialchars($data[
                 </div>
                 <?php endif; ?>
 
-                <!-- Meta: date + views — always fits on 1 line -->
+                <!-- Meta: date + views â€” always fits on 1 line -->
                 <div class="flex items-center justify-between text-[11px] text-slate-400 mt-auto pt-2.5 border-t border-slate-100">
                     <span class="flex items-center gap-1 truncate mr-2">
                         <i class="fas fa-user-pen text-emerald-400"></i>

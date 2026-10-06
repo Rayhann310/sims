@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf\Language;
 
@@ -86,7 +86,7 @@ class LanguageToFont implements \Mpdf\Language\LanguageToFontInterface
 			case 'nn':
 			case 'nno': // Norwegian Nynorsk
 			case 'nb':
-			case 'nob': // Norwegian Bokmål
+			case 'nob': // Norwegian BokmÃ¥l
 			case 'pl':
 			case 'pol': // Polish
 			case 'pt':
@@ -232,7 +232,7 @@ class LanguageToFont implements \Mpdf\Language\LanguageToFontInterface
 			case 'phn':  // PHOENICIAN
 				$unifont = 'aegean';
 				break;
-			//CASE 'smp':	// SAMARITAN
+			//CASE 'SMA':	// SAMARITAN
 			case 'uga':  // UGARITIC
 				$unifont = 'aegean';
 				break;

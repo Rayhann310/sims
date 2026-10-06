@@ -1,4 +1,4 @@
-<div class="space-y-6" x-data="scannerKelasData()">
+﻿<div class="space-y-6" x-data="scannerKelasData()">
 
     <!-- Header -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
@@ -193,7 +193,7 @@ function scannerKelasData() {
                 { 
                     fps: 10, 
                     qrbox: function(viewfinderWidth, viewfinderHeight) {
-                        var minEdgePercentage = 0.7; // 70% of the SMPllest edge
+                        var minEdgePercentage = 0.7; // 70% of the SMAllest edge
                         var minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
                         var qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
                         return { width: qrboxSize, height: qrboxSize };

@@ -1,16 +1,16 @@
-<?php
+﻿<?php
 
 /**
  * Controller: Berita (Publik)
  * Halaman berita / artikel yang dapat diakses oleh publik tanpa login.
- * Route: /berita           → daftar berita
- *        /berita/{slug}    → detail berita
+ * Route: /berita           â†’ daftar berita
+ *        /berita/{slug}    â†’ detail berita
  */
 class Berita extends Controller {
 
     public function __construct()
     {
-        // Tidak perlu autentikasi — halaman publik
+        // Tidak perlu autentikasi â€” halaman publik
     }
 
     /**
@@ -36,7 +36,7 @@ class Berita extends Controller {
             'is_featured' => (isset($_GET['filter']) && $_GET['filter'] === 'unggulan') ? '1' : '',
         ];
 
-        $data['judul']         = 'Berita & Artikel — SMP Nahdlatul Wathan Jakarta';
+        $data['judul']         = 'Berita & Artikel â€” SMA Nahdlatul Wathan Jakarta';
         $data['hide_navbar']   = false;
         $data['artikels']      = $artikelModel->getAllArtikel($filter);
         $data['kategori_list'] = $artikelModel->getAllKategori();
@@ -50,7 +50,7 @@ class Berita extends Controller {
     }
 
     /**
-     * Detail satu artikel (publik) — diakses via slug
+     * Detail satu artikel (publik) â€” diakses via slug
      * URL: /berita/{slug}
      */
     public function detail($slug = null)
@@ -84,7 +84,7 @@ class Berita extends Controller {
             5
         );
 
-        $data['judul']          = htmlspecialchars($artikel['judul']) . ' — SMP NW Jakarta';
+        $data['judul']          = htmlspecialchars($artikel['judul']) . ' â€” SMA NW Jakarta';
         $data['hide_navbar']    = false;
         $data['artikel']        = $artikel;
         $data['artikel_terkait'] = $artikelTerkait;

@@ -1,11 +1,11 @@
-<?php
+﻿<?php
 /**
  * ONE-TIME MIGRATION RUNNER
- * Akses: /run_migration.php?token=SMPNW_MIGRATE_2026
+ * Akses: /run_migration.php?token=SMANW_MIGRATE_2026
  * HAPUS FILE INI setelah migration berhasil!
  */
 
-define('SECRET_TOKEN', 'SMPNW_MIGRATE_2026');
+define('SECRET_TOKEN', 'SMANW_MIGRATE_2026');
 
 if (!isset($_GET['token']) || $_GET['token'] !== SECRET_TOKEN) {
     http_response_code(403);
@@ -106,9 +106,9 @@ $results = [];
 foreach ($queries as $i => $sql) {
     try {
         $db->exec($sql);
-        $results[] = ['status' => '✅ OK', 'query' => substr(trim($sql), 0, 80) . '...'];
+        $results[] = ['status' => 'âœ… OK', 'query' => substr(trim($sql), 0, 80) . '...'];
     } catch (Exception $e) {
-        $results[] = ['status' => '❌ GAGAL', 'query' => substr(trim($sql), 0, 80) . '...', 'error' => $e->getMessage()];
+        $results[] = ['status' => 'âŒ GAGAL', 'query' => substr(trim($sql), 0, 80) . '...', 'error' => $e->getMessage()];
     }
 }
 ?>
@@ -118,20 +118,20 @@ foreach ($queries as $i => $sql) {
 <style>body{font-family:monospace;padding:20px;background:#1a1a2e;color:#eee} .ok{color:#00ff88} .err{color:#ff4757} table{width:100%;border-collapse:collapse} td,th{padding:10px;border:1px solid #333;text-align:left} th{background:#16213e}</style>
 </head>
 <body>
-<h2>🚀 E-Rapor Migration Runner</h2>
-<p style="color:#ffa502">⚠️ HAPUS FILE INI SETELAH SELESAI: <code>run_migration.php</code></p>
+<h2>ðŸš€ E-Rapor Migration Runner</h2>
+<p style="color:#ffa502">âš ï¸ HAPUS FILE INI SETELAH SELESAI: <code>run_migration.php</code></p>
 <table>
 <tr><th>#</th><th>Status</th><th>Query</th><th>Error</th></tr>
 <?php foreach ($results as $i => $r): ?>
 <tr>
     <td><?= $i+1 ?></td>
-    <td class="<?= $r['status'][0] === '✅' ? 'ok' : 'err' ?>"><?= $r['status'] ?></td>
+    <td class="<?= $r['status'][0] === 'âœ…' ? 'ok' : 'err' ?>"><?= $r['status'] ?></td>
     <td><?= htmlspecialchars($r['query']) ?></td>
     <td><?= htmlspecialchars($r['error'] ?? '-') ?></td>
 </tr>
 <?php endforeach; ?>
 </table>
 <br>
-<p class="ok">✅ Migration selesai! Silakan hapus file <strong>run_migration.php</strong> dari server.</p>
+<p class="ok">âœ… Migration selesai! Silakan hapus file <strong>run_migration.php</strong> dari server.</p>
 </body>
 </html>

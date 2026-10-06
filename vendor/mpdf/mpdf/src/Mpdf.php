@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf;
 
@@ -270,7 +270,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 	var $kt_p00;
 	var $upperCase;
 	var $checkSIP;
-	var $checkSMP;
+	var $checkSMA;
 	var $checkCJK;
 
 	var $watermarkImgAlpha;
@@ -1279,7 +1279,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 		$this->ispre = false;
 
 		$this->checkSIP = false;
-		$this->checkSMP = false;
+		$this->checkSMA = false;
 		$this->checkCJK = false;
 
 		$this->page_break_after_avoid = false;
@@ -3872,7 +3872,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 			'strs' => '',
 			'strp' => '',
 			'sip' => false,
-			'smp' => false,
+			'SMA' => false,
 			'useOTL' => 0,
 			'fontmetrics' => '',
 			'haskerninfo' => false,
@@ -3983,7 +3983,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 			'used' => false,
 			'sip' => $font['sip'],
 			'sipext' => $sipext,
-			'smp' => $font['smp'],
+			'SMA' => $font['SMA'],
 			'TTCfontID' => $TTCfontID,
 			'useOTL' => $fontUseOTL,
 			'useKashida' => (isset($this->fontdata[$family]['useKashida']) ? $this->fontdata[$family]['useKashida'] : false),
@@ -4001,7 +4001,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 		];
 
 
-		if (!$font['sip'] && !$font['smp']) {
+		if (!$font['sip'] && !$font['SMA']) {
 			$subsetRange = range(32, 127);
 			$this->fonts[$fontkey]['subset'] = array_combine($subsetRange, $subsetRange);
 		} else {
@@ -4018,7 +4018,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 			'type' => 'TTF',
 			'ttffile' => $ttffile,
 			'sip' => $font['sip'],
-			'smp' => $font['smp'],
+			'SMA' => $font['SMA'],
 		];
 
 		unset($cw);
@@ -4404,14 +4404,14 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 		if ($this->usingCoreFont && !($textvar & TextVars::FC_SMALLCAPS) && !($textvar & TextVars::FC_KERNING)) {
 			$txt2 = $this->writer->escape($txt2);
 			$s .= sprintf('BT ' . $aix . ' (%s) Tj ET', $px, $py, $txt2);
-		} // IF NOT corefonts [AND NO wordspacing] AND NOT SIP/SMP AND NOT SmCaps AND NOT Kerning AND NOT OTL
+		} // IF NOT corefonts [AND NO wordspacing] AND NOT SIP/SMA AND NOT SmCaps AND NOT Kerning AND NOT OTL
 		// Just output text
 		elseif (!$this->usingCoreFont && !($textvar & TextVars::FC_SMALLCAPS) && !($textvar & TextVars::FC_KERNING) && !(isset($this->CurrentFont['useOTL']) && ($this->CurrentFont['useOTL'] & 0xFF) && !empty($OTLdata['GPOSinfo']))) {
-			// IF SIP/SMP
-			if ($this->CurrentFont['sip'] || $this->CurrentFont['smp']) {
+			// IF SIP/SMA
+			if ($this->CurrentFont['sip'] || $this->CurrentFont['SMA']) {
 				$txt2 = $this->UTF8toSubset($txt2);
 				$s .=sprintf('BT ' . $aix . ' %s Tj ET', $px, $py, $txt2);
-			} // NOT SIP/SMP
+			} // NOT SIP/SMA
 			else {
 				$txt2 = $this->writer->utf8ToUtf16BigEndian($txt2, false);
 				$txt2 = $this->writer->escape($txt2);
@@ -4419,7 +4419,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 			}
 		} // IF NOT corefonts [AND IS wordspacing] AND NOT SIP AND NOT SmCaps AND NOT Kerning AND NOT OTL
 		// Not required here (cf. Cell() )
-		// ELSE (IF SmCaps || Kerning || OTL) [corefonts or not corefonts; SIP or SMP or BMP]
+		// ELSE (IF SmCaps || Kerning || OTL) [corefonts or not corefonts; SIP or SMA or BMP]
 		else {
 			$s .= $this->applyGPOSpdf($txt2, $aix, $px, $py, $OTLdata, $textvar);
 		}
@@ -5189,14 +5189,14 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 			if ($this->usingCoreFont && !($textvar & TextVars::FC_SMALLCAPS) && !($textvar & TextVars::FC_KERNING)) {
 				$txt2 = $this->writer->escape($txt2);
 				$sub .= sprintf('BT ' . $aix . ' (%s) Tj ET', $px, $py, $txt2);
-			} // IF NOT corefonts AND NO wordspacing AND NOT SIP/SMP AND NOT SmCaps AND NOT Kerning AND NOT OTL
+			} // IF NOT corefonts AND NO wordspacing AND NOT SIP/SMA AND NOT SmCaps AND NOT Kerning AND NOT OTL
 			// Just output text
 			elseif (!$this->usingCoreFont && !$this->ws && !($textvar & TextVars::FC_SMALLCAPS) && !($textvar & TextVars::FC_KERNING) && !(isset($this->CurrentFont['useOTL']) && ($this->CurrentFont['useOTL'] & 0xFF) && !empty($OTLdata['GPOSinfo']))) {
-				// IF SIP/SMP
-				if ((isset($this->CurrentFont['sip']) && $this->CurrentFont['sip']) || (isset($this->CurrentFont['smp']) && $this->CurrentFont['smp'])) {
+				// IF SIP/SMA
+				if ((isset($this->CurrentFont['sip']) && $this->CurrentFont['sip']) || (isset($this->CurrentFont['SMA']) && $this->CurrentFont['SMA'])) {
 					$txt2 = $this->UTF8toSubset($txt2);
 					$sub .=sprintf('BT ' . $aix . ' %s Tj ET', $px, $py, $txt2);
-				} // NOT SIP/SMP
+				} // NOT SIP/SMA
 				else {
 					$txt2 = $this->writer->utf8ToUtf16BigEndian($txt2, false);
 					$txt2 = $this->writer->escape($txt2);
@@ -5205,7 +5205,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 			} // IF NOT corefonts AND IS wordspacing AND NOT SIP AND NOT SmCaps AND NOT Kerning AND NOT OTL
 			// Output text word by word with an adjustment to the intercharacter spacing for SPACEs to form word spacing
 			// IF multibyte - Tw has no effect - need to do word spacing using an adjustment before each space
-			elseif (!$this->usingCoreFont && $this->ws && !((isset($this->CurrentFont['sip']) && $this->CurrentFont['sip']) || (isset($this->CurrentFont['smp']) && $this->CurrentFont['smp'])) && !($textvar & TextVars::FC_SMALLCAPS) && !($textvar & TextVars::FC_KERNING) && !(isset($this->CurrentFont['useOTL']) && ($this->CurrentFont['useOTL'] & 0xFF) && (!empty($OTLdata['GPOSinfo']) || (strpos($OTLdata['group'], 'M') !== false && $this->charspacing)) )) {
+			elseif (!$this->usingCoreFont && $this->ws && !((isset($this->CurrentFont['sip']) && $this->CurrentFont['sip']) || (isset($this->CurrentFont['SMA']) && $this->CurrentFont['SMA'])) && !($textvar & TextVars::FC_SMALLCAPS) && !($textvar & TextVars::FC_KERNING) && !(isset($this->CurrentFont['useOTL']) && ($this->CurrentFont['useOTL'] & 0xFF) && (!empty($OTLdata['GPOSinfo']) || (strpos($OTLdata['group'], 'M') !== false && $this->charspacing)) )) {
 				$space = " ";
 				$space = $this->writer->utf8ToUtf16BigEndian($space, false);
 				$space = $this->writer->escape($space);
@@ -5224,7 +5224,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 				}
 				$sub .='] TJ ';
 				$sub .=' ET';
-			} // ELSE (IF SmCaps || Kerning || OTL) [corefonts or not corefonts; SIP or SMP or BMP]
+			} // ELSE (IF SmCaps || Kerning || OTL) [corefonts or not corefonts; SIP or SMA or BMP]
 			else {
 				$sub = $this->applyGPOSpdf($txt, $aix, $px, $py, $OTLdata, $textvar);
 			}
@@ -5425,7 +5425,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 	function applyGPOSpdf($txt, $aix, $x, $y, $OTLdata, $textvar = 0)
 	{
 		$sipset = (isset($this->CurrentFont['sip']) && $this->CurrentFont['sip'])
-			|| (isset($this->CurrentFont['smp']) && $this->CurrentFont['smp']);
+			|| (isset($this->CurrentFont['SMA']) && $this->CurrentFont['SMA']);
 
 		$smcaps = ($textvar & TextVars::FC_SMALLCAPS);
 
@@ -8237,7 +8237,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 					}
 
 					if ($type === 'hyphen') {
-						$hyphen = in_array(mb_substr($currContent, -1), ['-', '–', '—'], true);
+						$hyphen = in_array(mb_substr($currContent, -1), ['-', 'â€“', 'â€”'], true);
 						if (!$hyphen) {
 							$currContent .= '-';
 						} else {
@@ -10022,7 +10022,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 		// Remove references to unused fonts (usually default font)
 		foreach ($this->fonts as $fk => $font) {
 			if (isset($font['type']) && $font['type'] == 'TTF' && !$font['used']) {
-				if ($font['sip'] || $font['smp']) {
+				if ($font['sip'] || $font['SMA']) {
 					foreach ($font['subsetfontids'] as $k => $fid) {
 						foreach ($this->pages as $pn => $page) {
 							$this->pages[$pn] = preg_replace('/\s\/F' . $fid . ' \d[\d.]* Tf\s/is', ' ', $this->pages[$pn]);
@@ -13409,7 +13409,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 		$html = str_replace('<?', '< ', $html); // Fix '<?XML' bug from HTML code generated by MS Word
 
 		$this->checkSIP = false;
-		$this->checkSMP = false;
+		$this->checkSMA = false;
 		$this->checkCJK = false;
 		if ($this->onlyCoreFonts) {
 			$html = $this->SubstituteChars($html);
@@ -13421,7 +13421,7 @@ class Mpdf implements \Psr\Log\LoggerAwareInterface
 				$this->checkSIP = true;
 			}
 			if (preg_match("/([\x{10000}-\x{1FFFF}])/u", $html)) {
-				$this->checkSMP = true;
+				$this->checkSMA = true;
 			}
 			/* -- CJK-FONTS -- */
 			if (preg_match("/([" . $this->pregCJKchars . "])/u", $html)) {

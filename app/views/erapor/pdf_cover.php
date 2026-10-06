@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -146,7 +146,7 @@
                 <?php endif; ?>
             </div>
             <div class="sekolah-info">
-                <div class="nama-sekolah"><?= htmlspecialchars($pengaturan['nama_aplikasi'] ?? 'SMP Nahdlatul Wathan Jakarta') ?></div>
+                <div class="nama-sekolah"><?= htmlspecialchars($pengaturan['nama_aplikasi'] ?? 'SMA Nahdlatul Wathan Jakarta') ?></div>
                 <div class="alamat-sekolah"><?= htmlspecialchars($pengaturan['teks_footer'] ?? '') ?></div>
             </div>
         </div>

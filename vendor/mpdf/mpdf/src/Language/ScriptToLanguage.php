@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf\Language;
 
@@ -53,7 +53,7 @@ class ScriptToLanguage implements \Mpdf\Language\ScriptToLanguageInterface
 		Ucdn::SCRIPT_MANDAIC => 'mid',
 		Ucdn::SCRIPT_OLD_PERSIAN => 'peo',
 		Ucdn::SCRIPT_PHOENICIAN => 'phn',
-		Ucdn::SCRIPT_SAMARITAN => 'smp',
+		Ucdn::SCRIPT_SAMARITAN => 'SMA',
 		Ucdn::SCRIPT_UGARITIC => 'uga',
 		Ucdn::SCRIPT_CUNEIFORM => 'und-Xsux',
 		Ucdn::SCRIPT_OLD_SOUTH_ARABIAN => 'und-Sarb',

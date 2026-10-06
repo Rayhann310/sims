@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf\Writer;
 
@@ -167,7 +167,7 @@ final class BackgroundWriter
 						continue;
 					}
 					if (isset($font['fo']) && $font['fo']) {
-						if ($font['type'] === 'TTF' && ($font['sip'] || $font['smp'])) {
+						if ($font['type'] === 'TTF' && ($font['sip'] || $font['SMA'])) {
 							foreach ($font['n'] as $k => $fid) {
 								$this->writer->write('/F' . $font['subsetfontids'][$k] . ' ' . $font['n'][$k] . ' 0 R');
 							}

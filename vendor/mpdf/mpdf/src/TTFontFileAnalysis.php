@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf;
 
@@ -282,7 +282,7 @@ class TTFontFileAnalysis extends TTFontFile
 		$indic = false;
 		$cjk = false;
 		$sip = false;
-		$smp = false;
+		$SMA = false;
 		$pua = false;
 		$puaag = false;
 		$glyphToChar = [];
@@ -302,7 +302,7 @@ class TTFontFileAnalysis extends TTFontFile
 					$sip = true;
 				}
 				if ($endCharCode > 0x10000 && $endCharCode < 0x1FFFF) {
-					$smp = true;
+					$SMA = true;
 				}
 				if (($endCharCode > 0x0590 && $endCharCode < 0x077F) || ($endCharCode > 0xFE70 && $endCharCode < 0xFEFF) || ($endCharCode > 0xFB50 && $endCharCode < 0xFDFF)) {
 					$rtl = true;
@@ -449,6 +449,6 @@ class TTFontFileAnalysis extends TTFontFile
 		}
 
 		fclose($this->fh);
-		return [$this->familyName, $bold, $italic, $ftype, $TTCfontID, $rtl, $indic, $cjk, $sip, $smp, $puaag, $pua, $unAGlyphs];
+		return [$this->familyName, $bold, $italic, $ftype, $TTCfontID, $rtl, $indic, $cjk, $sip, $SMA, $puaag, $pua, $unAGlyphs];
 	}
 }

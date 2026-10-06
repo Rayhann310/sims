@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 class AkademikModel {
     private $db;
@@ -71,7 +71,7 @@ class AkademikModel {
         return $this->db->rowCount();
     }
 
-    public function hapuSMPpel($id)
+    public function hapuSMApel($id)
     {
         $this->db->query("DELETE FROM mata_pelajaran WHERE id = :id");
         $this->db->bind('id', $id);

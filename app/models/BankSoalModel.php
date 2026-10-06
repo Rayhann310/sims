@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 class BankSoalModel {
     private $table = 'cbt_bank_soal';
@@ -166,7 +166,7 @@ class BankSoalModel {
         return $this->db->rowCount();
     }
 
-    public function hapuSMPssalSoal($ids)
+    public function hapuSMAssalSoal($ids)
     {
         if (empty($ids)) return 0;
         

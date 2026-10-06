@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf\Config;
 
@@ -243,7 +243,7 @@ class FontVariables
 					'R' => "TaameyDavidCLM-Medium.ttf",
 					'useOTL' => 0xFF,
 				],
-				/* SMP */
+				/* SMA */
 				"mph2bdamase" => [
 					'R' => "damase_v.2.ttf",
 				],
@@ -288,7 +288,7 @@ class FontVariables
 				],
 			],
 
-			// Add fonts to this array if they contain characters in the SIP or SMP Unicode planes
+			// Add fonts to this array if they contain characters in the SIP or SMA Unicode planes
 			// but you do not require them. This allows a more efficient form of subsetting to be used.
 			'BMPonly' => [
 				"dejavusanscondensed",

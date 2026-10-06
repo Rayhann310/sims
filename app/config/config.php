@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 // Deteksi Protocol (Bekerja untuk HTTP biasa, HTTPS, dan Reverse Proxy seperti Localtunnel/Ngrok)
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
@@ -26,4 +26,4 @@ define('BASEURL', $baseurl);
 define('DB_HOST', $_ENV['DB_HOST'] ?? 'localhost');
 define('DB_USER', $_ENV['DB_USER'] ?? 'root');
 define('DB_PASS', $_ENV['DB_PASS'] ?? '');
-define('DB_NAME', $_ENV['DB_NAME'] ?? 'db_SMPnw');
+define('DB_NAME', $_ENV['DB_NAME'] ?? 'db_SMAnw');

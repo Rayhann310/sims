@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -40,7 +40,7 @@
                 <span class="text-emerald-400">Akademik & PPDB</span>
             </h1>
             <p class="text-lg text-slate-300 leading-relaxed mb-10">
-                Kelola data sekolah dengan efisien, terpusat, dan modern. SMP Nahdlatul Wathan Jakarta kini hadir dengan layanan digital yang mempermudah proses akademik dan pendaftaran siswa baru.
+                Kelola data sekolah dengan efisien, terpusat, dan modern. SMA Nahdlatul Wathan Jakarta kini hadir dengan layanan digital yang mempermudah proses akademik dan pendaftaran siswa baru.
             </p>
             
             <div class="flex items-center gap-4">
@@ -113,7 +113,7 @@
                         </div>
                         <input type="password" id="password" name="password" required 
                                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all text-slate-900 placeholder-slate-400"
-                               placeholder="••••••••">
+                               placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
                     </div>
                 </div>
 

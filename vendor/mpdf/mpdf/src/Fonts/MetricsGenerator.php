@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf\Fonts;
 
@@ -48,7 +48,7 @@ class MetricsGenerator
 			'TTCfontID' => $TTCfontID,
 			'originalsize' => $ttfstat['size'] + 0, /* cast ? */
 			'sip' => ($ttf->sipset) ? true : false,
-			'smp' => ($ttf->smpset) ? true : false,
+			'SMA' => ($ttf->SMAset) ? true : false,
 			'BMPselected' => ($BMPonly) ? true : false,
 			'fontkey' => $fontkey,
 			'panose' => $this->getPanose($ttf),

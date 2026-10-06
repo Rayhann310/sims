@@ -1,6 +1,6 @@
-<?php
+﻿<?php
 $modeAbsen = $data['pengaturan']['mode_absen_siswa'] ?? 'Masuk Saja';
-$iSMPsukPulang = ($modeAbsen === 'Masuk & Pulang');
+$iSMAsukPulang = ($modeAbsen === 'Masuk & Pulang');
 $isPerMapel    = ($modeAbsen === 'Per Mata Pelajaran');
 ?>
 
@@ -15,8 +15,8 @@ $isPerMapel    = ($modeAbsen === 'Per Mata Pelajaran');
             <p class="text-sm text-slate-500 mt-1">
                 Catat kehadiran siswa per hari.
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold
-                    <?= $iSMPsukPulang ? 'bg-violet-100 text-violet-700' : ($isPerMapel ? 'bg-sky-100 text-sky-700' : 'bg-emerald-100 text-emerald-700') ?>">
-                    <i class="fas <?= $iSMPsukPulang ? 'fa-exchange-alt' : ($isPerMapel ? 'fa-chalkboard-teacher' : 'fa-sign-in-alt') ?>"></i>
+                    <?= $iSMAsukPulang ? 'bg-violet-100 text-violet-700' : ($isPerMapel ? 'bg-sky-100 text-sky-700' : 'bg-emerald-100 text-emerald-700') ?>">
+                    <i class="fas <?= $iSMAsukPulang ? 'fa-exchange-alt' : ($isPerMapel ? 'fa-chalkboard-teacher' : 'fa-sign-in-alt') ?>"></i>
                     <?= htmlspecialchars($modeAbsen) ?>
                 </span>
             </p>
@@ -67,7 +67,7 @@ $isPerMapel    = ($modeAbsen === 'Per Mata Pelajaran');
                 <input type="date" x-model="tanggal" @change="loadSiswa()"
                        class="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 text-sm">
             </div>
-            <?php if ($iSMPsukPulang): ?>
+            <?php if ($iSMAsukPulang): ?>
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">Tipe Absen</label>
                 <div class="flex gap-2">
@@ -241,7 +241,7 @@ $isPerMapel    = ($modeAbsen === 'Per Mata Pelajaran');
             <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h3 class="font-bold text-slate-800 text-lg">Scan QR Siswa</h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Mode opsional — arahkan QR ke kamera</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Mode opsional â€” arahkan QR ke kamera</p>
                 </div>
                 <button @click="closeScanModal()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors">
                     <i class="fas fa-times text-slate-500 text-sm"></i>
@@ -249,7 +249,7 @@ $isPerMapel    = ($modeAbsen === 'Per Mata Pelajaran');
             </div>
 
             <!-- Tipe toggle (jika Masuk & Pulang) -->
-            <?php if ($iSMPsukPulang): ?>
+            <?php if ($iSMAsukPulang): ?>
             <div class="px-6 pt-4 flex gap-3">
                 <button @click="scanTipe = 'masuk'"
                         :class="scanTipe === 'masuk' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'"

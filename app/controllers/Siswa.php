@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 class Siswa extends Controller {
     public function __construct()
@@ -98,10 +98,10 @@ class Siswa extends Controller {
         exit;
     }
 
-    public function hapuSMPsal()
+    public function hapuSMAsal()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ids']) && is_array($_POST['ids'])) {
-            $deleted = $this->model('SiswaModel')->hapuSMPsalDataSiswa($_POST['ids']);
+            $deleted = $this->model('SiswaModel')->hapuSMAsalDataSiswa($_POST['ids']);
             if($deleted > 0) {
                 $_SESSION['flash'] = ['pesan' => "$deleted data berhasil", 'aksi' => 'dihapus', 'tipe' => 'success'];
             } else {

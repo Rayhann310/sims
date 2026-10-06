@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Mpdf\Writer;
 
@@ -44,7 +44,7 @@ class FontWriter
 	{
 		foreach ($this->mpdf->FontFiles as $fontkey => $info) {
 			// TrueType embedded
-			if (isset($info['type']) && $info['type'] === 'TTF' && !$info['sip'] && !$info['smp']) {
+			if (isset($info['type']) && $info['type'] === 'TTF' && !$info['sip'] && !$info['SMA']) {
 				$used = true;
 				$asSubset = true;
 				foreach ($this->mpdf->fonts as $k => $f) {
@@ -150,7 +150,7 @@ class FontWriter
 				$this->writer->write('>>');
 				$this->writer->write('endobj');
 
-			} elseif ($type === 'TTF' && ($font['sip'] || $font['smp'])) {
+			} elseif ($type === 'TTF' && ($font['sip'] || $font['SMA'])) {
 
 				// TrueType embedded SUBSETS for SIP (CJK extB containing Supplementary Ideographic Plane 2)
 				// Or Unicode Plane 1 - Supplementary Multilingual Plane

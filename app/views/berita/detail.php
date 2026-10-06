@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $artikel = $data['artikel'];
 $terkait = $data['artikel_terkait'] ?? [];
 ?>
@@ -13,7 +13,7 @@ $terkait = $data['artikel_terkait'] ?? [];
         <!-- ============================== -->
         <article class="flex-1 min-w-0">
 
-            <!-- Breadcrumb — truncate on mobile -->
+            <!-- Breadcrumb â€” truncate on mobile -->
             <nav class="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 mb-5 overflow-hidden">
                 <a href="<?= BASEURL; ?>/" class="hover:text-emerald-700 transition-colors shrink-0">Beranda</a>
                 <i class="fas fa-chevron-right text-[9px] shrink-0"></i>
@@ -49,7 +49,7 @@ $terkait = $data['artikel_terkait'] ?? [];
                 <?= htmlspecialchars($artikel['judul']); ?>
             </h1>
 
-            <!-- Meta — wraps cleanly on mobile -->
+            <!-- Meta â€” wraps cleanly on mobile -->
             <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-slate-500 mb-5 pb-5 border-b border-slate-200">
                 <span class="flex items-center gap-2">
                     <span class="w-7 h-7 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xs font-bold shrink-0">
@@ -67,7 +67,7 @@ $terkait = $data['artikel_terkait'] ?? [];
                 </span>
             </div>
 
-            <!-- Cover Image — capped height on mobile -->
+            <!-- Cover Image â€” capped height on mobile -->
             <?php if (!empty($artikel['gambar_sampul'])): ?>
             <figure class="mb-6 rounded-xl sm:rounded-2xl overflow-hidden shadow-md">
                 <img src="<?= htmlspecialchars($artikel['gambar_sampul']); ?>"
@@ -190,7 +190,7 @@ $terkait = $data['artikel_terkait'] ?? [];
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-black text-base shrink-0">NW</div>
                     <div>
-                        <p class="font-bold text-sm leading-tight">SMP Nahdlatul Wathan</p>
+                        <p class="font-bold text-sm leading-tight">SMA Nahdlatul Wathan</p>
                         <p class="text-emerald-200 text-xs">Jakarta Timur</p>
                     </div>
                 </div>
@@ -207,7 +207,7 @@ $terkait = $data['artikel_terkait'] ?? [];
     </div>
 </div>
 
-<!-- Article body & prose styles — mobile-safe -->
+<!-- Article body & prose styles â€” mobile-safe -->
 <style>
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
