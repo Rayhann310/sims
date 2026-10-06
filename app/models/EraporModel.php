@@ -246,4 +246,99 @@ class EraporModel {
         return $this->db->single();
     }
 
+    // ============================================
+    // PENGATURAN E-RAPOR
+    // ============================================
+
+    public function getAllMapel()
+    {
+        $this->db->query("
+            SELECT m.*, km.nama_kelompok
+            FROM mata_pelajaran m
+            LEFT JOIN kelompok_mapel km ON m.kelompok_id = km.id
+            ORDER BY km.urutan ASC, m.urutan ASC, m.nama_mapel ASC
+        ");
+        return $this->db->resultSet();
+    }
+
+    public function updateMapelKKM($id, $kkm, $kelompok_id, $urutan)
+    {
+        $this->db->query("UPDATE mata_pelajaran SET kkm = :kkm, kelompok_id = :kelompok_id, urutan = :urutan WHERE id = :id");
+        $this->db->bind('kkm', $kkm);
+        $this->db->bind('kelompok_id', $kelompok_id ?: null);
+        $this->db->bind('urutan', $urutan);
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    // Kelompok Mapel
+    public function getAllKelompokMapel()
+    {
+        $this->db->query("SELECT * FROM kelompok_mapel ORDER BY urutan ASC");
+        return $this->db->resultSet();
+    }
+
+    public function saveKelompokMapel($nama, $urutan)
+    {
+        $this->db->query("INSERT INTO kelompok_mapel (nama_kelompok, urutan) VALUES (:nama, :urutan)");
+        $this->db->bind('nama', $nama);
+        $this->db->bind('urutan', $urutan);
+        $this->db->execute();
+        return $this->db->lastInsertId();
+    }
+
+    public function updateKelompokMapel($id, $nama, $urutan)
+    {
+        $this->db->query("UPDATE kelompok_mapel SET nama_kelompok = :nama, urutan = :urutan WHERE id = :id");
+        $this->db->bind('nama', $nama);
+        $this->db->bind('urutan', $urutan);
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function deleteKelompokMapel($id)
+    {
+        $this->db->query("DELETE FROM kelompok_mapel WHERE id = :id");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    // Master Ekskul
+    public function getAllMasterEkskul()
+    {
+        $this->db->query("SELECT * FROM master_ekskul ORDER BY nama_ekskul ASC");
+        return $this->db->resultSet();
+    }
+
+    public function saveMasterEkskul($nama, $pembina)
+    {
+        $this->db->query("INSERT INTO master_ekskul (nama_ekskul, pembina) VALUES (:nama, :pembina)");
+        $this->db->bind('nama', $nama);
+        $this->db->bind('pembina', $pembina);
+        $this->db->execute();
+        return $this->db->lastInsertId();
+    }
+
+    public function updateMasterEkskul($id, $nama, $pembina)
+    {
+        $this->db->query("UPDATE master_ekskul SET nama_ekskul = :nama, pembina = :pembina WHERE id = :id");
+        $this->db->bind('nama', $nama);
+        $this->db->bind('pembina', $pembina);
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
+    public function deleteMasterEkskul($id)
+    {
+        $this->db->query("DELETE FROM master_ekskul WHERE id = :id");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+        return $this->db->rowCount();
+    }
+
 }
+

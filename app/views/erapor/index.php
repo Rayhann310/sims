@@ -70,5 +70,16 @@
             <p class="text-sm text-slate-500">Cetak dokumen rapor lengkap dalam bentuk PDF.</p>
         </a>
         <?php endif; ?>
+
+        <?php if($_SESSION['user']['role'] === 'admin'): ?>
+        <!-- Card: Pengaturan E-Rapor (Admin Only) -->
+        <a href="<?= BASEURL; ?>/erapor/pengaturan" class="group bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:border-violet-500 hover:shadow-md transition-all duration-300">
+            <div class="w-12 h-12 bg-violet-50 text-violet-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <i class="fas fa-cogs text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Pengaturan E-Rapor</h3>
+            <p class="text-sm text-slate-500">Kelola kelompok mapel, KKM tiap mata pelajaran, dan daftar ekskul.</p>
+        </a>
+        <?php endif; ?>
     </div>
 </div>

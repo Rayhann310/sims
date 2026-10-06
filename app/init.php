@@ -18,4 +18,8 @@ require_once 'core/Controller.php';
 require_once 'core/Database.php';
 require_once 'core/HakAksesHelper.php';
 require_once 'core/Flasher.php';
+require_once 'core/SelfHealingMigrator.php';
 require_once 'config/config.php';
+
+// Auto-migrate: pastikan semua tabel & kolom E-Rapor tersedia
+(new SelfHealingMigrator())->run();

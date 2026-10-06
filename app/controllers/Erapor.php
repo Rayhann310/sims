@@ -29,6 +29,76 @@ class Erapor extends Controller {
     }
 
     // ============================================
+    // ADMIN: PENGATURAN E-RAPOR
+    // ============================================
+    public function pengaturan()
+    {
+        if($_SESSION['user']['role'] !== 'admin') {
+            header('Location: ' . BASEURL . '/erapor');
+            exit;
+        }
+
+        $model = $this->model('EraporModel');
+
+        // Handle POST actions
+        if($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $action = $_POST['action'] ?? '';
+
+            // --- Kelompok Mapel ---
+            if($action === 'save_kelompok') {
+                $id   = $_POST['id'] ?? null;
+                $nama = trim($_POST['nama_kelompok']);
+                $urutan = (int)($_POST['urutan'] ?? 99);
+                if($id) $model->updateKelompokMapel($id, $nama, $urutan);
+                else    $model->saveKelompokMapel($nama, $urutan);
+                echo json_encode(['status' => 'success']);
+                exit;
+            }
+            if($action === 'delete_kelompok') {
+                $model->deleteKelompokMapel($_POST['id']);
+                echo json_encode(['status' => 'success']);
+                exit;
+            }
+
+            // --- KKM Mapel ---
+            if($action === 'save_kkm') {
+                $id         = $_POST['mapel_id'];
+                $kkm        = (int)$_POST['kkm'];
+                $kelompok   = $_POST['kelompok_id'] ?: null;
+                $urutan     = (int)($_POST['urutan'] ?? 99);
+                $model->updateMapelKKM($id, $kkm, $kelompok, $urutan);
+                echo json_encode(['status' => 'success']);
+                exit;
+            }
+
+            // --- Master Ekskul ---
+            if($action === 'save_ekskul') {
+                $id      = $_POST['id'] ?? null;
+                $nama    = trim($_POST['nama_ekskul']);
+                $pembina = trim($_POST['pembina'] ?? '');
+                if($id) $model->updateMasterEkskul($id, $nama, $pembina);
+                else    $model->saveMasterEkskul($nama, $pembina);
+                echo json_encode(['status' => 'success']);
+                exit;
+            }
+            if($action === 'delete_ekskul') {
+                $model->deleteMasterEkskul($_POST['id']);
+                echo json_encode(['status' => 'success']);
+                exit;
+            }
+        }
+
+        $data['judul']          = 'Pengaturan E-Rapor';
+        $data['kelompok_list']  = $model->getAllKelompokMapel();
+        $data['mapel_list']     = $model->getAllMapel();
+        $data['ekskul_list']    = $model->getAllMasterEkskul();
+
+        $this->view('templates/admin_header', $data);
+        $this->view('erapor/pengaturan', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    // ============================================
     // GURU: INPUT NILAI RAPOR
     // ============================================
     public function inputNilai()
