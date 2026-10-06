@@ -12,6 +12,12 @@ class Erapor extends Controller {
         }
         
         $this->tahunAktif = $this->model('EraporModel')->getTahunAkademikAktif();
+
+        if(!$this->tahunAktif) {
+            $_SESSION['flash'] = ['pesan' => 'Belum ada data tahun akademik.', 'aksi' => 'Silakan tambahkan tahun akademik terlebih dahulu.', 'tipe' => 'error'];
+            header('Location: ' . BASEURL . '/dashboard');
+            exit;
+        }
     }
 
     public function index()
