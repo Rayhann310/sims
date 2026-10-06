@@ -7,6 +7,21 @@ class EraporModel {
     {
         $this->db = new Database();
     }
+    
+    public function getKepalaSekolahName()
+    {
+        $this->db->query("
+            SELECT u.nama_lengkap
+            FROM guru g
+            JOIN users u ON g.user_id = u.id
+            JOIN guru_jabatan gj ON gj.guru_id = g.id
+            JOIN jabatan j ON j.id = gj.jabatan_id
+            WHERE j.nama_jabatan LIKE '%Kepala Sekolah%'
+            LIMIT 1
+        ");
+        $res = $this->db->single();
+        return $res ? $res['nama_lengkap'] : null;
+    }
 
     public function getMapelByGuru($guru_id, $tahun_akademik_id)
     {

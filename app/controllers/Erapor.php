@@ -426,17 +426,8 @@ class Erapor extends Controller {
             $semester   = $tahun_obj ? $tahun_obj['semester'] : 'Ganjil';
 
             // --- Ambil Nama Kepala Sekolah dari jabatan ---
-            $this->db->query("
-                SELECT u.nama_lengkap
-                FROM guru g
-                JOIN users u ON g.user_id = u.id
-                JOIN guru_jabatan gj ON gj.guru_id = g.id
-                JOIN jabatan j ON j.id = gj.jabatan_id
-                WHERE j.nama_jabatan LIKE '%Kepala Sekolah%'
-                LIMIT 1
-            ");
-            $kepsek = $this->db->single();
-            $kepsek_name = $kepsek['nama_lengkap'] ?? ($pengaturan['nama_kepsek'] ?? 'Kepala Sekolah');
+            $kepsek_nama_db = $this->model('EraporModel')->getKepalaSekolahName();
+            $kepsek_name = $kepsek_nama_db ?? ($pengaturan['nama_kepsek'] ?? 'Kepala Sekolah');
 
             $cover_template   = realpath(__DIR__ . '/../views/erapor/pdf_cover.php');
             $rapor_template   = realpath(__DIR__ . '/../views/erapor/pdf_template.php');
