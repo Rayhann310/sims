@@ -322,6 +322,9 @@ class Erapor extends Controller {
         require_once __DIR__ . '/../../vendor/autoload.php';
         
         try {
+            $tmpDir = sys_get_temp_dir() . '/mpdf_tmp';
+            if (!is_dir($tmpDir)) { mkdir($tmpDir, 0777, true); }
+
             $mpdf = new \Mpdf\Mpdf([
                 'mode' => 'utf-8',
                 'format' => 'A4',
@@ -330,25 +333,25 @@ class Erapor extends Controller {
                 'margin_bottom' => 12,
                 'margin_left' => 10,
                 'margin_right' => 10,
-                'default_font_size' => 10
+                'default_font_size' => 10,
+                'tempDir' => $tmpDir,
             ]);
             
-            $html = "";
             $tahun_id = $data['selected_tahun'];
             $pengaturan = $data['pengaturan'];
             $tahun_obj = array_filter($data['tahun_list'], fn($t) => $t['id'] == $tahun_id);
             $tahun_obj = reset($tahun_obj);
             $tahun_name = $tahun_obj ? $tahun_obj['nama_tahun'] : 'Tahun Ajaran';
             $semester = $tahun_obj ? $tahun_obj['semester'] : 'Ganjil';
+
+            $pdf_template = realpath(__DIR__ . '/../views/erapor/pdf_template.php');
             
             foreach($data['siswa_data'] as $index => $siswa) {
-                // Get all data
                 $nilai_data = $this->model('EraporModel')->getNilaiKelompokBySiswa($siswa['id'], $tahun_id);
-                $absensi = $this->model('EraporModel')->getAbsensiRapor($siswa['id'], $tahun_id) ?: ['sakit'=>0,'izin'=>0,'alfa'=>0];
-                $catatan = $this->model('EraporModel')->getCatatanWali($siswa['id'], $tahun_id);
-                $ekskul = $this->model('EraporModel')->getEkskulSiswa($siswa['id'], $tahun_id);
+                $absensi   = $this->model('EraporModel')->getAbsensiRapor($siswa['id'], $tahun_id) ?: ['sakit'=>0,'izin'=>0,'alfa'=>0];
+                $catatan   = $this->model('EraporModel')->getCatatanWali($siswa['id'], $tahun_id);
+                $ekskul    = $this->model('EraporModel')->getEkskulSiswa($siswa['id'], $tahun_id);
                 
-                // average
                 $total = 0; $count = 0;
                 foreach($nilai_data as $kelompok) {
                     foreach($kelompok['mapel'] as $nm) {
@@ -357,45 +360,32 @@ class Erapor extends Controller {
                 }
                 $rata_rata = $count > 0 ? round($total/$count, 2) : 0;
                 
-                // Get walikelas name
-                $wali_name = "Wali Kelas";
-                if($siswa['wali_kelas_id']) {
+                $wali_name = 'Wali Kelas';
+                if(!empty($siswa['wali_kelas_id'])) {
                     $wali_guru = $this->model('EraporModel')->getGuruDetail($siswa['wali_kelas_id']);
                     $wali_name = $wali_guru['nama_lengkap'] ?? $wali_name;
                 }
 
-                // Render view to string (buffer)
                 ob_start();
-                extract([
-                    'siswa' => $siswa,
-                    'nilai_data' => $nilai_data,
-                    'absensi' => $absensi,
-                    'catatan' => $catatan,
-                    'ekskul' => $ekskul,
-                    'rata_rata' => $rata_rata,
-                    'tahun_name' => $tahun_name,
-                    'semester' => $semester,
-                    'pengaturan' => $pengaturan,
-                    'wali_name' => $wali_name
-                ]);
-                include '../app/views/erapor/pdf_template.php';
+                extract(compact('siswa','nilai_data','absensi','catatan','ekskul','rata_rata','tahun_name','semester','pengaturan','wali_name'));
+                include $pdf_template;
                 $content = ob_get_clean();
                 
                 $mpdf->WriteHTML($content);
-                
                 if($index < count($data['siswa_data']) - 1) {
                     $mpdf->AddPage();
                 }
             }
             
-            $filename = count($data['siswa_data']) > 1 
-                ? "Rapor_Kelas_{$data['siswa_data'][0]['nama_kelas']}_{$tahun_name}.pdf" 
-                : "Rapor_{$data['siswa_data'][0]['nama_lengkap']}_{$tahun_name}.pdf";
+            $filename = count($data['siswa_data']) > 1
+                ? 'Rapor_Kelas_' . ($data['siswa_data'][0]['nama_kelas'] ?? 'Kelas') . '_' . $tahun_name . '.pdf'
+                : 'Rapor_' . ($data['siswa_data'][0]['nama_lengkap'] ?? 'Siswa') . '_' . $tahun_name . '.pdf';
                 
             $mpdf->Output($filename, 'D');
             
-        } catch (\Mpdf\MpdfException $e) {
-            echo $e->getMessage();
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo '<pre>PDF Error: ' . htmlspecialchars($e->getMessage()) . ' in ' . $e->getFile() . ':' . $e->getLine() . '</pre>';
         }
     }
 }
