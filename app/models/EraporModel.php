@@ -279,4 +279,33 @@ class EraporModel {
         $this->db->query("SELECT * FROM pengaturan LIMIT 1");
         return $this->db->single();
     }
+
+    public function getEkskulSiswa($siswa_id, $tahun_id)
+    {
+        $this->db->query("SELECT * FROM nilai_ekskul WHERE siswa_id = :siswa_id AND tahun_akademik_id = :tahun_id");
+        $this->db->bind('siswa_id', $siswa_id);
+        $this->db->bind('tahun_id', $tahun_id);
+        return $this->db->resultSet();
+    }
+
+    public function saveEkskulSiswa($siswa_id, $tahun_id, $nama_ekskul, $nilai, $keterangan)
+    {
+        $this->db->query("
+            INSERT INTO nilai_ekskul (siswa_id, tahun_akademik_id, nama_ekskul, nilai, keterangan)
+            VALUES (:siswa_id, :tahun_id, :nama_ekskul, :nilai, :keterangan)
+        ");
+        $this->db->bind('siswa_id', $siswa_id);
+        $this->db->bind('tahun_id', $tahun_id);
+        $this->db->bind('nama_ekskul', $nama_ekskul);
+        $this->db->bind('nilai', $nilai);
+        $this->db->bind('keterangan', $keterangan);
+        $this->db->execute();
+    }
+
+    public function deleteEkskul($id)
+    {
+        $this->db->query("DELETE FROM nilai_ekskul WHERE id = :id");
+        $this->db->bind('id', $id);
+        $this->db->execute();
+    }
 }
