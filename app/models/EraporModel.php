@@ -27,11 +27,12 @@ class EraporModel {
     public function getSiswaByRombel($rombel_id)
     {
         $this->db->query("
-            SELECT s.* 
+            SELECT s.*, u.nama_lengkap 
             FROM siswa s
             JOIN anggota_rombel ar ON s.id = ar.siswa_id
+            JOIN users u ON s.user_id = u.id
             WHERE ar.rombel_id = :rombel_id
-            ORDER BY s.nama_lengkap ASC
+            ORDER BY u.nama_lengkap ASC
         ");
         $this->db->bind('rombel_id', $rombel_id);
         return $this->db->resultSet();
@@ -226,7 +227,7 @@ class EraporModel {
 
     public function getSiswaDetail($siswa_id)
     {
-        $this->db->query("SELECT s.*, r.nama_rombel as nama_kelas, r.id as id_kelas, r.wali_kelas_id FROM siswa s JOIN anggota_rombel ar ON s.id = ar.siswa_id JOIN rombel r ON ar.rombel_id = r.id WHERE s.id = :siswa_id LIMIT 1");
+        $this->db->query("SELECT s.*, u.nama_lengkap, r.nama_rombel as nama_kelas, r.id as id_kelas, r.wali_kelas_id FROM siswa s JOIN anggota_rombel ar ON s.id = ar.siswa_id JOIN rombel r ON ar.rombel_id = r.id JOIN users u ON s.user_id = u.id WHERE s.id = :siswa_id LIMIT 1");
         $this->db->bind('siswa_id', $siswa_id);
         return $this->db->single();
     }
