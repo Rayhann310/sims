@@ -114,8 +114,8 @@ class Erapor extends Controller {
         $guru = $this->model('EraporModel')->getGuruDetail($user_id);
         $guru_id = $guru['id'] ?? 0;
         
-        // Asumsi admin
-        if($_SESSION['user']['role'] === 'admin') {
+        // Jika Admin (Operator) tapi BUKAN guru, berikan fallback agar tetap jalan (atau admin bisa pilih guru)
+        if($_SESSION['user']['role'] === 'admin' && $guru_id === 0) {
             $guru_id = isset($_GET['guru_id']) ? $_GET['guru_id'] : 1; 
         }
 
