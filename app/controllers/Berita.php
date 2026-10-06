@@ -36,7 +36,7 @@ class Berita extends Controller {
             'is_featured' => (isset($_GET['filter']) && $_GET['filter'] === 'unggulan') ? '1' : '',
         ];
 
-        $data['judul']         = 'Berita & Artikel — SMA Nahdlatul Wathan Jakarta';
+        $data['judul']         = 'Berita & Artikel — SMP Nahdlatul Wathan Jakarta';
         $data['hide_navbar']   = false;
         $data['artikels']      = $artikelModel->getAllArtikel($filter);
         $data['kategori_list'] = $artikelModel->getAllKategori();
@@ -84,7 +84,7 @@ class Berita extends Controller {
             5
         );
 
-        $data['judul']          = htmlspecialchars($artikel['judul']) . ' — SMA NW Jakarta';
+        $data['judul']          = htmlspecialchars($artikel['judul']) . ' — SMP NW Jakarta';
         $data['hide_navbar']    = false;
         $data['artikel']        = $artikel;
         $data['artikel_terkait'] = $artikelTerkait;

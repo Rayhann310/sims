@@ -109,8 +109,8 @@
                 </div>
             </div>
 
-            <button type="button" id="btnHapusMasal" class="hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm items-center gap-2" onclick="submitHapusMasal()">
-                <i class="fas fa-trash"></i> Hapus (<span id="countHapusMasal">0</span>)
+            <button type="button" id="btnHapuSMPsal" class="hidden bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm items-center gap-2" onclick="submitHapuSMPsal()">
+                <i class="fas fa-trash"></i> Hapus (<span id="countHapuSMPsal">0</span>)
             </button>
             <button @click="showModal = true" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 shadow-sm shrink-0">
                 <i class="fas fa-plus"></i>
@@ -254,7 +254,7 @@
             </tbody>
         </table>
     </div>
-    <form id="formSubmitHapusMasal" action="<?= BASEURL; ?>/siswa/hapusMasal" method="POST" class="hidden"></form>
+    <form id="formSubmitHapuSMPsal" action="<?= BASEURL; ?>/siswa/hapuSMPsal" method="POST" class="hidden"></form>
     </div> <!-- End Table Container -->
 
     <!-- Charts Grid -->
@@ -900,7 +900,7 @@ document.addEventListener('change', function(e) {
         } else {
             selectedSiswaIds.delete(e.target.value);
         }
-        updateHapusMasalButton();
+        updateHapuSMPsalButton();
     }
     if(e.target && e.target.id === 'chk-all-siswa') {
         const checkboxes = document.querySelectorAll('.chk-siswa');
@@ -909,13 +909,13 @@ document.addEventListener('change', function(e) {
             if(e.target.checked) selectedSiswaIds.add(chk.value);
             else selectedSiswaIds.delete(chk.value);
         });
-        updateHapusMasalButton();
+        updateHapuSMPsalButton();
     }
 });
 
-function updateHapusMasalButton() {
-    const btn = document.getElementById('btnHapusMasal');
-    const countSpan = document.getElementById('countHapusMasal');
+function updateHapuSMPsalButton() {
+    const btn = document.getElementById('btnHapuSMPsal');
+    const countSpan = document.getElementById('countHapuSMPsal');
     if(selectedSiswaIds.size > 0) {
         btn.classList.remove('hidden');
         btn.classList.add('flex');
@@ -926,9 +926,9 @@ function updateHapusMasalButton() {
     }
 }
 
-function submitHapusMasal() {
+function submitHapuSMPsal() {
     if(confirm(`Yakin ingin menghapus ${selectedSiswaIds.size} siswa terpilih beserta seluruh data terkait?`)) {
-        const form = document.getElementById('formSubmitHapusMasal');
+        const form = document.getElementById('formSubmitHapuSMPsal');
         form.innerHTML = ''; // clear
         selectedSiswaIds.forEach(id => {
             const input = document.createElement('input');

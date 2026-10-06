@@ -118,12 +118,12 @@ class BankSoal extends Controller {
         }
     }
 
-    public function hapusMassal()
+    public function hapuSMPssal()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['selected_ids'])) {
             $ids = json_decode($_POST['selected_ids'], true);
             if(is_array($ids) && count($ids) > 0) {
-                $deleted = $this->model('BankSoalModel')->hapusMassalSoal($ids);
+                $deleted = $this->model('BankSoalModel')->hapuSMPssalSoal($ids);
                 Flasher::setFlash("$deleted Soal berhasil", 'dihapus secara massal', 'success');
             }
         }

@@ -138,7 +138,7 @@
                     <i class="fas fa-times"></i> Reset
                 </a>
                 <?php endif; ?>
-                <button type="button" onclick="submitHapusMassal()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ml-auto shadow-sm">
+                <button type="button" onclick="submitHapuSMPssal()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ml-auto shadow-sm">
                     <i class="fas fa-trash-alt"></i> Hapus Terpilih
                 </button>
             </div>
@@ -164,7 +164,7 @@
 
     <!-- Tabel -->
     <div class="overflow-x-auto">
-        <form id="formHapusMassal" action="<?= BASEURL; ?>/guru/hapus_massal" method="POST">
+        <form id="formHapuSMPssal" action="<?= BASEURL; ?>/guru/hapus_massal" method="POST">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-slate-50 text-slate-500 text-sm uppercase tracking-wider border-b border-slate-200">
@@ -895,14 +895,14 @@ function toggleSelectAll(source) {
     }
 }
 
-function submitHapusMassal() {
+function submitHapuSMPssal() {
     const checkboxes = document.querySelectorAll('.guru-checkbox:checked');
     if (checkboxes.length === 0) {
         alert('Pilih setidaknya satu data guru untuk dihapus.');
         return;
     }
     if (confirm('Apakah Anda yakin ingin menghapus ' + checkboxes.length + ' data guru yang dipilih secara permanen?')) {
-        document.getElementById('formHapusMassal').submit();
+        document.getElementById('formHapuSMPssal').submit();
     }
 }
 </script>

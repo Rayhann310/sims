@@ -166,7 +166,7 @@ class BankSoalModel {
         return $this->db->rowCount();
     }
 
-    public function hapusMassalSoal($ids)
+    public function hapuSMPssalSoal($ids)
     {
         if (empty($ids)) return 0;
         

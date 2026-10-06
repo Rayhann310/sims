@@ -34,7 +34,7 @@
                         </button>
                     </form>
                     
-                    <form action="<?= BASEURL; ?>/BankSoal/hapusMassal" method="POST" class="inline" @submit.prevent="if(confirm('Yakin ingin menghapus '+selectedIds.length+' soal terpilih?')) $el.submit()">
+                    <form action="<?= BASEURL; ?>/BankSoal/hapuSMPssal" method="POST" class="inline" @submit.prevent="if(confirm('Yakin ingin menghapus '+selectedIds.length+' soal terpilih?')) $el.submit()">
                         <input type="hidden" name="selected_ids" :value="JSON.stringify(selectedIds)">
                         <button type="submit" class="px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 text-sm font-bold rounded-lg transition-colors shadow-sm border border-red-200">
                             <i class="fas fa-trash-alt mr-1"></i> Hapus Massal

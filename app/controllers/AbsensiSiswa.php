@@ -123,26 +123,26 @@ class AbsensiSiswa extends Controller {
         $absensiRows = $db->resultSet();
 
         // Map status per siswa (masuk & pulang)
-        $statusMap = [];
+        $statuSMPp = [];
         foreach ($absensiRows as $row) {
             $sid = $row['siswa_id'];
-            if (!isset($statusMap[$sid])) {
-                $statusMap[$sid] = ['masuk' => null, 'pulang' => null, 'status' => null, 'waktu' => null];
+            if (!isset($statuSMPp[$sid])) {
+                $statuSMPp[$sid] = ['masuk' => null, 'pulang' => null, 'status' => null, 'waktu' => null];
             }
-            $statusMap[$sid][$row['tipe_absen']] = $row['status'];
+            $statuSMPp[$sid][$row['tipe_absen']] = $row['status'];
             if ($row['tipe_absen'] === 'masuk') {
-                $statusMap[$sid]['status'] = $row['status'];
-                $statusMap[$sid]['waktu']  = $row['waktu_scan'];
+                $statuSMPp[$sid]['status'] = $row['status'];
+                $statuSMPp[$sid]['waktu']  = $row['waktu_scan'];
             }
         }
 
         foreach ($siswaList as &$s) {
             $sid          = $s['id'];
-            $s['status']  = $statusMap[$sid]['status']  ?? null;
-            $s['waktu']   = $statusMap[$sid]['waktu']   ?? null;
-            $s['sudah_masuk']  = $statusMap[$sid]['masuk']  !== null;
-            $s['sudah_pulang'] = $statusMap[$sid]['pulang'] !== null;
-            $s['status_pulang'] = $statusMap[$sid]['pulang'] ?? null;
+            $s['status']  = $statuSMPp[$sid]['status']  ?? null;
+            $s['waktu']   = $statuSMPp[$sid]['waktu']   ?? null;
+            $s['sudah_masuk']  = $statuSMPp[$sid]['masuk']  !== null;
+            $s['sudah_pulang'] = $statuSMPp[$sid]['pulang'] !== null;
+            $s['status_pulang'] = $statuSMPp[$sid]['pulang'] ?? null;
         }
 
         echo json_encode(['status' => true, 'data' => $siswaList]);

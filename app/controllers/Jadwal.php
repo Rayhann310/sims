@@ -508,9 +508,9 @@ class Jadwal extends Controller {
                 require_once 'app/models/AkademikModel.php';
                 $akademikModel = new AkademikModel();
                 $kelas_list = $akademikModel->getAllKelas();
-                $kelasMap = [];
+                $kelaSMPp = [];
                 foreach($kelas_list as $k) {
-                    $kelasMap[$k['id']] = $k;
+                    $kelaSMPp[$k['id']] = $k;
                 }
 
                 $previewData = [];
@@ -536,8 +536,8 @@ class Jadwal extends Controller {
                     }
 
                     $nama_kelas = '-';
-                    if (isset($kelasMap[$kelas_id])) {
-                        $nama_kelas = $kelasMap[$kelas_id]['nama_kelas'] . ' (' . $kelasMap[$kelas_id]['tingkat'] . ' ' . $kelasMap[$kelas_id]['jurusan'] . ')';
+                    if (isset($kelaSMPp[$kelas_id])) {
+                        $nama_kelas = $kelaSMPp[$kelas_id]['nama_kelas'] . ' (' . $kelaSMPp[$kelas_id]['tingkat'] . ' ' . $kelaSMPp[$kelas_id]['jurusan'] . ')';
                     } else {
                         $is_valid = false;
                         $error_msg[] = 'Kelas ID tidak ditemukan';

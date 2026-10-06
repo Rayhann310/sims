@@ -121,7 +121,7 @@
                     <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
                         <p class="text-sm text-yellow-800 mb-2">Silakan transfer biaya pendaftaran formulir sebesar:</p>
                         <p class="text-2xl font-bold text-yellow-900">Rp <?= number_format($data['peserta']['harga_formulir'], 0, ',', '.'); ?></p>
-                        <p class="text-sm text-yellow-800 mt-2">Ke Rekening Bank BSI: <strong>1234567890</strong> a.n. SMA NW Jakarta</p>
+                        <p class="text-sm text-yellow-800 mt-2">Ke Rekening Bank BSI: <strong>1234567890</strong> a.n. SMP NW Jakarta</p>
                     </div>
 
                     <form action="<?= BASEURL; ?>/spmb/bayar" method="POST" enctype="multipart/form-data">

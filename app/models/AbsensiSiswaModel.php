@@ -168,14 +168,14 @@ class AbsensiSiswaModel {
         $existing = $this->db->resultSet();
 
         // Index by siswa_id
-        $statusMap = [];
+        $statuSMPp = [];
         foreach ($existing as $row) {
-            $statusMap[$row['siswa_id']] = $row['status'];
+            $statuSMPp[$row['siswa_id']] = $row['status'];
         }
 
         // Merge status ke daftar siswa
         foreach ($siswaList as &$s) {
-            $s['status'] = $statusMap[$s['id']] ?? null;
+            $s['status'] = $statuSMPp[$s['id']] ?? null;
         }
 
         return $siswaList;

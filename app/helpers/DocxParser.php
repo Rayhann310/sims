@@ -9,7 +9,7 @@ class DocxParser
     public function __construct($file)
     {
         $this->file = $file;
-        $this->uploadDir = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/smanw/public/uploads/soal/';
+        $this->uploadDir = rtrim($_SERVER['DOCUMENT_ROOT'], '/') . '/SMPnw/public/uploads/soal/';
         
         if (!is_dir($this->uploadDir)) {
             mkdir($this->uploadDir, 0755, true);

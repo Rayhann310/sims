@@ -13,7 +13,7 @@
                     </div>
                 <?php endif; ?>
                 <div>
-                    <h1 class="text-lg md:text-xl font-bold text-slate-800 leading-tight mt-2 md:mt-0">SMA NAHDLATUL WATHAN JAKARTA</h1>
+                    <h1 class="text-lg md:text-xl font-bold text-slate-800 leading-tight mt-2 md:mt-0">SMP NAHDLATUL WATHAN JAKARTA</h1>
                     <p class="text-emerald-700 font-semibold italic text-sm mt-1">Religius • Nasionalis • Berkualitas</p>
                 </div>
             </div>
@@ -40,7 +40,7 @@
 
                 <?php if(!empty($data['pengaturan']['brosur_spmb'])): ?>
                 <div class="mb-10">
-                    <a href="<?= $data['pengaturan']['brosur_spmb'] ?>" download="Brosur_PPDB_SMANW" class="inline-flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-transform transform hover:-translate-y-1">
+                    <a href="<?= $data['pengaturan']['brosur_spmb'] ?>" download="Brosur_PPDB_SMPNW" class="inline-flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-transform transform hover:-translate-y-1">
                         <i class="fas fa-file-download text-xl"></i> 
                         <span>Download Brosur PPDB</span>
                     </a>
@@ -96,10 +96,10 @@
                     <?php 
                     $hero_img = !empty($data['pengaturan']['gambar_hero_spmb']) ? $data['pengaturan']['gambar_hero_spmb'] : 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop'; 
                     ?>
-                    <img src="<?= $hero_img ?>" alt="Siswa SMA NW" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                    <img src="<?= $hero_img ?>" alt="Siswa SMP NW" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-[#004d33]/80 to-transparent"></div>
                     <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-sm">
-                        <p class="font-bold text-emerald-800 text-sm">SMA NAHDLATUL WATHAN JAKARTA</p>
+                        <p class="font-bold text-emerald-800 text-sm">SMP NAHDLATUL WATHAN JAKARTA</p>
                     </div>
                 </div>
 
@@ -224,7 +224,7 @@
                         </div>
                         <div>
                             <i class="fas fa-chalkboard-teacher text-3xl text-emerald-600 mb-2"></i>
-                            <p class="text-xs font-semibold text-slate-700">Smart Class</p>
+                            <p class="text-xs font-semibold text-slate-700">SMPrt Class</p>
                         </div>
                         <div>
                             <i class="fas fa-utensils text-3xl text-emerald-600 mb-2"></i>
@@ -459,7 +459,7 @@
                 <!-- CTA -->
                 <div class="text-center md:text-left bg-emerald-800/50 p-6 rounded-2xl border border-emerald-600 w-full md:w-1/3">
                     <h3 class="text-2xl font-black mb-2">DAFTAR SEKARANG!</h3>
-                    <p class="text-emerald-100 text-sm mb-6 leading-relaxed">Wujudkan masa depan terbaik bersama SMA Nahdlatul Wathan Jakarta</p>
+                    <p class="text-emerald-100 text-sm mb-6 leading-relaxed">Wujudkan masa depan terbaik bersama SMP Nahdlatul Wathan Jakarta</p>
                     
                     <?php if (!empty($data['gelombang_aktif'])): ?>
                         <a href="<?= BASEURL; ?>/spmb" class="inline-block w-full bg-amber-400 hover:bg-amber-500 text-[#004d33] font-bold py-3 px-6 rounded-xl text-center transition-colors shadow-lg">
@@ -486,7 +486,7 @@
                         </li>
                         <li class="flex items-center justify-center md:justify-start gap-3">
                             <i class="fab fa-instagram text-2xl text-emerald-400"></i>
-                            <span class="font-medium">sma.nwjakarta</span>
+                            <span class="font-medium">SMP.nwjakarta</span>
                         </li>
                     </ul>
                 </div>
@@ -507,7 +507,7 @@
         </div>
         
         <div class="text-center mt-8 text-sm text-slate-500 font-medium">
-            &copy; 2026 SMA Nahdlatul Wathan Jakarta. All rights reserved.
+            &copy; 2026 SMP Nahdlatul Wathan Jakarta. All rights reserved.
         </div>
     </div>
 </section>

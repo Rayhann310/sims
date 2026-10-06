@@ -258,7 +258,7 @@ class SiswaModel {
         return 0;
     }
 
-    public function hapusMasalDataSiswa($ids)
+    public function hapuSMPsalDataSiswa($ids)
     {
         if (empty($ids)) return 0;
 

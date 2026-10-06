@@ -1,11 +1,11 @@
 <?php
 /**
  * ONE-TIME MIGRATION RUNNER
- * Akses: /run_migration.php?token=SMANW_MIGRATE_2026
+ * Akses: /run_migration.php?token=SMPNW_MIGRATE_2026
  * HAPUS FILE INI setelah migration berhasil!
  */
 
-define('SECRET_TOKEN', 'SMANW_MIGRATE_2026');
+define('SECRET_TOKEN', 'SMPNW_MIGRATE_2026');
 
 if (!isset($_GET['token']) || $_GET['token'] !== SECRET_TOKEN) {
     http_response_code(403);

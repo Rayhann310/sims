@@ -12,7 +12,7 @@
                             S
                         </div>
                         <span class="font-bold text-xl text-white tracking-tight">
-                            SMA Nahdlatul Wathan Jakarta
+                            SMP Nahdlatul Wathan Jakarta
                         </span>
                     </div>
                     <p class="text-slate-400 leading-relaxed mb-6 max-w-md">
@@ -59,7 +59,7 @@
                         </li>
                         <li class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-secondary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            <span class="text-sm">info@smanwjakarta.sch.id</span>
+                            <span class="text-sm">info@SMPnwjakarta.sch.id</span>
                         </li>
                     </ul>
                 </div>
@@ -69,7 +69,7 @@
             <!-- Copyright -->
             <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
                 <p class="text-sm text-slate-500 mb-4 md:mb-0">
-                    &copy; <?= date('Y'); ?> SMA Nahdlatul Wathan Jakarta. All rights reserved.
+                    &copy; <?= date('Y'); ?> SMP Nahdlatul Wathan Jakarta. All rights reserved.
                 </p>
                 <div class="flex space-x-4 text-sm text-slate-500">
                     <a href="#" class="hover:text-white transition-colors">Kebijakan Privasi</a>

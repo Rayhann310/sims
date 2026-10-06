@@ -98,10 +98,10 @@ class Siswa extends Controller {
         exit;
     }
 
-    public function hapusMasal()
+    public function hapuSMPsal()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ids']) && is_array($_POST['ids'])) {
-            $deleted = $this->model('SiswaModel')->hapusMasalDataSiswa($_POST['ids']);
+            $deleted = $this->model('SiswaModel')->hapuSMPsalDataSiswa($_POST['ids']);
             if($deleted > 0) {
                 $_SESSION['flash'] = ['pesan' => "$deleted data berhasil", 'aksi' => 'dihapus', 'tipe' => 'success'];
             } else {

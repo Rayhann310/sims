@@ -6,7 +6,7 @@ try {
 } catch (Throwable $e) {
     $pengaturan = [];
 }
-$app_name = $pengaturan ? htmlspecialchars($pengaturan['nama_aplikasi']) : 'SMA NAHDLATUL WATHAN JAKARTA';
+$app_name = $pengaturan ? htmlspecialchars($pengaturan['nama_aplikasi']) : 'SMP NAHDLATUL WATHAN JAKARTA';
 $app_logo = (!empty($pengaturan['logo_sekolah'])) ? htmlspecialchars($pengaturan['logo_sekolah']) : BASEURL . '/img/logo.png';
 ?>
 <!DOCTYPE html>

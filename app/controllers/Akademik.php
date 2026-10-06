@@ -96,10 +96,10 @@ class Akademik extends Controller {
         }
     }
 
-    public function hapusMapel($id)
+    public function hapuSMPpel($id)
     {
         requireAccess('akademik_mapel');
-        if($this->model('AkademikModel')->hapusMapel($id) > 0) {
+        if($this->model('AkademikModel')->hapuSMPpel($id) > 0) {
             $_SESSION['flash'] = ['pesan' => 'berhasil', 'aksi' => 'dihapus', 'tipe' => 'success'];
         } else {
             $_SESSION['flash'] = ['pesan' => 'gagal', 'aksi' => 'dihapus', 'tipe' => 'danger'];

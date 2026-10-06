@@ -1,6 +1,6 @@
 <?php
 $modeAbsen = $data['pengaturan']['mode_absen_siswa'] ?? 'Masuk Saja';
-$isMasukPulang = ($modeAbsen === 'Masuk & Pulang');
+$iSMPsukPulang = ($modeAbsen === 'Masuk & Pulang');
 $isPerMapel    = ($modeAbsen === 'Per Mata Pelajaran');
 ?>
 
@@ -15,8 +15,8 @@ $isPerMapel    = ($modeAbsen === 'Per Mata Pelajaran');
             <p class="text-sm text-slate-500 mt-1">
                 Catat kehadiran siswa per hari.
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold
-                    <?= $isMasukPulang ? 'bg-violet-100 text-violet-700' : ($isPerMapel ? 'bg-sky-100 text-sky-700' : 'bg-emerald-100 text-emerald-700') ?>">
-                    <i class="fas <?= $isMasukPulang ? 'fa-exchange-alt' : ($isPerMapel ? 'fa-chalkboard-teacher' : 'fa-sign-in-alt') ?>"></i>
+                    <?= $iSMPsukPulang ? 'bg-violet-100 text-violet-700' : ($isPerMapel ? 'bg-sky-100 text-sky-700' : 'bg-emerald-100 text-emerald-700') ?>">
+                    <i class="fas <?= $iSMPsukPulang ? 'fa-exchange-alt' : ($isPerMapel ? 'fa-chalkboard-teacher' : 'fa-sign-in-alt') ?>"></i>
                     <?= htmlspecialchars($modeAbsen) ?>
                 </span>
             </p>
@@ -67,7 +67,7 @@ $isPerMapel    = ($modeAbsen === 'Per Mata Pelajaran');
                 <input type="date" x-model="tanggal" @change="loadSiswa()"
                        class="w-full px-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-slate-50 text-sm">
             </div>
-            <?php if ($isMasukPulang): ?>
+            <?php if ($iSMPsukPulang): ?>
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">Tipe Absen</label>
                 <div class="flex gap-2">
@@ -249,7 +249,7 @@ $isPerMapel    = ($modeAbsen === 'Per Mata Pelajaran');
             </div>
 
             <!-- Tipe toggle (jika Masuk & Pulang) -->
-            <?php if ($isMasukPulang): ?>
+            <?php if ($iSMPsukPulang): ?>
             <div class="px-6 pt-4 flex gap-3">
                 <button @click="scanTipe = 'masuk'"
                         :class="scanTipe === 'masuk' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500'"

@@ -193,7 +193,7 @@ function scannerKelasData() {
                 { 
                     fps: 10, 
                     qrbox: function(viewfinderWidth, viewfinderHeight) {
-                        var minEdgePercentage = 0.7; // 70% of the smallest edge
+                        var minEdgePercentage = 0.7; // 70% of the SMPllest edge
                         var minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
                         var qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
                         return { width: qrboxSize, height: qrboxSize };
