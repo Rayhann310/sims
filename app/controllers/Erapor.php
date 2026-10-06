@@ -249,9 +249,11 @@ class Erapor extends Controller {
     public function rekapNilai()
     {
         $rombel_id = $this->checkWalikelas();
-        if(!$rombel_id && $_SESSION['user']['role'] === 'admin') {
+        if($_SESSION['user']['role'] === 'admin') {
             $data['rombel_list'] = $this->model('EraporModel')->getAllRombel();
-            $rombel_id = $_GET['rombel_id'] ?? null;
+            if(!$rombel_id) {
+                $rombel_id = $_GET['rombel_id'] ?? null;
+            }
         }
 
         $data['judul'] = 'Rekap Nilai Kelas';
