@@ -3,7 +3,7 @@
 class Home extends Controller {
     public function index()
     {
-        $data['judul'] = 'Beranda SMA Nahdlatul Wathan Jakarta';
+        $data['judul'] = 'Beranda SMP Nahdlatul Wathan Jakarta';
         $spmbModel = $this->model('SpmbModel');
         
         try {
@@ -60,3 +60,4 @@ class Home extends Controller {
         $this->view('templates/footer');
     }
 }
+

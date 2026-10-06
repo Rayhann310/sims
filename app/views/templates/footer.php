@@ -12,7 +12,7 @@
                             S
                         </div>
                         <span class="font-bold text-xl text-white tracking-tight">
-                            SMA Nahdlatul Wathan Jakarta
+                            SMP Nahdlatul Wathan Jakarta
                         </span>
                     </div>
                     <p class="text-slate-400 leading-relaxed mb-6 max-w-md">
@@ -69,7 +69,7 @@
             <!-- Copyright -->
             <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
                 <p class="text-sm text-slate-500 mb-4 md:mb-0">
-                    &copy; <?= date('Y'); ?> SMA Nahdlatul Wathan Jakarta. All rights reserved.
+                    &copy; <?= date('Y'); ?> SMP Nahdlatul Wathan Jakarta. All rights reserved.
                 </p>
                 <div class="flex space-x-4 text-sm text-slate-500">
                     <a href="#" class="hover:text-white transition-colors">Kebijakan Privasi</a>
@@ -81,3 +81,4 @@
 
 </body>
 </html>
+

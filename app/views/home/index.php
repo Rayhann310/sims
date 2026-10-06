@@ -13,8 +13,8 @@
                     </div>
                 <?php endif; ?>
                 <div>
-                    <h1 class="text-lg md:text-xl font-bold text-slate-800 leading-tight mt-2 md:mt-0">SMA NAHDLATUL WATHAN JAKARTA</h1>
-                    <p class="text-emerald-700 font-semibold italic text-sm mt-1">Religius â€¢ Nasionalis â€¢ Berkualitas</p>
+                    <h1 class="text-lg md:text-xl font-bold text-slate-800 leading-tight mt-2 md:mt-0">SMP NAHDLATUL WATHAN JAKARTA</h1>
+                    <p class="text-emerald-700 font-semibold italic text-sm mt-1">Berakhlak Mulia â€¢ Gotong Royong â€¢ Kreatif â€¢ Mandiri</p>
                 </div>
             </div>
             <div class="flex w-full md:w-auto gap-4 mt-6 md:mt-0">
@@ -99,7 +99,7 @@
                     <img src="<?= $hero_img ?>" alt="Siswa SMA NW" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-[#004d33]/80 to-transparent"></div>
                     <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-sm">
-                        <p class="font-bold text-emerald-800 text-sm">SMA NAHDLATUL WATHAN JAKARTA</p>
+                        <p class="font-bold text-emerald-800 text-sm">SMP NAHDLATUL WATHAN JAKARTA</p>
                     </div>
                 </div>
 
@@ -459,7 +459,7 @@
                 <!-- CTA -->
                 <div class="text-center md:text-left bg-emerald-800/50 p-6 rounded-2xl border border-emerald-600 w-full md:w-1/3">
                     <h3 class="text-2xl font-black mb-2">DAFTAR SEKARANG!</h3>
-                    <p class="text-emerald-100 text-sm mb-6 leading-relaxed">Wujudkan masa depan terbaik bersama SMA Nahdlatul Wathan Jakarta</p>
+                    <p class="text-emerald-100 text-sm mb-6 leading-relaxed">Wujudkan masa depan terbaik bersama SMP NAHDLATUL WATHAN JAKARTA</p>
                     
                     <?php if (!empty($data['gelombang_aktif'])): ?>
                         <a href="<?= BASEURL; ?>/spmb" class="inline-block w-full bg-amber-400 hover:bg-amber-500 text-[#004d33] font-bold py-3 px-6 rounded-xl text-center transition-colors shadow-lg">
@@ -507,7 +507,7 @@
         </div>
         
         <div class="text-center mt-8 text-sm text-slate-500 font-medium">
-            &copy; 2026 SMA Nahdlatul Wathan Jakarta. All rights reserved.
+            &copy; 2026 SMP NAHDLATUL WATHAN JAKARTA. All rights reserved.
         </div>
     </div>
 </section>
@@ -532,3 +532,4 @@ function showBiayaTab(tabId, button) {
     button.classList.add('bg-emerald-100', 'text-emerald-800');
 }
 </script>
+

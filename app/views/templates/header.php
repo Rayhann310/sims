@@ -59,7 +59,7 @@ $app_logo = (!empty($pengaturan['logo_sekolah'])) ? htmlspecialchars($pengaturan
                     <img src="<?= $app_logo ?>" alt="Logo" class="w-12 h-12 object-contain bg-white rounded-full p-1" onerror="this.src='https://ui-avatars.com/api/?name=NW&background=fff&color=064e3b'">
                     <div>
                         <h1 class="text-white font-bold text-lg tracking-wide leading-tight"><?= $app_name ?></h1>
-                        <p class="text-accent text-xs font-medium tracking-wide">Religius â€¢ Nasionalis â€¢ Berkualitas</p>
+                        <p class="text-accent text-xs font-medium tracking-wide">Berakhlak Mulia â€¢ Gotong Royong â€¢ Kreatif â€¢ Mandiri</p>
                     </div>
                 </div>
 
@@ -105,3 +105,4 @@ $app_logo = (!empty($pengaturan['logo_sekolah'])) ? htmlspecialchars($pengaturan
     <?php endif; ?>
 
     <main class="flex-grow">
+
