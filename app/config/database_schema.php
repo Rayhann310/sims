@@ -1130,5 +1130,124 @@ return array (
       'tag_id' => 'INT(11) NOT NULL',
     ),
   ),
+  'kelompok_mapel' =>
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `kelompok_mapel` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `nama_kelompok` varchar(150) NOT NULL,
+      `urutan` int(11) DEFAULT 1,
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' =>
+    array (
+      'id' => 'int(11) NOT NULL AUTO_INCREMENT',
+      'nama_kelompok' => 'varchar(150) NOT NULL',
+      'urutan' => 'int(11) DEFAULT 1',
+    ),
+  ),
+  'nilai_rapor' =>
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `nilai_rapor` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `siswa_id` int(11) NOT NULL,
+      `mapel_id` int(11) NOT NULL,
+      `guru_id` int(11) DEFAULT NULL,
+      `tahun_akademik_id` int(11) NOT NULL,
+      `nilai` decimal(5,2) DEFAULT NULL,
+      `sikap` enum(\'A\',\'B\',\'C\',\'D\',\'E\') DEFAULT NULL,
+      `validasi` tinyint(1) DEFAULT 0,
+      `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+      `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `unique_nilai_rapor` (`siswa_id`,`mapel_id`,`tahun_akademik_id`),
+      KEY `siswa_id` (`siswa_id`),
+      KEY `mapel_id` (`mapel_id`),
+      KEY `tahun_akademik_id` (`tahun_akademik_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' =>
+    array (
+      'id' => 'int(11) NOT NULL AUTO_INCREMENT',
+      'siswa_id' => 'int(11) NOT NULL',
+      'mapel_id' => 'int(11) NOT NULL',
+      'guru_id' => 'int(11) DEFAULT NULL',
+      'tahun_akademik_id' => 'int(11) NOT NULL',
+      'nilai' => 'decimal(5,2) DEFAULT NULL',
+      'sikap' => 'enum(\'A\',\'B\',\'C\',\'D\',\'E\') DEFAULT NULL',
+      'validasi' => 'tinyint(1) DEFAULT 0',
+      'created_at' => 'timestamp NOT NULL DEFAULT current_timestamp()',
+      'updated_at' => 'timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()',
+    ),
+  ),
+  'nilai_ekskul' =>
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `nilai_ekskul` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `siswa_id` int(11) NOT NULL,
+      `tahun_akademik_id` int(11) NOT NULL,
+      `nama_ekskul` varchar(150) NOT NULL,
+      `nilai` varchar(50) DEFAULT NULL,
+      `keterangan` varchar(255) DEFAULT NULL,
+      PRIMARY KEY (`id`),
+      KEY `siswa_id` (`siswa_id`),
+      KEY `tahun_akademik_id` (`tahun_akademik_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' =>
+    array (
+      'id' => 'int(11) NOT NULL AUTO_INCREMENT',
+      'siswa_id' => 'int(11) NOT NULL',
+      'tahun_akademik_id' => 'int(11) NOT NULL',
+      'nama_ekskul' => 'varchar(150) NOT NULL',
+      'nilai' => 'varchar(50) DEFAULT NULL',
+      'keterangan' => 'varchar(255) DEFAULT NULL',
+    ),
+  ),
+  'absensi_rapor' =>
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `absensi_rapor` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `siswa_id` int(11) NOT NULL,
+      `tahun_akademik_id` int(11) NOT NULL,
+      `sakit` int(11) DEFAULT 0,
+      `izin` int(11) DEFAULT 0,
+      `alfa` int(11) DEFAULT 0,
+      `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `unique_absensi_rapor` (`siswa_id`,`tahun_akademik_id`),
+      KEY `siswa_id` (`siswa_id`),
+      KEY `tahun_akademik_id` (`tahun_akademik_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' =>
+    array (
+      'id' => 'int(11) NOT NULL AUTO_INCREMENT',
+      'siswa_id' => 'int(11) NOT NULL',
+      'tahun_akademik_id' => 'int(11) NOT NULL',
+      'sakit' => 'int(11) DEFAULT 0',
+      'izin' => 'int(11) DEFAULT 0',
+      'alfa' => 'int(11) DEFAULT 0',
+      'updated_at' => 'timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()',
+    ),
+  ),
+  'catatan_wali' =>
+  array (
+    'create_sql' => 'CREATE TABLE IF NOT EXISTS `catatan_wali` (
+      `id` int(11) NOT NULL AUTO_INCREMENT,
+      `siswa_id` int(11) NOT NULL,
+      `tahun_akademik_id` int(11) NOT NULL,
+      `catatan` text DEFAULT NULL,
+      `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `unique_catatan_wali` (`siswa_id`,`tahun_akademik_id`),
+      KEY `siswa_id` (`siswa_id`),
+      KEY `tahun_akademik_id` (`tahun_akademik_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4',
+    'columns' =>
+    array (
+      'id' => 'int(11) NOT NULL AUTO_INCREMENT',
+      'siswa_id' => 'int(11) NOT NULL',
+      'tahun_akademik_id' => 'int(11) NOT NULL',
+      'catatan' => 'text DEFAULT NULL',
+      'updated_at' => 'timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()',
+    ),
+  ),
 );
 

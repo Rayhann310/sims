@@ -156,6 +156,46 @@ class UserModel {
                 }
             } catch (Exception $e) { error_log("Self-healing tipe_absen: " . $e->getMessage()); }
 
+            // SELF-HEALING: Menu Hak Akses E-Rapor
+            try {
+                $menus = [
+                    ['erapor_input_nilai', 'Input Nilai Rapor', 1, 1],
+                    ['erapor_ekskul', 'Input Ekskul', 1, 1],
+                    ['erapor_cetak', 'Cetak Rapor', 1, 1],
+                    ['erapor', 'Menu E-Rapor (Global)', 1, 1]
+                ];
+                foreach ($menus as $m) {
+                    $this->db->query("INSERT IGNORE INTO hak_akses_menu (menu_key, nama_menu, jabatan_id, is_active) VALUES (:key, :nama, :jabatan, :aktif)");
+                    $this->db->bind('key', $m[0]);
+                    $this->db->bind('nama', $m[1]);
+                    $this->db->bind('jabatan', $m[2]);
+                    $this->db->bind('aktif', $m[3]);
+                    $this->db->execute();
+                }
+            } catch (Exception $e) { error_log("Self-healing hak akses erapor: " . $e->getMessage()); }
+
+            // SELF-HEALING: Seed Kelompok Mapel E-Rapor
+            try {
+                $this->db->query("SELECT COUNT(*) as count FROM kelompok_mapel");
+                $this->db->execute();
+                $countKelompok = $this->db->single()['count'];
+                if ($countKelompok == 0) {
+                    $kelompok_default = [
+                        [1, 'Kelompok A (Wajib)', 1],
+                        [2, 'Kelompok B (Wajib)', 2],
+                        [3, 'Kelompok C (Peminatan)', 3],
+                        [4, 'Lintas Minat', 4]
+                    ];
+                    foreach ($kelompok_default as $k) {
+                        $this->db->query("INSERT INTO kelompok_mapel (id, nama_kelompok, urutan) VALUES (:id, :nama, :urutan)");
+                        $this->db->bind('id', $k[0]);
+                        $this->db->bind('nama', $k[1]);
+                        $this->db->bind('urutan', $k[2]);
+                        $this->db->execute();
+                    }
+                }
+            } catch (Exception $e) { error_log("Self-healing kelompok_mapel: " . $e->getMessage()); }
+
         } catch (Exception $e) {
             error_log("Self-healing encountered a critical error: " . $e->getMessage());
         }
