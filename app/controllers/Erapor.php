@@ -350,11 +350,22 @@ class Erapor extends Controller {
     // ============================================
     public function cetak()
     {
-        $data['judul'] = 'Cetak Rapor';
-        $data['rombel_list'] = $this->model('EraporModel')->getAllRombel();
-        $data['tahun_list'] = $this->model('EraporModel')->getAllTahunAkademik();
+        $rombel_id = $this->checkWalikelas();
         
-        $data['selected_rombel'] = $_GET['rombel'] ?? null;
+        $data['judul'] = 'Cetak Rapor';
+        
+        if($_SESSION['user']['role'] === 'admin') {
+            $data['rombel_list'] = $this->model('EraporModel')->getAllRombel();
+            $data['selected_rombel'] = $_GET['rombel'] ?? null;
+        } else {
+            // Jika Walas, paksa rombel_id nya sesuai dengan rombel yang diawasi
+            $data['rombel_list'] = array_filter($this->model('EraporModel')->getAllRombel(), function($r) use ($rombel_id) {
+                return $r['id'] == $rombel_id;
+            });
+            $data['selected_rombel'] = $rombel_id;
+        }
+        
+        $data['tahun_list'] = $this->model('EraporModel')->getAllTahunAkademik();
         $data['selected_tahun'] = $_GET['tahun'] ?? $this->tahunAktif['id'];
         $data['selected_siswa'] = $_GET['siswa'] ?? null;
         $data['type'] = $_GET['type'] ?? 'preview';
