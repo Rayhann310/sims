@@ -136,40 +136,6 @@ class EraporModel {
         return $this->db->rowCount();
     }
 
-    public function getRombelWaliKelas($guru_id, $tahun_id)
-    {
-        $this->db->query("SELECT * FROM rombel WHERE wali_kelas_id = :guru_id AND tahun_akademik_id = :tahun_id LIMIT 1");
-        $this->db->bind('guru_id', $guru_id);
-        $this->db->bind('tahun_id', $tahun_id);
-        return $this->db->single();
-    }
-
-    public function getAbsensiRapor($siswa_id, $tahun_id)
-    {
-        $this->db->query("SELECT * FROM absensi_rapor WHERE siswa_id = :siswa_id AND tahun_akademik_id = :tahun_id LIMIT 1");
-        $this->db->bind('siswa_id', $siswa_id);
-        $this->db->bind('tahun_id', $tahun_id);
-        return $this->db->single();
-    }
-
-    public function saveAbsensiRapor($siswa_id, $tahun_id, $sakit, $izin, $alfa)
-    {
-        $this->db->query("
-            INSERT INTO absensi_rapor (siswa_id, tahun_akademik_id, sakit, izin, alfa)
-            VALUES (:siswa_id, :tahun_id, :sakit, :izin, :alfa)
-            ON DUPLICATE KEY UPDATE
-                sakit = :sakit_upd, izin = :izin_upd, alfa = :alfa_upd
-        ");
-        $this->db->bind('siswa_id', $siswa_id);
-        $this->db->bind('tahun_id', $tahun_id);
-        $this->db->bind('sakit', $sakit);
-        $this->db->bind('izin', $izin);
-        $this->db->bind('alfa', $alfa);
-        $this->db->bind('sakit_upd', $sakit);
-        $this->db->bind('izin_upd', $izin);
-        $this->db->bind('alfa_upd', $alfa);
-        $this->db->execute();
-    }
 
     public function getCatatanWali($siswa_id, $tahun_id)
     {
@@ -280,32 +246,4 @@ class EraporModel {
         return $this->db->single();
     }
 
-    public function getEkskulSiswa($siswa_id, $tahun_id)
-    {
-        $this->db->query("SELECT * FROM nilai_ekskul WHERE siswa_id = :siswa_id AND tahun_akademik_id = :tahun_id");
-        $this->db->bind('siswa_id', $siswa_id);
-        $this->db->bind('tahun_id', $tahun_id);
-        return $this->db->resultSet();
-    }
-
-    public function saveEkskulSiswa($siswa_id, $tahun_id, $nama_ekskul, $nilai, $keterangan)
-    {
-        $this->db->query("
-            INSERT INTO nilai_ekskul (siswa_id, tahun_akademik_id, nama_ekskul, nilai, keterangan)
-            VALUES (:siswa_id, :tahun_id, :nama_ekskul, :nilai, :keterangan)
-        ");
-        $this->db->bind('siswa_id', $siswa_id);
-        $this->db->bind('tahun_id', $tahun_id);
-        $this->db->bind('nama_ekskul', $nama_ekskul);
-        $this->db->bind('nilai', $nilai);
-        $this->db->bind('keterangan', $keterangan);
-        $this->db->execute();
-    }
-
-    public function deleteEkskul($id)
-    {
-        $this->db->query("DELETE FROM nilai_ekskul WHERE id = :id");
-        $this->db->bind('id', $id);
-        $this->db->execute();
-    }
 }
