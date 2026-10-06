@@ -399,28 +399,59 @@ class Erapor extends Controller {
                 'mode' => 'utf-8',
                 'format' => 'A4',
                 'orientation' => 'P',
-                'margin_top' => 12,
-                'margin_bottom' => 12,
-                'margin_left' => 10,
-                'margin_right' => 10,
+                'margin_top'    => 0,
+                'margin_bottom' => 0,
+                'margin_left'   => 0,
+                'margin_right'  => 0,
                 'default_font_size' => 10,
                 'tempDir' => $tmpDir,
             ]);
             
-            $tahun_id = $data['selected_tahun'];
+            $tahun_id   = $data['selected_tahun'];
             $pengaturan = $data['pengaturan'];
-            $tahun_obj = array_filter($data['tahun_list'], fn($t) => $t['id'] == $tahun_id);
-            $tahun_obj = reset($tahun_obj);
+            $tahun_obj  = array_filter($data['tahun_list'], fn($t) => $t['id'] == $tahun_id);
+            $tahun_obj  = reset($tahun_obj);
             $tahun_name = $tahun_obj ? $tahun_obj['nama_tahun'] : 'Tahun Ajaran';
-            $semester = $tahun_obj ? $tahun_obj['semester'] : 'Ganjil';
+            $semester   = $tahun_obj ? $tahun_obj['semester'] : 'Ganjil';
 
-            $pdf_template = realpath(__DIR__ . '/../views/erapor/pdf_template.php');
+            // --- Ambil Nama Kepala Sekolah dari jabatan ---
+            $this->db->query("
+                SELECT u.nama_lengkap
+                FROM guru g
+                JOIN users u ON g.user_id = u.id
+                JOIN guru_jabatan gj ON gj.guru_id = g.id
+                JOIN jabatan j ON j.id = gj.jabatan_id
+                WHERE j.nama_jabatan LIKE '%Kepala Sekolah%'
+                LIMIT 1
+            ");
+            $kepsek = $this->db->single();
+            $kepsek_name = $kepsek['nama_lengkap'] ?? ($pengaturan['nama_kepsek'] ?? 'Kepala Sekolah');
+
+            $cover_template   = realpath(__DIR__ . '/../views/erapor/pdf_cover.php');
+            $rapor_template   = realpath(__DIR__ . '/../views/erapor/pdf_template.php');
+
+            // Margin untuk halaman rapor (bukan cover)
+            $raporMargin = ['top' => 12, 'bottom' => 12, 'left' => 10, 'right' => 10];
+            
+            $total_siswa = count($data['siswa_data']);
             
             foreach($data['siswa_data'] as $index => $siswa) {
+                // -------- COVER --------
+                ob_start();
+                extract(compact('siswa','pengaturan','tahun_name','semester'));
+                include $cover_template;
+                $cover_html = ob_get_clean();
+
+                $mpdf->SetMargins(0, 0, 0);
+                $mpdf->SetHTMLFooter('');
+                $mpdf->WriteHTML($cover_html);
+                $mpdf->AddPage();
+
+                // -------- RAPOR --------
                 $nilai_data = $this->model('EraporModel')->getNilaiKelompokBySiswa($siswa['id'], $tahun_id);
-                $absensi   = $this->model('EraporModel')->getAbsensiRapor($siswa['id'], $tahun_id) ?: ['sakit'=>0,'izin'=>0,'alfa'=>0];
-                $catatan   = $this->model('EraporModel')->getCatatanWali($siswa['id'], $tahun_id);
-                $ekskul    = $this->model('EraporModel')->getEkskulSiswa($siswa['id'], $tahun_id);
+                $absensi    = $this->model('EraporModel')->getAbsensiRapor($siswa['id'], $tahun_id) ?: ['sakit'=>0,'izin'=>0,'alfa'=>0];
+                $catatan    = $this->model('EraporModel')->getCatatanWali($siswa['id'], $tahun_id);
+                $ekskul     = $this->model('EraporModel')->getEkskulSiswa($siswa['id'], $tahun_id);
                 
                 $total = 0; $count = 0;
                 foreach($nilai_data as $kelompok) {
@@ -437,17 +468,21 @@ class Erapor extends Controller {
                 }
 
                 ob_start();
-                extract(compact('siswa','nilai_data','absensi','catatan','ekskul','rata_rata','tahun_name','semester','pengaturan','wali_name'));
-                include $pdf_template;
+                extract(compact('siswa','nilai_data','absensi','catatan','ekskul','rata_rata','tahun_name','semester','pengaturan','wali_name','kepsek_name'));
+                include $rapor_template;
                 $content = ob_get_clean();
                 
+                // Set margin normal untuk halaman rapor
+                $mpdf->SetMargins($raporMargin['left'], $raporMargin['right'], $raporMargin['top']);
                 $mpdf->WriteHTML($content);
-                if($index < count($data['siswa_data']) - 1) {
+                
+                // Jika masih ada siswa berikutnya, tambah halaman baru
+                if ($index < $total_siswa - 1) {
                     $mpdf->AddPage();
                 }
             }
             
-            $filename = count($data['siswa_data']) > 1
+            $filename = $total_siswa > 1
                 ? 'Rapor_Kelas_' . ($data['siswa_data'][0]['nama_kelas'] ?? 'Kelas') . '_' . $tahun_name . '.pdf'
                 : 'Rapor_' . ($data['siswa_data'][0]['nama_lengkap'] ?? 'Siswa') . '_' . $tahun_name . '.pdf';
                 
@@ -457,5 +492,11 @@ class Erapor extends Controller {
             http_response_code(500);
             echo '<pre>PDF Error: ' . htmlspecialchars($e->getMessage()) . ' in ' . $e->getFile() . ':' . $e->getLine() . '</pre>';
         }
+    }
+
+    private function getDb()
+    {
+        if(!$this->db) $this->db = new Database();
+        return $this->db;
     }
 }

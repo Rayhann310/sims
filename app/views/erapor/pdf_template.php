@@ -186,10 +186,11 @@
             .................., <?= date('d F Y') ?><br>
             Kepala Sekolah
             <br><br><br><br><br>
-            <b><u>Kepala Sekolah</u></b>
+            <b><u><?= $kepsek_name ?? 'Kepala Sekolah' ?></u></b>
         </div>
         <div class="clearfix"></div>
     </div>
+
 
 </body>
 </html>
