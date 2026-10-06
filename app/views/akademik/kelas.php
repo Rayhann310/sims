@@ -92,9 +92,9 @@
                         <div>
                             <label for="tingkat" class="block text-sm font-medium text-slate-700 mb-1">Tingkat</label>
                             <select name="tingkat" id="tingkat" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white" required>
-                                <option value="10">10 (Kelas X)</option>
-                                <option value="11">11 (Kelas XI)</option>
-                                <option value="12">12 (Kelas XII)</option>
+                                <option value="7">7 (Kelas VII)</option>
+                                <option value="8">8 (Kelas VIII)</option>
+                                <option value="9">9 (Kelas IX)</option>
                             </select>
                         </div>
                         <div>
@@ -145,9 +145,9 @@
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Tingkat</label>
                             <select name="tingkat" x-model="formData.tingkat" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white" required>
-                                <option value="10">10 (Kelas X)</option>
-                                <option value="11">11 (Kelas XI)</option>
-                                <option value="12">12 (Kelas XII)</option>
+                                <option value="7">7 (Kelas VII)</option>
+                                <option value="8">8 (Kelas VIII)</option>
+                                <option value="9">9 (Kelas IX)</option>
                             </select>
                         </div>
                         <div>
@@ -170,4 +170,5 @@
         </div>
     </div>
 </div>
+
 
