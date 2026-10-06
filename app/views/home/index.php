@@ -14,7 +14,7 @@
                 <?php endif; ?>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold text-slate-800 leading-tight mt-2 md:mt-0">SMP NAHDLATUL WATHAN JAKARTA</h1>
-                    <p class="text-emerald-700 font-semibold italic text-sm mt-1">Religius • Nasionalis • Berkualitas</p>
+                    <p class="text-emerald-700 font-semibold italic text-sm mt-1">Berakhlak mulia, gotong royong, Kreatif, Mandiri</p>
                 </div>
             </div>
             <div class="flex w-full md:w-auto gap-4 mt-6 md:mt-0">
