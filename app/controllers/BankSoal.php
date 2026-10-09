@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory as WordIOFactory;

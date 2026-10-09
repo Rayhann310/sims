@@ -40,7 +40,7 @@
     <?php if(isset($data['siswa_list'])): ?>
     <!-- Form Absensi -->
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden" x-data="absensiRapor()">
-        <form @submit.prevent="simpanSemua()">
+        <form @submit.prevent="simpanSemua($event)" x-ref="formAbsensi">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <div>
                     <h3 class="font-bold text-slate-800 text-lg">Daftar Siswa</h3>
@@ -53,7 +53,7 @@
             </div>
             
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse whitespace-nowrap">
+                <table class="w-full text-left border-collapse whitespace-nowrap no-datatable">
                     <thead>
                         <tr class="bg-white">
                             <th class="py-4 px-4 md:px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 w-16">No</th>
@@ -95,29 +95,46 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('absensiRapor', () => ({
         loading: false,
-        simpanSemua() {
+        simpanSemua(event) {
             this.loading = true;
-            const form = this.$el.querySelector('form');
+            const form = (event && event.target && event.target.tagName === 'FORM')
+                         ? event.target
+                         : (this.$refs.formAbsensi || (this.$el.tagName === 'FORM' ? this.$el : this.$el.querySelector('form')));
+            
+            if (!form) {
+                this.loading = false;
+                Swal.fire('Error', 'Elemen form tidak ditemukan', 'error');
+                return;
+            }
+
             const formData = new FormData(form);
             
             fetch('<?= BASEURL; ?>/erapor/saveAbsensi', {
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(data => {
+            .then(res => res.text())
+            .then(text => {
                 this.loading = false;
-                Swal.fire({
-                    icon: data.status,
-                    title: data.title,
-                    text: data.message,
-                    timer: 2000,
-                    showConfirmButton: false
-                });
+                try {
+                    const cleanText = text.replace(/^\uFEFF/, '').trim();
+                    const data = JSON.parse(cleanText);
+                    Swal.fire({
+                        icon: data.status,
+                        title: data.title,
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } catch (err) {
+                    console.error('Response parse error:', text, err);
+                    Swal.fire('Error', 'Gagal memproses respons dari server', 'error');
+                }
             })
-            .catch(() => {
+            .catch(err => {
+                console.error(err);
                 this.loading = false;
-                Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
+                Swal.fire('Error', 'Terjadi kesalahan sistem saat menyimpan absensi', 'error');
             });
         }
     }));

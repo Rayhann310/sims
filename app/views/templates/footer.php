@@ -1,4 +1,4 @@
-﻿</main>
+</main>
 
     <!-- Footer -->
     <footer class="bg-slate-900 text-slate-300 pt-16 pb-8 border-t border-slate-800">

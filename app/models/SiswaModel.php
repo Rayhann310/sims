@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class SiswaModel {
     private $db;

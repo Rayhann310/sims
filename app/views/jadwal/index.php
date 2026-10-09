@@ -75,7 +75,7 @@
         
         <!-- List View -->
         <div class="overflow-x-auto" x-show="viewMode === 'list'">
-            <table class="min-w-full divide-y divide-slate-200">
+            <table class="min-w-full divide-y divide-slate-200 no-datatable">
                 <thead class="bg-slate-50">
                     <tr>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Hari</th>
@@ -111,12 +111,12 @@
                         </tr>
                     </template>
                     <tr x-show="jadwal.length === 0 && rombel_id">
-                        <td colspan="4" class="px-6 py-10 text-center text-slate-500">
+                        <td :colspan="'<?= $_SESSION['user']['role'] == 'admin' ? 5 : 4 ?>'" class="px-6 py-10 text-center text-slate-500">
                             Belum ada jadwal untuk rombel ini.
                         </td>
                     </tr>
                     <tr x-show="!rombel_id">
-                        <td colspan="4" class="px-6 py-10 text-center text-slate-500">
+                        <td :colspan="'<?= $_SESSION['user']['role'] == 'admin' ? 5 : 4 ?>'" class="px-6 py-10 text-center text-slate-500">
                             Silakan pilih Tahun Akademik dan Rombel terlebih dahulu.
                         </td>
                     </tr>
@@ -326,9 +326,11 @@ document.addEventListener('alpine:init', () => {
             
             try {
                 const res = await fetch(`<?= BASEURL; ?>/jadwal/getRombelAjax/${this.ta_id}`);
-                this.rombels = await res.json();
+                const text = await res.text();
+                const cleanText = text.replace(/^\uFEFF/, '').trim();
+                this.rombels = JSON.parse(cleanText);
             } catch (err) {
-                console.error(err);
+                console.error("fetchRombel error:", err);
             }
         },
         
@@ -339,9 +341,11 @@ document.addEventListener('alpine:init', () => {
             
             try {
                 const res = await fetch(`<?= BASEURL; ?>/jadwal/getJadwalAjax/${this.rombel_id}`);
-                this.jadwal = await res.json();
+                const text = await res.text();
+                const cleanText = text.replace(/^\uFEFF/, '').trim();
+                this.jadwal = JSON.parse(cleanText);
             } catch (err) {
-                console.error(err);
+                console.error("fetchJadwal error:", err);
             }
         },
 
@@ -397,10 +401,8 @@ document.addEventListener('alpine:init', () => {
             if(!data) return;
             
             const j = JSON.parse(data);
-            if(j.hari === hariBaru) return; // Same day, maybe dragging within day (need specific time slot to drop, but here we just append to the day? We don't have visual slots in grid mode currently, we just drop in day. Wait, dragging requires changing hari and jam! Oh, if we just drop on day, we don't know the time.)
+            if(j.hari === hariBaru) return;
             
-            // For now, if we drop on a day, we might prompt for time, OR we can't really do drag drop without time slots!
-            // Actually, if we just want a simple drag drop to another day, we can keep the same jam_mulai and jam_selesai, just change the hari.
             const hariLama = j.hari;
             j.hari = hariBaru;
 
@@ -415,7 +417,8 @@ document.addEventListener('alpine:init', () => {
                     method: 'POST',
                     body: fd
                 });
-                const result = await res.json();
+                const text = await res.text();
+                const result = JSON.parse(text.replace(/^\uFEFF/, '').trim());
                 
                 if (result.success) {
                     // Update local state
@@ -439,7 +442,8 @@ document.addEventListener('alpine:init', () => {
                     method: 'POST',
                     body: fd
                 });
-                const result = await res.json();
+                const text = await res.text();
+                const result = JSON.parse(text.replace(/^\uFEFF/, '').trim());
                 if (result.success) {
                     const index = this.jadwal.findIndex(item => item.id == id);
                     if (index !== -1) {
@@ -462,7 +466,8 @@ document.addEventListener('alpine:init', () => {
                     method: 'POST',
                     body: fd
                 });
-                const data = await res.json();
+                const text = await res.text();
+                const data = JSON.parse(text.replace(/^\uFEFF/, '').trim());
                 
                 if (data.konflik_rombel) {
                     this.errorMessage = `Bentrok jam rombel! Kelas ini sudah ada pelajaran ${data.konflik_rombel.nama_mapel} di jam ${data.konflik_rombel.jam_mulai} - ${data.konflik_rombel.jam_selesai}`;

@@ -1,4 +1,4 @@
-﻿        </main>
+        </main>
         
         <!-- Minimalist Footer -->
         <footer class="bg-white border-t border-slate-200 py-4 px-4 lg:px-8 text-center sm:text-left text-sm text-slate-400">
@@ -51,17 +51,21 @@
             const tables = document.querySelectorAll('table:not(.no-datatable)');
             tables.forEach(table => {
                 if (table) {
-                    new simpleDatatables.DataTable(table, {
-                        searchable: true,
-                        fixedHeight: false,
-                        perPage: 10,
-                        labels: {
-                            placeholder: "Cari data...",
-                            perPage: "data per halaman",
-                            noRows: "Tidak ada data ditemukan",
-                            info: "Menampilkan {start} sampai {end} dari {rows} data",
-                        }
-                    });
+                    try {
+                        new simpleDatatables.DataTable(table, {
+                            searchable: true,
+                            fixedHeight: false,
+                            perPage: 10,
+                            labels: {
+                                placeholder: "Cari data...",
+                                perPage: "data per halaman",
+                                noRows: "Tidak ada data ditemukan",
+                                info: "Menampilkan {start} sampai {end} dari {rows} data",
+                            }
+                        });
+                    } catch (e) {
+                        console.warn("Could not initialize DataTable on table:", table, e);
+                    }
                 }
             });
         });

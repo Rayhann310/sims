@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 // Deteksi Protocol (Bekerja untuk HTTP biasa, HTTPS, dan Reverse Proxy seperti Localtunnel/Ngrok)
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';

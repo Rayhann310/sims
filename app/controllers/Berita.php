@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * Controller: Berita (Publik)

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class Akademik extends Controller {
 

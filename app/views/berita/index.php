@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $filterLabel = !empty($data['filter_label']) ? ' â€” ' . htmlspecialchars($data['filter_label']) : '';
 ?>
 

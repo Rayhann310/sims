@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $artikel = $data['artikel'];
 $terkait = $data['artikel_terkait'] ?? [];
 ?>

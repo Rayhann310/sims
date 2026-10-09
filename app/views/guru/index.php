@@ -1,4 +1,4 @@
-﻿<div x-data="{ 
+<div x-data="{ 
     showModal: false, 
     importModalOpen: false, 
     editModalOpen: false, 

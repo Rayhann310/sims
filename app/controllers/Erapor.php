@@ -269,18 +269,24 @@ class Erapor extends Controller {
     public function saveAbsensi()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (ob_get_length()) ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
             $tahun_id = $this->tahunAktif['id'];
             $sakit = $_POST['sakit'] ?? [];
             $izin = $_POST['izin'] ?? [];
             $alfa = $_POST['alfa'] ?? [];
             
-            foreach($sakit as $siswa_id => $val_sakit) {
-                $val_izin = $izin[$siswa_id] ?? 0;
-                $val_alfa = $alfa[$siswa_id] ?? 0;
+            $all_siswa_ids = array_unique(array_merge(array_keys($sakit), array_keys($izin), array_keys($alfa)));
+
+            foreach($all_siswa_ids as $siswa_id) {
+                $val_sakit = (int)($sakit[$siswa_id] ?? 0);
+                $val_izin  = (int)($izin[$siswa_id] ?? 0);
+                $val_alfa  = (int)($alfa[$siswa_id] ?? 0);
                 $this->model('EraporModel')->saveAbsensiRapor($siswa_id, $tahun_id, $val_sakit, $val_izin, $val_alfa);
             }
             
             echo json_encode(['status' => 'success', 'title' => 'Berhasil', 'message' => 'Absensi berhasil disimpan']);
+            exit;
         }
     }
 
@@ -307,12 +313,15 @@ class Erapor extends Controller {
     public function saveCatatanAjax()
     {
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (ob_get_length()) ob_clean();
+            header('Content-Type: application/json; charset=utf-8');
             $siswa_id = $_POST['id_siswa'];
             $catatan = $_POST['catatan'];
             $tahun_id = $this->tahunAktif['id'];
             
             $this->model('EraporModel')->saveCatatanWali($siswa_id, $tahun_id, $catatan);
             echo json_encode(['status' => 'success', 'message' => 'Catatan disimpan']);
+            exit;
         }
     }
     

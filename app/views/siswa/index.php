@@ -1,4 +1,4 @@
-﻿<div class="space-y-6" 
+<div class="space-y-6" 
      x-data="{ showModal: false, importModalOpen: false, editModalOpen: false, deleteModalOpen: false, detailModalOpen: false, ultahModalOpen: false, qrModalOpen: false, qrToken: '', qrName: '', deleteUrl: '', currentSiswa: {} }"
      @open-edit-modal.window="editModalOpen = true"
      @open-detail-modal.window="detailModalOpen = true; currentSiswa = $event.detail;"

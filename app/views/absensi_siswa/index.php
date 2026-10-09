@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $modeAbsen = $data['pengaturan']['mode_absen_siswa'] ?? 'Masuk Saja';
 $iSMAsukPulang = ($modeAbsen === 'Masuk & Pulang');
 $isPerMapel    = ($modeAbsen === 'Per Mata Pelajaran');

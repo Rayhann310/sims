@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * ONE-TIME MIGRATION RUNNER
  * Akses: /run_migration.php?token=SMANW_MIGRATE_2026

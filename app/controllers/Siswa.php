@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class Siswa extends Controller {
     public function __construct()

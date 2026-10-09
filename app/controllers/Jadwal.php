@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -31,7 +31,8 @@ class Jadwal extends Controller {
     // AJAX: dapatkan rombel by tahun akademik (terbuka untuk guru)
     public function getRombelAjax($ta_id)
     {
-        header('Content-Type: application/json');
+        if (ob_get_length()) ob_clean();
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode($this->model('RombelModel')->getRombelByTahunAkademik($ta_id));
         exit;
     }
@@ -39,7 +40,8 @@ class Jadwal extends Controller {
     // AJAX: dapatkan jadwal by rombel
     public function getJadwalAjax($rombel_id)
     {
-        header('Content-Type: application/json');
+        if (ob_get_length()) ob_clean();
+        header('Content-Type: application/json; charset=utf-8');
         $jadwal = $this->model('JadwalModel')->getJadwalByRombel($rombel_id);
         
         if (isset($_SESSION['user']) && $_SESSION['user']['role'] == 'guru') {
@@ -62,7 +64,8 @@ class Jadwal extends Controller {
     // AJAX: cek konflik jam sebelum simpan
     public function cekKonflik()
     {
-        header('Content-Type: application/json');
+        if (ob_get_length()) ob_clean();
+        header('Content-Type: application/json; charset=utf-8');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') { echo json_encode(['error' => 'invalid']); exit; }
 
         $model = $this->model('JadwalModel');
@@ -119,7 +122,8 @@ class Jadwal extends Controller {
     // AJAX: Pindah Jadwal (Drag & Drop)
     public function apiPindahJadwal()
     {
-        header('Content-Type: application/json');
+        if (ob_get_length()) ob_clean();
+        header('Content-Type: application/json; charset=utf-8');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') { echo json_encode(['success' => false, 'pesan' => 'Invalid method']); exit; }
 
         $id = $_POST['id'] ?? 0;
@@ -141,7 +145,8 @@ class Jadwal extends Controller {
     // AJAX: Toggle Lock
     public function apiToggleLock()
     {
-        header('Content-Type: application/json');
+        if (ob_get_length()) ob_clean();
+        header('Content-Type: application/json; charset=utf-8');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') { echo json_encode(['success' => false, 'pesan' => 'Invalid method']); exit; }
 
         $id = $_POST['id'] ?? 0;

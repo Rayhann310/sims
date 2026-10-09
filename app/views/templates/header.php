@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $db = new Database();
 try {
     $db->query("SELECT * FROM pengaturan ORDER BY id ASC LIMIT 1");

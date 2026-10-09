@@ -1,4 +1,4 @@
-﻿<div class="space-y-6" x-data="scannerKelasData()">
+<div class="space-y-6" x-data="scannerKelasData()">
 
     <!-- Header -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">

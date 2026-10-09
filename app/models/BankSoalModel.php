@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class BankSoalModel {
     private $table = 'cbt_bank_soal';
