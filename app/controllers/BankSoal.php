@@ -275,7 +275,7 @@ class BankSoal extends Controller {
         $sheet->setCellValue('C1', 'Opsi B');
         $sheet->setCellValue('D1', 'Opsi C');
         $sheet->setCellValue('E1', 'Opsi D');
-        $sheet->setCellValue('F1', 'Opsi E (Kosongkan jika SMP/MTS)');
+        $sheet->setCellValue('F1', 'Opsi E (Kosongkan jika SMA/MTS)');
         $sheet->setCellValue('G1', 'Kunci (Contoh: A, atau A,B,C untuk kompleks)');
         $sheet->setCellValue('H1', 'Tipe (PG / PG_KOMPLEKS / ESSAY)');
         $sheet->setCellValue('I1', 'Tingkat (Mudah/Sedang/Sulit)');

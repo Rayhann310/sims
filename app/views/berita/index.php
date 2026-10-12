@@ -15,7 +15,7 @@ $filterLabel = !empty($data['filter_label']) ? ' â€” ' . htmlspecialchars($
         <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 leading-tight">
             <?= !empty($data['filter_label']) ? $data['filter_label'] : 'Berita & Artikel'; ?>
         </h1>
-        <p class="text-slate-500 text-sm mt-2">Informasi, pengumuman, dan kegiatan terkini dari SMP Nahdlatul Wathan Jakarta.</p>
+        <p class="text-slate-500 text-sm mt-2">Informasi, pengumuman, dan kegiatan terkini dari SMA Nahdlatul Wathan Jakarta.</p>
     </div>
 
     <!-- Filter & Search â€” mobile stacked, desktop row -->

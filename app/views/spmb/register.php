@@ -33,7 +33,7 @@
                 </div>
 
                 <div>
-                    <label for="asal_sekolah" class="block text-sm font-medium text-slate-700">Asal Sekolah (SD/MI)</label>
+                    <label for="asal_sekolah" class="block text-sm font-medium text-slate-700">Asal Sekolah (SMA/MTs)</label>
                     <div class="mt-1">
                         <input id="asal_sekolah" name="asal_sekolah" type="text" required class="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm">
                     </div>
