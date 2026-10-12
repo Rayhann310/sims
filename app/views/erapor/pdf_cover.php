@@ -1,5 +1,5 @@
 <?php
-$nama_sekolah = !empty($pengaturan['nama_aplikasi']) ? $pengaturan['nama_aplikasi'] : "SMA Nahdlatul Wathan Jakarta";
+$nama_sekolah = "Nahdlatul Wathan Jakarta";
 $yayasan = "Yayasan Mi'rajus Shibyan";
 
 // Cari path logo fisik di smanw
