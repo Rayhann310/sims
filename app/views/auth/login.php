@@ -40,7 +40,7 @@
                 <span class="text-emerald-400">Akademik & PPDB</span>
             </h1>
             <p class="text-lg text-slate-300 leading-relaxed mb-10">
-                Kelola data sekolah dengan efisien, terpusat, dan modern. SMA Nahdlatul Wathan Jakarta kini hadir dengan layanan digital yang mempermudah proses akademik dan pendaftaran siswa baru.
+                Kelola data sekolah dengan efisien, terpusat, dan modern. SMP Nahdlatul Wathan Jakarta kini hadir dengan layanan digital yang mempermudah proses akademik dan pendaftaran siswa baru.
             </p>
             
             <div class="flex items-center gap-4">

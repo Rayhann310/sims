@@ -73,6 +73,22 @@ class UserModel {
             $this->db->query("ALTER TABLE alokasi_mapel MODIFY jurusan VARCHAR(50) NOT NULL");
             $this->db->execute();
 
+            // SELF-HEALING: Migrasi tingkat kelas SMA (10/11/12) -> SMP (7/8/9), hanya sekali
+            try {
+                $this->db->query("SHOW COLUMNS FROM kelas LIKE 'tingkat'");
+                $colTingkat = $this->db->single();
+                if ($colTingkat && strpos($colTingkat['Type'], "'10'") !== false) {
+                    $this->db->query("ALTER TABLE kelas MODIFY tingkat ENUM('7','8','9','10','11','12') NOT NULL");
+                    $this->db->execute();
+                    $this->db->query("UPDATE kelas SET tingkat = CASE tingkat WHEN '10' THEN '7' WHEN '11' THEN '8' WHEN '12' THEN '9' ELSE tingkat END");
+                    $this->db->execute();
+                    $this->db->query("ALTER TABLE kelas MODIFY tingkat ENUM('7','8','9') NOT NULL");
+                    $this->db->execute();
+                }
+            } catch (Exception $e) {
+                error_log("Self-healing tingkat kelas gagal: " . $e->getMessage());
+            }
+
             // SELF-HEALING: Populate master_jurusan jika masih kosong
             $this->db->query("SELECT COUNT(*) as count FROM master_jurusan");
             $this->db->execute();

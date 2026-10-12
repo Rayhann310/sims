@@ -298,7 +298,7 @@ class KeuanganModel {
         $nominal_rp = number_format($tagihan['nominal'], 0, ',', '.');
         
         $pesan = "Assalamu'alaikum Bapak/Ibu {$tagihan['nama_wali']},\n\n";
-        $pesan .= "Mohon maaf mengganggu waktunya. Kami dari bagian Keuangan SMA Nahdlatul Wathan Jakarta bermaksud menginformasikan rincian tagihan administrasi ananda:\n\n";
+        $pesan .= "Mohon maaf mengganggu waktunya. Kami dari bagian Keuangan SMP Nahdlatul Wathan Jakarta bermaksud menginformasikan rincian tagihan administrasi ananda:\n\n";
         $pesan .= "Nama: {$tagihan['nama_lengkap']}\n";
         $pesan .= "NISN: {$tagihan['nisn']}\n";
         $pesan .= "Jenis: {$jenis} - {$tagihan['bulan']} {$tagihan['tahun']}\n";

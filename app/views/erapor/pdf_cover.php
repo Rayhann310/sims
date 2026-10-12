@@ -37,8 +37,8 @@ $tahun_ajaran_name = $tahun_name ?? '2025/2026';
 <div style="width:210mm;height:297mm;padding:20mm;box-sizing:border-box;font-family:Times New Roman;">
     <div style="text-align:center;">
         <h1 style="margin-bottom:5mm;">RAPOR PENILAIAN TENGAH SEMESTER</h1>
-        <h2 style="margin-bottom:5mm;">SEKOLAH MENENGAH ATAS</h2>
-        <h3 style="margin-bottom:10mm;">(SMA)</h3>
+        <h2 style="margin-bottom:5mm;">SEKOLAH MENENGAH PERTAMA</h2>
+        <h3 style="margin-bottom:10mm;">(SMP)</h3>
         <h3 style="margin-bottom:10mm;">Tahun Pelajaran <?= htmlspecialchars($tahun_ajaran_name) ?></h3>
 
         <div style="width:60mm;height:60mm;margin:0 auto 10mm;">

@@ -190,7 +190,7 @@ $terkait = $data['artikel_terkait'] ?? [];
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-black text-base shrink-0">NW</div>
                     <div>
-                        <p class="font-bold text-sm leading-tight">SMA Nahdlatul Wathan</p>
+                        <p class="font-bold text-sm leading-tight">SMP Nahdlatul Wathan</p>
                         <p class="text-emerald-200 text-xs">Jakarta Timur</p>
                     </div>
                 </div>

@@ -115,7 +115,7 @@
                 </div>
                 <div class="info-row">
                     <span class="label">Sekolah</span><span class="colon">:</span>
-                    <span class="value"><?= htmlspecialchars($pengaturan['nama_aplikasi'] ?? 'SMA Nahdlatul Wathan') ?></span>
+                    <span class="value"><?= htmlspecialchars($pengaturan['nama_aplikasi'] ?? 'SMP Nahdlatul Wathan') ?></span>
                 </div>
             </td>
             <td class="header-right">

@@ -381,7 +381,7 @@ return array (
     'create_sql' => 'CREATE TABLE IF NOT EXISTS `kelas` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nama_kelas` varchar(50) NOT NULL,
-  `tingkat` enum(\'10\',\'11\',\'12\') NOT NULL,
+  `tingkat` enum(\'7\',\'8\',\'9\') NOT NULL,
   `jurusan` varchar(50) NOT NULL,
   `wali_kelas_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -392,7 +392,7 @@ return array (
     array (
       'id' => 'int(11) NOT NULL auto_increment',
       'nama_kelas' => 'varchar(50) NOT NULL',
-      'tingkat' => 'enum(\'10\',\'11\',\'12\') NOT NULL',
+      'tingkat' => 'enum(\'7\',\'8\',\'9\') NOT NULL',
       'jurusan' => 'varchar(50) NOT NULL',
       'wali_kelas_id' => 'int(11) DEFAULT NULL',
     ),

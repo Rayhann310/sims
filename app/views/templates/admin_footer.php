@@ -2,7 +2,7 @@
         
         <!-- Minimalist Footer -->
         <footer class="bg-white border-t border-slate-200 py-4 px-4 lg:px-8 text-center sm:text-left text-sm text-slate-400">
-            <?= $GLOBALS['pengaturan']['teks_footer'] ?? '&copy; ' . date('Y') . ' SMA Nahdlatul Wathan Jakarta. All rights reserved.'; ?>
+            <?= $GLOBALS['pengaturan']['teks_footer'] ?? '&copy; ' . date('Y') . ' SMP Nahdlatul Wathan Jakarta. All rights reserved.'; ?>
         </footer>
     </div>
     <script>
