@@ -397,9 +397,15 @@ class Erapor extends Controller {
         $data['pengaturan'] = $this->model('EraporModel')->getSettingSekolah() ?? $GLOBALS['pengaturan'];
         
         // Jika export PDF
-        if($data['type'] === 'pdf' && !empty($siswa_data)) {
-            $this->generatePdf($data);
-            return; // stop execution
+        if($data['type'] === 'pdf') {
+            if(!empty($siswa_data)) {
+                $this->generatePdf($data);
+                return; // stop execution
+            } else {
+                Flasher::setFlash('Gagal', 'Tidak ada siswa pada rombel yang dipilih untuk dicetak PDF.', 'danger');
+                header('Location: ' . BASEURL . '/erapor/cetak?tahun=' . $data['selected_tahun'] . '&rombel=' . $data['selected_rombel']);
+                exit;
+            }
         }
 
         $this->view('templates/admin_header', $data);
@@ -504,6 +510,7 @@ class Erapor extends Controller {
                 ? 'Rapor_Kelas_' . ($data['siswa_data'][0]['nama_kelas'] ?? 'Kelas') . '_' . $tahun_name . '.pdf'
                 : 'Rapor_' . ($data['siswa_data'][0]['nama_lengkap'] ?? 'Siswa') . '_' . $tahun_name . '.pdf';
                 
+            if (ob_get_length()) ob_end_clean();
             $mpdf->Output($filename, 'D');
             
         } catch (\Throwable $e) {
