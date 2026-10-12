@@ -42,13 +42,16 @@
                 </select>
             </div>
 
-            <div class="md:col-span-2 flex items-end gap-2">
-                <button type="submit" class="px-6 py-2.5 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-900 transition-all shadow-sm flex items-center">
+            <div class="md:col-span-2 flex flex-wrap items-end gap-2">
+                <button type="submit" class="px-5 py-2.5 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-900 transition-all shadow-sm flex items-center">
                     <i class="fas fa-search mr-2"></i> Tampilkan
                 </button>
                 <?php if(!empty($data['siswa_data'])): ?>
-                <a href="<?= BASEURL; ?>/erapor/cetak?type=pdf&tahun=<?= $data['selected_tahun'] ?>&rombel=<?= $data['selected_rombel'] ?>" target="_blank" class="px-6 py-2.5 bg-rose-600 text-white font-medium rounded-xl hover:bg-rose-700 focus:ring-4 focus:ring-rose-500/20 transition-all shadow-sm flex items-center">
-                    <i class="fas fa-file-pdf mr-2"></i> Cetak Satu Kelas (PDF)
+                <a href="<?= BASEURL; ?>/erapor/cetak?type=cover&tahun=<?= $data['selected_tahun'] ?>&rombel=<?= $data['selected_rombel'] ?>" target="_blank" class="px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-500/20 transition-all shadow-sm flex items-center">
+                    <i class="fas fa-book-open mr-2"></i> Cetak Cover Satu Kelas (PDF)
+                </a>
+                <a href="<?= BASEURL; ?>/erapor/cetak?type=pdf&tahun=<?= $data['selected_tahun'] ?>&rombel=<?= $data['selected_rombel'] ?>" target="_blank" class="px-5 py-2.5 bg-rose-600 text-white font-medium rounded-xl hover:bg-rose-700 focus:ring-4 focus:ring-rose-500/20 transition-all shadow-sm flex items-center">
+                    <i class="fas fa-file-pdf mr-2"></i> Cetak Rapor Lengkap (PDF)
                 </a>
                 <?php endif; ?>
             </div>
@@ -67,7 +70,7 @@
                         <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 w-16">No</th>
                         <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100">NISN</th>
                         <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100">Nama Siswa</th>
-                        <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 text-center w-32">Aksi</th>
+                        <th class="py-4 px-6 text-sm font-semibold text-slate-600 border-b border-slate-100 text-center w-48">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -78,9 +81,12 @@
                         <td class="py-4 px-6">
                             <p class="font-medium text-slate-800"><?= htmlspecialchars($s['nama_lengkap']) ?></p>
                         </td>
-                        <td class="py-4 px-6 text-center">
-                            <a href="<?= BASEURL; ?>/erapor/cetak?type=pdf&tahun=<?= $data['selected_tahun'] ?>&rombel=<?= $data['selected_rombel'] ?>&siswa=<?= $s['id'] ?>" target="_blank" class="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-colors text-sm font-medium inline-block">
-                                <i class="fas fa-print mr-1"></i> Cetak
+                        <td class="py-4 px-6 text-center space-x-1">
+                            <a href="<?= BASEURL; ?>/erapor/cetak?type=cover&tahun=<?= $data['selected_tahun'] ?>&rombel=<?= $data['selected_rombel'] ?>&siswa=<?= $s['id'] ?>" target="_blank" class="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors text-sm font-medium inline-block" title="Cetak Cover">
+                                <i class="fas fa-book-open mr-1"></i> Cover
+                            </a>
+                            <a href="<?= BASEURL; ?>/erapor/cetak?type=pdf&tahun=<?= $data['selected_tahun'] ?>&rombel=<?= $data['selected_rombel'] ?>&siswa=<?= $s['id'] ?>" target="_blank" class="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-colors text-sm font-medium inline-block" title="Cetak Rapor Lengkap">
+                                <i class="fas fa-print mr-1"></i> Rapor
                             </a>
                         </td>
                     </tr>

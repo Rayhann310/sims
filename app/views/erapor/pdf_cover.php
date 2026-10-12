@@ -1,191 +1,55 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            width: 210mm;
-            height: 297mm;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .cover-wrapper {
-            width: 100%;
-            height: 297mm;
-            padding: 15mm 20mm;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            border: 3px double #000;
-            position: relative;
-        }
+<?php
+$nama_sekolah = !empty($pengaturan['nama_aplikasi']) ? $pengaturan['nama_aplikasi'] : "SMA Nahdlatul Wathan Jakarta";
+$yayasan = "Yayasan Mi'rajus Shibyan";
 
-        /* ---- HEADER SEKOLAH ---- */
-        .header {
-            text-align: center;
-            width: 100%;
-            border-bottom: 3px solid #000;
-            padding-bottom: 8mm;
-        }
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10mm;
-        }
-        .logo {
-            width: 25mm;
-            height: 25mm;
-            flex-shrink: 0;
-        }
-        .logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        .logo-placeholder {
-            width: 25mm;
-            height: 25mm;
-            border: 2px solid #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8pt;
-            color: #666;
-        }
-        .sekolah-info { text-align: center; }
-        .nama-sekolah { font-size: 16pt; font-weight: bold; text-transform: uppercase; }
-        .alamat-sekolah { font-size: 9pt; margin-top: 2mm; }
+// Cari path logo fisik di smanw
+$logo_path = '';
+$possible_paths = [
+    realpath(__DIR__ . '/../../../public/img/logo.png'),
+    realpath(__DIR__ . '/../../../public/images/logo.png'),
+    realpath(__DIR__ . '/../../../../eraporsmanw/assets/images/logo.png'),
+];
 
-        /* ---- JUDUL ---- */
-        .judul-box {
-            text-align: center;
-            margin: 5mm 0;
-        }
-        .judul-rapor {
-            font-size: 20pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-top: 2px solid #000;
-            border-bottom: 2px solid #000;
-            padding: 4mm 10mm;
-            display: inline-block;
-        }
-        .sub-judul {
-            font-size: 12pt;
-            margin-top: 3mm;
-        }
+foreach ($possible_paths as $path) {
+    if ($path && file_exists($path)) {
+        $logo_path = $path;
+        break;
+    }
+}
 
-        /* ---- LOGO TENGAH ---- */
-        .logo-center {
-            width: 40mm;
-            height: 40mm;
-            margin: 0 auto;
-        }
-        .logo-center img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        .logo-center-placeholder {
-            width: 40mm;
-            height: 40mm;
-            border: 2px dashed #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8pt;
-            color: #999;
-            margin: 0 auto;
-        }
+$logo_src = '';
+if ($logo_path && file_exists($logo_path)) {
+    $logo_data = base64_encode(file_get_contents($logo_path));
+    $logo_src = 'data:image/png;base64,' . $logo_data;
+} elseif (!empty($pengaturan['logo_sekolah'])) {
+    if (strpos($pengaturan['logo_sekolah'], 'data:image') === 0) {
+        $logo_src = $pengaturan['logo_sekolah'];
+    } else {
+        $logo_src = 'data:image/png;base64,' . $pengaturan['logo_sekolah'];
+    }
+} else {
+    $logo_src = $logo_path;
+}
 
-        /* ---- DATA SISWA ---- */
-        .data-siswa {
-            width: 100%;
-            text-align: center;
-        }
-        .label-nama { font-size: 10pt; margin-bottom: 2mm; }
-        .nama-siswa-box {
-            border: 2px solid #000;
-            padding: 3mm 8mm;
-            display: inline-block;
-            min-width: 120mm;
-            font-size: 16pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 3mm;
-        }
-        .detail-siswa { font-size: 10pt; margin-top: 2mm; line-height: 1.8; }
+$nama_siswa = $siswa['nama_siswa'] ?? $siswa['nama_lengkap'] ?? '';
+$tahun_ajaran_name = $tahun_name ?? '2025/2026';
+?>
+<div style="width:210mm;height:297mm;padding:20mm;box-sizing:border-box;font-family:Times New Roman;">
+    <div style="text-align:center;">
+        <h1 style="margin-bottom:5mm;">RAPOR PENILAIAN TENGAH SEMESTER</h1>
+        <h2 style="margin-bottom:5mm;">SEKOLAH MENENGAH ATAS</h2>
+        <h3 style="margin-bottom:10mm;">(SMA)</h3>
+        <h3 style="margin-bottom:10mm;">Tahun Pelajaran <?= htmlspecialchars($tahun_ajaran_name) ?></h3>
 
-        /* ---- FOOTER ---- */
-        .footer {
-            text-align: center;
-            width: 100%;
-            border-top: 3px solid #000;
-            padding-top: 5mm;
-        }
-        .tahun-pelajaran { font-size: 12pt; font-weight: bold; }
-    </style>
-</head>
-<body>
-<div class="cover-wrapper">
+        <div style="width:60mm;height:60mm;margin:0 auto 10mm;">
+            <img src="<?= $logo_src ?>" style="width:100%;height:100%;object-fit:cover;" alt="Logo Sekolah">
+        </div><br><br><br>
 
-    <!-- Header Sekolah -->
-    <div class="header">
-        <div class="header-inner">
-            <div class="logo">
-                <?php if(!empty($pengaturan['logo_sekolah'])): ?>
-                <img src="data:image/png;base64,<?= $pengaturan['logo_sekolah'] ?>" alt="Logo">
-                <?php else: ?>
-                <div class="logo-placeholder">LOGO</div>
-                <?php endif; ?>
-            </div>
-            <div class="sekolah-info">
-                <div class="nama-sekolah"><?= htmlspecialchars($pengaturan['nama_aplikasi'] ?? 'SMA Nahdlatul Wathan Jakarta') ?></div>
-                <div class="alamat-sekolah"><?= htmlspecialchars($pengaturan['teks_footer'] ?? '') ?></div>
-            </div>
+        <div style="margin-bottom:2mm;font-weight:bold;">NAMA SISWA</div>
+        <div style="border:2px solid #000;padding:10px;font-size:20pt;font-weight:bold;margin-bottom:10mm;">
+            <?= htmlspecialchars($nama_siswa) ?>
         </div>
+        <div style="margin-bottom:2mm;font-weight:bold;"><?= htmlspecialchars($yayasan) ?></div>
+        <div style="font-weight:bold;font-size:16pt;"><?= htmlspecialchars($nama_sekolah) ?></div>
     </div>
-
-    <!-- Judul -->
-    <div class="judul-box">
-        <div class="judul-rapor">Rapor</div>
-        <div class="sub-judul">Laporan Hasil Belajar Siswa</div>
-        <div class="sub-judul">Semester <?= $semester == '1' || strtolower($semester) == 'ganjil' ? 'Ganjil' : 'Genap' ?></div>
-    </div>
-
-    <!-- Logo Tengah -->
-    <div>
-        <?php if(!empty($pengaturan['logo_sekolah'])): ?>
-        <div class="logo-center">
-            <img src="data:image/png;base64,<?= $pengaturan['logo_sekolah'] ?>" alt="Logo">
-        </div>
-        <?php else: ?>
-        <div class="logo-center-placeholder">Logo Sekolah</div>
-        <?php endif; ?>
-    </div>
-
-    <!-- Data Siswa -->
-    <div class="data-siswa">
-        <div class="label-nama">NAMA PESERTA DIDIK</div>
-        <div class="nama-siswa-box"><?= strtoupper(htmlspecialchars($siswa['nama_lengkap'])) ?></div>
-        <div class="detail-siswa">
-            NISN: <strong><?= htmlspecialchars($siswa['nisn'] ?? '-') ?></strong>
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-            Kelas: <strong><?= htmlspecialchars($siswa['nama_kelas'] ?? '-') ?></strong>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-        <div class="tahun-pelajaran">Tahun Pelajaran <?= htmlspecialchars($tahun_name) ?></div>
-    </div>
-
 </div>
-</body>
-</html>

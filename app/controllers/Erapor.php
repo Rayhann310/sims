@@ -406,11 +406,26 @@ class Erapor extends Controller {
                 header('Location: ' . BASEURL . '/erapor/cetak?tahun=' . $data['selected_tahun'] . '&rombel=' . $data['selected_rombel']);
                 exit;
             }
+        } elseif($data['type'] === 'cover') {
+            if(!empty($siswa_data)) {
+                $this->generateCoverPdf($data);
+                return; // stop execution
+            } else {
+                Flasher::setFlash('Gagal', 'Tidak ada siswa pada rombel yang dipilih untuk dicetak Cover.', 'danger');
+                header('Location: ' . BASEURL . '/erapor/cetak?tahun=' . $data['selected_tahun'] . '&rombel=' . $data['selected_rombel']);
+                exit;
+            }
         }
 
         $this->view('templates/admin_header', $data);
         $this->view('erapor/cetak_rapor', $data);
         $this->view('templates/admin_footer');
+    }
+
+    public function cetakCover()
+    {
+        $_GET['type'] = 'cover';
+        $this->cetak();
     }
     
     private function generatePdf($data)
@@ -509,6 +524,67 @@ class Erapor extends Controller {
             $filename = $total_siswa > 1
                 ? 'Rapor_Kelas_' . ($data['siswa_data'][0]['nama_kelas'] ?? 'Kelas') . '_' . $tahun_name . '.pdf'
                 : 'Rapor_' . ($data['siswa_data'][0]['nama_lengkap'] ?? 'Siswa') . '_' . $tahun_name . '.pdf';
+                
+            if (ob_get_length()) ob_end_clean();
+            $mpdf->Output($filename, 'D');
+            
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo '<pre>PDF Error: ' . htmlspecialchars($e->getMessage()) . ' in ' . $e->getFile() . ':' . $e->getLine() . '</pre>';
+        }
+    }
+
+    private function generateCoverPdf($data)
+    {
+        require_once __DIR__ . '/../../vendor/autoload.php';
+        
+        try {
+            $tmpDir = sys_get_temp_dir() . '/mpdf_tmp';
+            if (!is_dir($tmpDir)) { mkdir($tmpDir, 0777, true); }
+
+            $mpdf = new \Mpdf\Mpdf([
+                'mode' => 'utf-8',
+                'format' => 'A4',
+                'orientation' => 'P',
+                'margin_top'    => 0,
+                'margin_bottom' => 0,
+                'margin_left'   => 0,
+                'margin_right'  => 0,
+                'default_font_size' => 10,
+                'tempDir' => $tmpDir,
+            ]);
+            
+            $tahun_id   = $data['selected_tahun'];
+            $pengaturan = $data['pengaturan'];
+            $tahun_obj  = array_filter($data['tahun_list'], fn($t) => $t['id'] == $tahun_id);
+            $tahun_obj  = reset($tahun_obj);
+            $tahun_name = $tahun_obj ? $tahun_obj['nama_tahun'] : 'Tahun Ajaran';
+            $semester   = $tahun_obj ? $tahun_obj['semester'] : 'Ganjil';
+
+            $cover_template = realpath(__DIR__ . '/../views/erapor/pdf_cover.php');
+            $total_siswa    = count($data['siswa_data']);
+            
+            foreach($data['siswa_data'] as $index => $siswa) {
+                if ($index > 0) {
+                    $mpdf->AddPageByArray([
+                        'margin-left' => 0,
+                        'margin-right' => 0,
+                        'margin-top' => 0,
+                        'margin-bottom' => 0,
+                    ]);
+                }
+
+                ob_start();
+                extract(compact('siswa','pengaturan','tahun_name','semester'));
+                include $cover_template;
+                $cover_html = ob_get_clean();
+
+                $mpdf->WriteHTML($cover_html);
+            }
+            
+            $filename = $total_siswa > 1
+                ? 'Cover_Rapor_Kelas_' . ($data['siswa_data'][0]['nama_kelas'] ?? 'Kelas') . '_' . $tahun_name . '.pdf'
+                : 'Cover_Rapor_' . ($data['siswa_data'][0]['nama_lengkap'] ?? 'Siswa') . '_' . $tahun_name . '.pdf';
                 
             if (ob_get_length()) ob_end_clean();
             $mpdf->Output($filename, 'D');
