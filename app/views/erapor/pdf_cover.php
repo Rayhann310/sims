@@ -1,5 +1,5 @@
 <?php
-$nama_sekolah = "Nahdlatul Wathan Jakarta";
+$nama_sekolah = "SMA NAHDLATUL WATHAN JAKARTA";
 $yayasan = "Yayasan Mi'rajus Shibyan";
 
 // Cari path logo fisik di smanw
