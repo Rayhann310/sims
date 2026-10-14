@@ -364,6 +364,47 @@ class Erapor extends Controller {
     }
 
     // ============================================
+    // WALIKELAS / ADMIN: PROGRESS PENGISIAN NILAI OLEH GURU
+    // ============================================
+    public function progressPengisian()
+    {
+        $rombel_id = $this->checkWalikelas();
+        
+        $data['judul'] = 'Progress Pengisian Nilai Rapor';
+        $tahun_id = $_GET['tahun'] ?? $this->tahunAktif['id'];
+        $data['selected_tahun'] = $tahun_id;
+        $data['tahun_list'] = $this->model('EraporModel')->getAllTahunAkademik();
+        
+        if($_SESSION['user']['role'] === 'admin') {
+            $data['rombel_list'] = $this->model('EraporModel')->getAllRombel();
+            $data['selected_rombel'] = $_GET['rombel_id'] ?? ($data['rombel_list'][0]['id'] ?? null);
+        } else {
+            // Wali Kelas
+            $data['rombel_list'] = array_values(array_filter($this->model('EraporModel')->getAllRombel(), function($r) use ($rombel_id) {
+                return $r['id'] == $rombel_id;
+            }));
+            $data['selected_rombel'] = $rombel_id;
+        }
+
+        $data['progress'] = null;
+        $data['detail_rombel'] = null;
+
+        if(!empty($data['selected_rombel'])) {
+            $data['progress'] = $this->model('EraporModel')->getProgressPengisianMapel($data['selected_rombel'], $tahun_id);
+            foreach($data['rombel_list'] as $rb) {
+                if($rb['id'] == $data['selected_rombel']) {
+                    $data['detail_rombel'] = $rb;
+                    break;
+                }
+            }
+        }
+
+        $this->view('templates/admin_header', $data);
+        $this->view('erapor/progress_pengisian', $data);
+        $this->view('templates/admin_footer');
+    }
+
+    // ============================================
     // ADMIN / WALIKELAS: CETAK RAPOR
     // ============================================
     public function cetak()
@@ -377,10 +418,11 @@ class Erapor extends Controller {
             $data['selected_rombel'] = $_GET['rombel'] ?? null;
         } else {
             // Jika Walas, paksa rombel_id nya sesuai dengan rombel yang diawasi
-            $data['rombel_list'] = array_filter($this->model('EraporModel')->getAllRombel(), function($r) use ($rombel_id) {
+            $data['rombel_list'] = array_values(array_filter($this->model('EraporModel')->getAllRombel(), function($r) use ($rombel_id) {
                 return $r['id'] == $rombel_id;
-            });
-            $data['selected_rombel'] = $rombel_id;
+            }));
+            // Otomatis pilih kelas yang diawasi walas jika belum ada di parameter GET
+            $data['selected_rombel'] = $_GET['rombel'] ?? $rombel_id;
         }
         
         $data['tahun_list'] = $this->model('EraporModel')->getAllTahunAkademik();

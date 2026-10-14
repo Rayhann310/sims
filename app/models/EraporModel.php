@@ -23,6 +23,87 @@ class EraporModel {
         return $res ? $res['nama_lengkap'] : null;
     }
 
+    public function getProgressPengisianMapel($rombel_id, $tahun_id)
+    {
+        // 1. Hitung jumlah total siswa dalam rombel ini
+        $this->db->query("SELECT COUNT(siswa_id) as total_siswa FROM anggota_rombel WHERE rombel_id = :rombel_id");
+        $this->db->bind('rombel_id', $rombel_id);
+        $resSiswa = $this->db->single();
+        $totalSiswa = (int)($resSiswa['total_siswa'] ?? 0);
+
+        // 2. Ambil semua mapel dan guru yang mengajar di rombel ini dari jadwal_pelajaran
+        $this->db->query("
+            SELECT DISTINCT jp.mapel_id, jp.guru_id, m.nama_mapel, m.kode_mapel, u.nama_lengkap as nama_guru, g.no_hp
+            FROM jadwal_pelajaran jp
+            JOIN mata_pelajaran m ON jp.mapel_id = m.id
+            JOIN guru g ON jp.guru_id = g.id
+            JOIN users u ON g.user_id = u.id
+            WHERE jp.rombel_id = :rombel_id
+            ORDER BY m.nama_mapel ASC
+        ");
+        $this->db->bind('rombel_id', $rombel_id);
+        $mapelList = $this->db->resultSet();
+
+        $result = [];
+        $totalTuntas = 0;
+
+        foreach($mapelList as $mp) {
+            // Hitung siswa di rombel ini yang sudah ada nilai untuk mapel ini
+            $this->db->query("
+                SELECT COUNT(nr.id) as terisi
+                FROM nilai_rapor nr
+                JOIN anggota_rombel ar ON nr.siswa_id = ar.siswa_id
+                WHERE ar.rombel_id = :rombel_id
+                  AND nr.mapel_id = :mapel_id
+                  AND nr.tahun_akademik_id = :tahun_id
+                  AND nr.nilai IS NOT NULL
+            ");
+            $this->db->bind('rombel_id', $rombel_id);
+            $this->db->bind('mapel_id', $mp['mapel_id']);
+            $this->db->bind('tahun_id', $tahun_id);
+            $terisiRes = $this->db->single();
+            $terisi = (int)($terisiRes['terisi'] ?? 0);
+
+            $persen = ($totalSiswa > 0) ? round(($terisi / $totalSiswa) * 100) : 0;
+            if($persen > 100) $persen = 100;
+            if($persen === 100 && $totalSiswa > 0) $totalTuntas++;
+
+            // Normalisasi nomor HP untuk WhatsApp
+            $noHp = $mp['no_hp'] ?? '';
+            $noHpClean = preg_replace('/[^0-9]/', '', $noHp);
+            if(strpos($noHpClean, '0') === 0) {
+                $noHpClean = '62' . substr($noHpClean, 1);
+            } elseif(strpos($noHpClean, '8') === 0) {
+                $noHpClean = '62' . $noHpClean;
+            }
+
+            $result[] = [
+                'mapel_id'    => $mp['mapel_id'],
+                'nama_mapel'  => $mp['nama_mapel'],
+                'kode_mapel'  => $mp['kode_mapel'],
+                'guru_id'     => $mp['guru_id'],
+                'nama_guru'   => $mp['nama_guru'],
+                'no_hp'       => $noHp,
+                'no_hp_wa'    => $noHpClean,
+                'total_siswa' => $totalSiswa,
+                'terisi'      => $terisi,
+                'persen'      => $persen,
+                'status'      => ($totalSiswa > 0 && $terisi >= $totalSiswa) ? 'Lengkap' : ($terisi > 0 ? 'Sebagian' : 'Belum')
+            ];
+        }
+
+        $totalMapel = count($result);
+        $totalPersenKelas = $totalMapel > 0 ? round(array_sum(array_column($result, 'persen')) / $totalMapel) : 0;
+
+        return [
+            'total_siswa'        => $totalSiswa,
+            'total_mapel'        => $totalMapel,
+            'mapel_tuntas'       => $totalTuntas,
+            'total_persen_kelas' => $totalPersenKelas,
+            'list'               => $result
+        ];
+    }
+
     public function getMapelByGuru($guru_id, $tahun_akademik_id)
     {
         $this->db->query("

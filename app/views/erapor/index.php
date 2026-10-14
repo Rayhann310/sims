@@ -60,16 +60,29 @@
             <p class="text-sm text-slate-500">Lihat rekapitulasi seluruh nilai siswa di kelas Anda (Khusus Wali Kelas).</p>
         </a>
 
-        <?php if(hasMenuAccess('erapor_cetak') || $_SESSION['user']['role'] === 'admin'): ?>
-        <!-- Card: Cetak Rapor -->
+        <!-- Card: Monitoring Pengisian Nilai (Walas & Admin) -->
+        <a href="<?= BASEURL; ?>/erapor/progressPengisian" class="group bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:border-teal-500 hover:shadow-md transition-all duration-300">
+            <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <i class="fas fa-chart-pie text-xl"></i>
+            </div>
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-bold text-slate-800">Progress Pengisian</h3>
+                <span class="px-2 py-0.5 bg-teal-100 text-teal-700 text-[10px] font-bold uppercase rounded-md">Wali Kelas</span>
+            </div>
+            <p class="text-sm text-slate-500">Pantau persentase guru mengisi nilai rapor kelas dan hubungi guru via WhatsApp.</p>
+        </a>
+
+        <!-- Card: Cetak Rapor (Admin & Wali Kelas) -->
         <a href="<?= BASEURL; ?>/erapor/cetak" class="group bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:border-rose-500 hover:shadow-md transition-all duration-300">
             <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <i class="fas fa-print text-xl"></i>
             </div>
-            <h3 class="text-lg font-bold text-slate-800 mb-2">Cetak Rapor</h3>
-            <p class="text-sm text-slate-500">Cetak dokumen rapor lengkap dalam bentuk PDF.</p>
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-bold text-slate-800">Cetak Rapor</h3>
+                <span class="px-2 py-0.5 bg-rose-100 text-rose-700 text-[10px] font-bold uppercase rounded-md">Wali Kelas</span>
+            </div>
+            <p class="text-sm text-slate-500">Cetak dokumen cover dan rapor lengkap siswa dalam format PDF.</p>
         </a>
-        <?php endif; ?>
 
         <?php if($_SESSION['user']['role'] === 'admin'): ?>
         <!-- Card: Pengaturan E-Rapor (Admin Only) -->
