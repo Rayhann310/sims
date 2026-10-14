@@ -62,12 +62,21 @@ class Erapor extends Controller {
 
             // --- KKM Mapel ---
             if($action === 'save_kkm') {
-                $id         = $_POST['mapel_id'];
+                $id         = (int)$_POST['mapel_id'];
                 $kkm        = (int)$_POST['kkm'];
-                $kelompok   = $_POST['kelompok_id'] ?: null;
-                $urutan     = (int)($_POST['urutan'] ?? 99);
+                $kelompok   = !empty($_POST['kelompok_id']) ? (int)$_POST['kelompok_id'] : null;
+                $urutan     = (int)($_POST['urutan'] ?? 1);
                 $model->updateMapelKKM($id, $kkm, $kelompok, $urutan);
-                echo json_encode(['status' => 'success']);
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Data mapel berhasil diperbarui',
+                    'data' => [
+                        'mapel_id' => $id,
+                        'kkm' => $kkm,
+                        'kelompok_id' => $kelompok,
+                        'urutan' => $urutan
+                    ]
+                ]);
                 exit;
             }
 

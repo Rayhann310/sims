@@ -196,7 +196,7 @@ class EraporModel {
             JOIN mata_pelajaran m ON n.mapel_id = m.id 
             LEFT JOIN kelompok_mapel km ON m.kelompok_id = km.id
             WHERE n.siswa_id = :siswa_id AND n.tahun_akademik_id = :tahun_id 
-            ORDER BY km.urutan ASC, m.urutan ASC, m.nama_mapel ASC
+            ORDER BY COALESCE(km.urutan, 9999) ASC, COALESCE(m.urutan, 9999) ASC, m.nama_mapel ASC
         ");
         $this->db->bind('siswa_id', $siswa_id);
         $this->db->bind('tahun_id', $tahun_id);
@@ -268,10 +268,10 @@ class EraporModel {
     public function getAllMapel()
     {
         $this->db->query("
-            SELECT m.*, km.nama_kelompok
+            SELECT m.*, km.nama_kelompok, km.urutan as urutan_kelompok
             FROM mata_pelajaran m
             LEFT JOIN kelompok_mapel km ON m.kelompok_id = km.id
-            ORDER BY km.urutan ASC, m.urutan ASC, m.nama_mapel ASC
+            ORDER BY COALESCE(km.urutan, 9999) ASC, COALESCE(m.urutan, 9999) ASC, m.nama_mapel ASC
         ");
         return $this->db->resultSet();
     }
