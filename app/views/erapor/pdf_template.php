@@ -6,97 +6,105 @@
     <style>
         body { 
             font-family: Arial, sans-serif; 
-            margin: 15px; 
-            font-size: 10pt; 
-            line-height: 1.3;
+            margin: 0; 
+            padding: 0;
+            font-size: 8.5pt; 
+            line-height: 1.15;
+            color: #111;
         }
         .header-table { 
             width: 100%; 
             border-collapse: collapse; 
-            margin-bottom: 15px; 
+            margin-bottom: 8px; 
         }
         .header-table td { 
-            padding: 4px; 
+            padding: 1.5px 3px; 
             border: none; 
             vertical-align: top; 
         }
-        .header-left { width: 60%; }
-        .header-right { width: 40%; }
+        .header-left { width: 55%; }
+        .header-right { width: 45%; }
         
         .info-row { 
-            margin-bottom: 3px; 
+            margin-bottom: 1px; 
         }
         .label { 
             font-weight: bold; 
-            width: 120px; 
+            width: 100px; 
             display: inline-block;
         }
-        .colon { margin: 0 5px; }
+        .colon { margin: 0 4px; }
         
         .nilai-table, .kehadiran-table { 
             width: 100%; 
             border-collapse: collapse; 
-            margin-bottom: 15px; 
-            font-size: 9pt;
+            margin-bottom: 8px; 
+            font-size: 8pt;
         }
         .nilai-table th, .nilai-table td, .kehadiran-table th, .kehadiran-table td { 
             border: 1px solid #000; 
-            padding: 4px; 
+            padding: 2.5px 4px; 
         }
         .nilai-table th { 
             background-color: #f0f0f0; 
             text-align: center; 
             font-weight: bold;
+            padding: 3px 4px;
         }
         .kelompok-header { 
-            background-color: #e0e0e0; 
+            background-color: #e8e8e8; 
             font-weight: bold; 
         }
         .text-center { text-align: center; }
         .text-left { text-align: left; }
         
-        .catatan-section { margin-bottom: 15px; }
-        .catatan-section h4 { font-size: 10pt; margin-bottom: 5px; }
+        .catatan-section { margin-bottom: 8px; }
+        .catatan-section h4 { font-size: 8.5pt; margin: 4px 0 2px 0; font-weight: bold; }
         .catatan-section p { 
             border: 1px solid #000; 
-            padding: 8px; 
-            min-height: 50px;
-            font-size: 9pt;
+            padding: 5px 8px; 
+            min-height: 28px; 
+            font-size: 8pt;
             margin: 0;
+            line-height: 1.2;
         }
-        h4 { font-size: 10pt; margin: 8px 0 5px 0; }
+        h4 { font-size: 8.5pt; margin: 4px 0 2px 0; font-weight: bold; }
         
-        /* TANDA TANGAN */
+        /* TANDA TANGAN (COMPACT & TIDAK PECAH HALAMAN) */
         .signature-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 40px;
+            margin-top: 10px;
+            page-break-inside: avoid;
         }
         .signature-table td {
             vertical-align: top;
             padding: 0;
+            border: none;
         }
         .signature-cell {
             display: inline-block;
             text-align: center;
         }
         .signature-line {
-            width: 200px;
+            width: 160px;
             height: 1px;
             border-bottom: 1px solid #000;
-            margin: 50px auto 5px auto;
+            margin: 30px auto 2px auto;
         }
         .signature-name {
-            margin-top: 5px;
+            margin-top: 2px;
             font-weight: bold;
+            font-size: 8.5pt;
         }
         .signature-role {
-            margin-top: 2px;
-            font-size: 9pt;
+            font-size: 8.5pt;
+            font-weight: 500;
         }
         .know-text {
-            margin-bottom: 40px;
+            margin-bottom: 2px;
             font-weight: bold;
+            font-size: 8.5pt;
         }
     </style>
 </head>
@@ -215,27 +223,27 @@
             <tr>
                 <td width="50%" style="text-align: center; vertical-align: top; padding: 0;">
                     <div class="signature-cell">
-                        <div class="signature-role">Orang Tua/Wali</div><br><br><br>
-                        <div class="signature-line"></div>
-                        <div class="signature-name" style="margin-top: 5px;">(___________________)</div>
+                        <div class="signature-role">Orang Tua/Wali</div>
+                        <div class="signature-line" style="margin-top: 45px;"></div>
+                        <div class="signature-name">(___________________)</div>
                     </div>
                 </td>
                 
                 <td width="50%" style="text-align: center; vertical-align: top; padding: 0;">
                     <div class="signature-cell">
-                        <div class="signature-role">Wali Kelas</div><br><br><br>
-                        <div class="signature-line"></div>
-                        <div class="signature-name" style="margin-top: 5px;"><u><?= htmlspecialchars($wali_name) ?></u></div>
+                        <div class="signature-role">Wali Kelas</div>
+                        <div class="signature-line" style="margin-top: 45px;"></div>
+                        <div class="signature-name"><u><?= htmlspecialchars($wali_name) ?></u></div>
                     </div>
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="text-align: center; vertical-align: top; padding: 20px 0 0 0;">
+                <td colspan="2" style="text-align: center; vertical-align: top; padding: 12px 0 0 0;">
                     <div class="signature-cell">
-                        <div class="know-text" style="margin-bottom: 20px;">Mengetahui</div>
-                        <div class="signature-role">Kepala Sekolah</div><br><br><br>
-                        <div class="signature-line"></div>
-                        <div class="signature-name" style="margin-top: 5px;"><u><?= htmlspecialchars($kepsek_name) ?></u></div>
+                        <div class="know-text">Mengetahui,</div>
+                        <div class="signature-role">Kepala Sekolah</div>
+                        <div class="signature-line" style="margin-top: 45px;"></div>
+                        <div class="signature-name"><u><?= htmlspecialchars($kepsek_name) ?></u></div>
                     </div>
                 </td>
             </tr>

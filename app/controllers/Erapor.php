@@ -562,12 +562,12 @@ class Erapor extends Controller {
                 include $rapor_template;
                 $content = ob_get_clean();
                 
-                // Tambah halaman baru dengan margin yang sesuai untuk Rapor
+                // Tambah halaman baru dengan margin yang presisi agar pas dalam 1 lembar tanpa tumpah ke halaman berikutnya
                 $mpdf->AddPageByArray([
-                    'margin-left' => 15,
-                    'margin-right' => 15,
-                    'margin-top' => 15,
-                    'margin-bottom' => 15,
+                    'margin-left' => 12,
+                    'margin-right' => 12,
+                    'margin-top' => 10,
+                    'margin-bottom' => 10,
                 ]);
                 $mpdf->WriteHTML($content);
             }
